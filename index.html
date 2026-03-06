@@ -1,1 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a0a2e">
+<meta name="description" content="Hamster RPG — Tools, character builders, and resources for your tabletop adventures.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Hamster RPG — Tabletop Tools & Resources</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Favicon / icon from ref folder -->
+<link rel="icon" type="image/png" href="ref/favicon.png">
+<style>
+  :root {
+    --bg-deep:      #0f0e2a;
+    --bg-card:      #181640;
+    --bg-card2:     #1e1c50;
+    --bg-card3:     #13122e;
+    --accent-gold:  #e8c84a;
+    --accent-gold2: #f5d660;
+    --accent-hope:  #2ecfd4;
+    --accent-fear:  #e04444;
+    --accent-teal:  #2ecfd4;
+    --accent-purple:#6b5ce7;
+    --text-primary: #ffffff;
+    --text-muted:   #9b9bc4;
+    --text-gold:    #e8c84a;
+    --border:       rgba(232,200,74,0.2);
+    --border-bright:rgba(232,200,74,0.55);
+    --shadow:       0 8px 40px rgba(0,0,0,0.6);
+    --glow-gold:    0 0 20px rgba(201,168,76,0.3);
+    --glow-hope:    0 0 20px rgba(46,207,212,0.4);
+    --transition:   all 0.25s cubic-bezier(0.4,0,0.2,1);
+    --radius:       12px;
+  }
 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-deep);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background glow layers */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 15%  0%,  rgba(107,92,231,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 85% 90%,  rgba(46,207,212,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 50%,  rgba(30,28,80,0.4)   0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─────────────────── LAYOUT SHELL ─────────────────── */
+  #page { position: relative; z-index: 1; }
+
+  /* ─────────────────── HEADER ─────────────────── */
+  .site-header {
+    text-align: center;
+    padding: clamp(32px, 6vw, 64px) 20px clamp(24px, 4vw, 44px);
+    border-bottom: 2px solid rgba(232,200,74,0.25);
+    background: linear-gradient(180deg, rgba(107,92,231,0.14) 0%, transparent 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Decorative shimmer lines in the header */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        105deg,
+        transparent 0px,
+        transparent 80px,
+        rgba(232,200,74,0.025) 80px,
+        rgba(232,200,74,0.025) 81px
+      );
+    pointer-events: none;
+  }
+
+  .site-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 8%; right: 8%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+  }
+
+  .logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  /* Site logo — pulls from ref/ folder */
+  .logo-wrap img {
+    height: clamp(56px, 10vw, 96px);
+    width: auto;
+    filter: drop-shadow(0 0 20px rgba(232,200,74,0.35));
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px);  }
+    50%       { transform: translateY(-6px); }
+  }
+
+  .site-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.9rem, 6vw, 3.8rem);
+    font-weight: 700;
+    color: var(--accent-gold2);
+    text-shadow:
+      0 0 30px rgba(232,200,74,0.5),
+      0 0 60px rgba(232,200,74,0.2),
+      0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    animation: fade-down 0.7s ease both;
+  }
+
+  .header-divider {
+    width: 220px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(46,207,212,0.6), transparent);
+    margin: 10px auto 12px;
+  }
+
+  .site-tagline {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.6rem, 1.8vw, 0.78rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    animation: fade-up 0.9s 0.2s ease both;
+  }
+
+  /* ─────────────────── NAV ─────────────────── */
+  .site-nav {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    padding: 0 12px;
+    border-bottom: 1px solid rgba(232,200,74,0.12);
+    background: rgba(15,14,42,0.7);
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .site-nav a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 13px 20px;
+    border-bottom: 3px solid transparent;
+    transition: var(--transition);
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .site-nav a:hover {
+    color: #fff;
+    border-bottom-color: rgba(232,200,74,0.4);
+  }
+
+  /* ─────────────────── MAIN CONTENT ─────────────────── */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(24px, 4vw, 48px) clamp(14px, 3vw, 28px) 80px;
+  }
+
+  /* ─────────────────── SECTION HEADING ─────────────────── */
+  .section-heading {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .section-heading::before,
+  .section-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(232,200,74,0.4));
+  }
+
+  .section-heading::before {
+    background: linear-gradient(to left, transparent, rgba(232,200,74,0.4));
+  }
+
+  /* ─────────────────── HERO BANNER ─────────────────── */
+  .hero {
+    text-align: center;
+    padding: clamp(28px, 5vw, 56px) 20px;
+    margin-bottom: clamp(28px, 4vw, 48px);
+    background: linear-gradient(160deg, rgba(30,28,80,0.7) 0%, rgba(15,14,42,0.85) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(232,200,74,0.5), rgba(46,207,212,0.4), transparent);
+  }
+
+  /* Decorative star/diamond ornaments */
+  .hero::after {
+    content: '✦';
+    position: absolute;
+    bottom: 14px; right: 20px;
+    font-size: 0.7rem;
+    color: rgba(232,200,74,0.25);
+    letter-spacing: 8px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+    margin-bottom: 12px;
+  }
+
+  .hero-headline {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.3rem, 4vw, 2.4rem);
+    color: #fff;
+    line-height: 1.25;
+    margin-bottom: 16px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  }
+
+  .hero-headline span {
+    color: var(--accent-gold2);
+    text-shadow: 0 0 20px rgba(232,200,74,0.4);
+  }
+
+  .hero-body {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--text-muted);
+    max-width: 620px;
+    margin: 0 auto 28px;
+    font-style: italic;
+  }
+
+  .hero-cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ─────────────────── TOOL CARDS GRID ─────────────────── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: 18px;
+    margin-bottom: clamp(36px, 5vw, 60px);
+  }
+
+  .tool-card {
+    background: linear-gradient(160deg, rgba(30,28,80,0.95) 0%, rgba(15,14,42,0.98) 100%);
+    border: 1px solid rgba(232,200,74,0.18);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(232,200,74,0.5), rgba(46,207,212,0.4), transparent);
+    pointer-events: none;
+  }
+
+  .tool-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(232,200,74,0.0) 0%, rgba(232,200,74,0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+
+  .tool-card:hover {
+    border-color: rgba(232,200,74,0.42);
+    box-shadow: 0 0 28px rgba(232,200,74,0.15), var(--shadow);
+    transform: translateY(-3px);
+  }
+
+  .tool-card:hover::after { opacity: 1; }
+
+  /* accent top-bar colour variants */
+  .tool-card.teal::before {
+    background: linear-gradient(to right, transparent, rgba(46,207,212,0.7), rgba(46,207,212,0.3), transparent);
+  }
+  .tool-card.teal:hover { border-color: rgba(46,207,212,0.4); box-shadow: 0 0 28px rgba(46,207,212,0.18), var(--shadow); }
+
+  .tool-card.purple::before {
+    background: linear-gradient(to right, transparent, rgba(107,92,231,0.7), rgba(107,92,231,0.3), transparent);
+  }
+  .tool-card.purple:hover { border-color: rgba(107,92,231,0.4); box-shadow: 0 0 28px rgba(107,92,231,0.2), var(--shadow); }
+
+  .tool-card.red::before {
+    background: linear-gradient(to right, transparent, rgba(224,68,68,0.7), rgba(224,68,68,0.3), transparent);
+  }
+  .tool-card.red:hover { border-color: rgba(224,68,68,0.4); box-shadow: 0 0 28px rgba(224,68,68,0.2), var(--shadow); }
+
+  .tool-icon {
+    font-size: 1.9rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 8px rgba(232,200,74,0.3));
+  }
+
+  .tool-card.teal  .tool-icon { filter: drop-shadow(0 0 8px rgba(46,207,212,0.3)); }
+  .tool-card.purple .tool-icon { filter: drop-shadow(0 0 8px rgba(107,92,231,0.4)); }
+  .tool-card.red    .tool-icon { filter: drop-shadow(0 0 8px rgba(224,68,68,0.4)); }
+
+  .tool-badge {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid;
+    align-self: flex-start;
+  }
+
+  .badge-gold   { color: var(--accent-gold);  border-color: rgba(232,200,74,0.4);  background: rgba(232,200,74,0.08);  }
+  .badge-teal   { color: var(--accent-teal);  border-color: rgba(46,207,212,0.4);  background: rgba(46,207,212,0.08);  }
+  .badge-purple { color: #9d90f0;             border-color: rgba(107,92,231,0.4);  background: rgba(107,92,231,0.08);  }
+  .badge-red    { color: var(--accent-fear);  border-color: rgba(224,68,68,0.4);   background: rgba(224,68,68,0.08);   }
+  .badge-muted  { color: var(--text-muted);   border-color: rgba(155,155,196,0.3); background: rgba(155,155,196,0.05); }
+
+  .tool-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.88rem;
+    letter-spacing: 0.08em;
+    color: var(--accent-gold2);
+    text-transform: uppercase;
+  }
+
+  .tool-card.teal   .tool-name { color: var(--accent-teal);  }
+  .tool-card.purple .tool-name { color: #b3a8ff;              }
+  .tool-card.red    .tool-name { color: #ef8080;              }
+
+  .tool-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex: 1;
+    line-height: 1.55;
+  }
+
+  .tool-link-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-top: 4px;
+  }
+
+  .tool-card.teal   .tool-link-row { color: var(--accent-teal); }
+  .tool-card.purple .tool-link-row { color: #b3a8ff; }
+  .tool-card.red    .tool-link-row { color: #ef8080; }
+
+  .tool-link-row::after {
+    content: '→';
+    transition: transform 0.2s;
+  }
+
+  .tool-card:hover .tool-link-row::after { transform: translateX(4px); }
+
+  /* ─────────────────── ABOUT / FEATURE STRIP ─────────────────── */
+  .features-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+    gap: 14px;
+    margin-bottom: clamp(36px, 5vw, 60px);
+  }
+
+  .feature-item {
+    background: rgba(30,28,80,0.55);
+    border: 1px solid rgba(232,200,74,0.12);
+    border-radius: 8px;
+    padding: 18px 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .feature-icon { font-size: 1.5rem; }
+
+  .feature-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+  }
+
+  .feature-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ─────────────────── LATEST UPDATES ─────────────────── */
+  .updates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: clamp(36px, 5vw, 60px);
+    border: 1px solid rgba(232,200,74,0.15);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .update-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(232,200,74,0.1);
+    background: linear-gradient(90deg, rgba(30,28,80,0.7) 0%, rgba(15,14,42,0.85) 100%);
+    transition: background 0.2s;
+  }
+
+  .update-item:last-child { border-bottom: none; }
+  .update-item:hover { background: linear-gradient(90deg, rgba(40,36,90,0.9) 0%, rgba(24,22,64,0.95) 100%); }
+
+  .update-date {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .update-text {
+    font-size: 0.92rem;
+    color: var(--text-primary);
+  }
+
+  .update-text strong {
+    color: var(--accent-gold2);
+    font-weight: 600;
+  }
+
+  /* ─────────────────── BUTTONS ─────────────────── */
+  .btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 11px 24px;
+    border: 1.5px solid var(--accent-gold);
+    background: transparent;
+    color: var(--accent-gold2);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(232,200,74,0.0) 0%, rgba(232,200,74,0.08) 100%);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .btn:hover::before { opacity: 1; }
+  .btn:hover {
+    border-color: var(--accent-gold2);
+    box-shadow: 0 0 16px rgba(232,200,74,0.28), inset 0 0 8px rgba(232,200,74,0.06);
+    color: #fff;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #d4a820 0%, #e8c84a 50%, #c9a010 100%);
+    color: #0f0e2a;
+    border-color: #e8c84a;
+    font-weight: 700;
+    box-shadow: 0 2px 16px rgba(232,200,74,0.3);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #e8c84a 0%, #f5d660 50%, #d4a820 100%);
+    box-shadow: 0 4px 24px rgba(232,200,74,0.5);
+    color: #0f0e2a;
+  }
+
+  .btn-teal {
+    border-color: var(--accent-teal);
+    color: var(--accent-teal);
+  }
+
+  .btn-teal:hover {
+    background: rgba(46,207,212,0.1);
+    box-shadow: 0 0 16px rgba(46,207,212,0.3);
+    color: #fff;
+  }
+
+  /* ─────────────────── FOOTER ─────────────────── */
+  .site-footer {
+    border-top: 1px solid rgba(232,200,74,0.15);
+    padding: 32px 20px;
+    text-align: center;
+    background: rgba(15,14,42,0.8);
+    position: relative;
+  }
+
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: 10%; right: 10%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+  }
+
+  .footer-logo-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .footer-logo-row img {
+    height: 28px;
+    width: auto;
+    opacity: 0.7;
+    filter: drop-shadow(0 0 6px rgba(232,200,74,0.2));
+  }
+
+  .footer-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  .footer-links a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--accent-gold2); }
+
+  .footer-copy {
+    font-size: 0.78rem;
+    color: rgba(155,155,196,0.5);
+    font-style: italic;
+  }
+
+  /* ─────────────────── ORNAMENT ─────────────────── */
+  .ornament {
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    color: rgba(232,200,74,0.3);
+    font-size: 0.7rem;
+    letter-spacing: 12px;
+    margin: 8px 0 28px;
+    user-select: none;
+  }
+
+  /* ─────────────────── ANIMATIONS ─────────────────── */
+  @keyframes fade-down {
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .tools-grid .tool-card {
+    animation: fade-up 0.5s ease both;
+  }
+
+  .tools-grid .tool-card:nth-child(1) { animation-delay: 0.05s; }
+  .tools-grid .tool-card:nth-child(2) { animation-delay: 0.12s; }
+  .tools-grid .tool-card:nth-child(3) { animation-delay: 0.19s; }
+  .tools-grid .tool-card:nth-child(4) { animation-delay: 0.26s; }
+  .tools-grid .tool-card:nth-child(5) { animation-delay: 0.33s; }
+  .tools-grid .tool-card:nth-child(6) { animation-delay: 0.40s; }
+
+  /* ─────────────────── RESPONSIVE ─────────────────── */
+  @media (max-width: 500px) {
+    .update-item {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    .update-date { order: -1; }
+  }
+</style>
+</head>
+<body>
+<div id="page">
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="logo-wrap">
+      <!-- Replace with your actual logo path, e.g. ref/logo.png or img/logo.png -->
+      <img src="ref/logo.png" alt="Hamster RPG Logo" onerror="this.style.display='none'">
+    </div>
+    <h1 class="site-title">Hamster RPG</h1>
+    <div class="header-divider"></div>
+    <p class="site-tagline">Tools &amp; Resources for Tabletop Adventurers</p>
+  </header>
+
+  <!-- ===== STICKY NAV ===== -->
+  <nav class="site-nav" aria-label="Site navigation">
+    <a href="#tools">Tools</a>
+    <a href="#updates">Updates</a>
+    <a href="#about">About</a>
+    <a href="https://github.com/Hamster-RPG" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- HERO -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <p class="hero-eyebrow">✦ Welcome, Adventurer ✦</p>
+      <h2 class="hero-headline" id="hero-heading">
+        Your <span>forge</span> for every<br>tabletop session
+      </h2>
+      <p class="hero-body">
+        Free, browser-based tools built to help you create characters, track resources,
+        and roll dice — no login, no install, just play.
+      </p>
+      <div class="hero-cta-row">
+        <a href="daggerheart-character-forge.html" class="btn btn-primary">Open Character Forge</a>
+        <a href="#tools" class="btn btn-teal">Browse All Tools</a>
+      </div>
+    </section>
+
+    <!-- TOOLS SECTION -->
+    <section id="tools" aria-labelledby="tools-heading">
+      <h2 class="section-heading" id="tools-heading">Available Tools</h2>
+
+      <div class="tools-grid">
+
+        <!-- Daggerheart Character Forge -->
+        <a href="daggerheart-character-forge.html" class="tool-card">
+          <div class="tool-icon">⚔️</div>
+          <span class="tool-badge badge-gold">Daggerheart</span>
+          <div class="tool-name">Character Forge</div>
+          <div class="tool-desc">
+            Build and manage Daggerheart characters with a full step-by-step wizard,
+            live tracker, domain card manager, and integrated dice roller.
+          </div>
+          <div class="tool-link-row">Open Tool</div>
+        </a>
+
+        <!-- Placeholder: Dice Vault -->
+        <div class="tool-card teal" style="opacity:0.7; cursor:default;">
+          <div class="tool-icon">🎲</div>
+          <span class="tool-badge badge-muted">Coming Soon</span>
+          <div class="tool-name">Dice Vault</div>
+          <div class="tool-desc">
+            A standalone dice roller supporting custom dice pools, modifiers,
+            advantage/disadvantage, and session history logging.
+          </div>
+          <div class="tool-link-row" style="opacity:0.5;">In Development</div>
+        </div>
+
+        <!-- Placeholder: Session Notes -->
+        <div class="tool-card purple" style="opacity:0.7; cursor:default;">
+          <div class="tool-icon">📜</div>
+          <span class="tool-badge badge-muted">Coming Soon</span>
+          <div class="tool-name">Session Scribe</div>
+          <div class="tool-desc">
+            Lightweight session notes organiser — track NPCs, locations, plot hooks,
+            and party loot without leaving the browser.
+          </div>
+          <div class="tool-link-row" style="opacity:0.5;">In Development</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FEATURE STRIP -->
+    <section id="about" aria-labelledby="about-heading">
+      <h2 class="section-heading" id="about-heading">Why Hamster RPG</h2>
+      <div class="features-strip">
+        <div class="feature-item">
+          <div class="feature-icon">🌐</div>
+          <div class="feature-label">Browser-Native</div>
+          <div class="feature-text">Nothing to install. Works on phone, tablet, and desktop.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-label">Local Storage</div>
+          <div class="feature-text">Your data stays on your device — no accounts, no servers.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-label">Fast & Offline</div>
+          <div class="feature-text">Tools load instantly and work without an internet connection.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🎲</div>
+          <div class="feature-label">System Agnostic</div>
+          <div class="feature-text">Built around Daggerheart today, with more TTRPGs on the horizon.</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🛠️</div>
+          <div class="feature-label">Open Source</div>
+          <div class="feature-text">All tools are open on GitHub. Contributions and forks welcome.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPDATES SECTION -->
+    <section id="updates" aria-labelledby="updates-heading">
+      <h2 class="section-heading" id="updates-heading">Latest Updates</h2>
+      <div class="updates-list">
+        <div class="update-item">
+          <span class="update-date">2025 · Jun</span>
+          <span class="update-text"><strong>Character Forge v1.0</strong> — Full Daggerheart character creation wizard, tracker, and dice roller launched.</span>
+          <span class="tool-badge badge-gold">New</span>
+        </div>
+        <div class="update-item">
+          <span class="update-date">2025 · Jun</span>
+          <span class="update-text"><strong>Site Launch</strong> — Hamster RPG goes live on GitHub Pages.</span>
+          <span class="tool-badge badge-teal">Site</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="footer-logo-row">
+      <img src="ref/logo.png" alt="" aria-hidden="true" onerror="this.style.display='none'">
+      <span class="footer-title">Hamster RPG</span>
+    </div>
+    <nav class="footer-links" aria-label="Footer navigation">
+      <a href="#tools">Tools</a>
+      <a href="#about">About</a>
+      <a href="https://github.com/Hamster-RPG" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+    <p class="footer-copy">
+      Made with ♥ for the tabletop community &nbsp;·&nbsp;
+      Not affiliated with Darrington Press or Critical Role.
+    </p>
+  </footer>
+
+</div><!-- /page -->
+</body>
+</html>

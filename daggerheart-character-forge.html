@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a0a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Daggerheart — Character Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0f0e2a;
+    --bg-card: #181640;
+    --bg-card2: #1e1c50;
+    --bg-card3: #13122e;
+    --accent-gold: #e8c84a;
+    --accent-gold2: #f5d660;
+    --accent-hope: #2ecfd4;
+    --accent-fear: #e04444;
+    --accent-teal: #2ecfd4;
+    --accent-purple: #6b5ce7;
+    --text-primary: #ffffff;
+    --text-muted: #9b9bc4;
+    --text-gold: #e8c84a;
+    --border: rgba(232,200,74,0.2);
+    --border-bright: rgba(232,200,74,0.55);
+    --shadow: 0 8px 40px rgba(0,0,0,0.6);
+    --glow-gold: 0 0 20px rgba(201,168,76,0.3);
+    --glow-hope: 0 0 20px rgba(46,207,212,0.4);
+    --glow-fear: 0 0 20px rgba(192,64,64,0.4);
+    --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-deep);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 70% 50% at 15% 0%, rgba(107,92,231,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 85% 90%, rgba(46,207,212,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(30,28,80,0.4) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 12px 80px; }
+
+  /* ========= HEADER ========= */
+  .app-header {
+    text-align: center;
+    padding: 24px 20px 16px;
+    border-bottom: 2px solid rgba(232,200,74,0.3);
+    margin-bottom: 0;
+    background: linear-gradient(180deg, rgba(107,92,231,0.12) 0%, transparent 100%);
+    position: relative;
+  }
+  .app-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 10%; right: 10%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+  }
+  .header-logo-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .header-logo-img {
+    height: clamp(28px, 5vw, 44px);
+    width: auto;
+    filter: drop-shadow(0 0 12px rgba(232,200,74,0.3));
+  }
+  .header-divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(46,207,212,0.5), transparent);
+    margin: 6px auto 8px;
+  }
+  .app-header .subtitle {
+    font-family: 'Cinzel', serif;
+    color: var(--accent-teal);
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+  }
+
+  /* ========= NAV TABS ========= */
+  .nav-tabs {
+    display: flex;
+    gap: 2px;
+    padding: 0;
+    border-bottom: 1px solid rgba(232,200,74,0.15);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    background: rgba(15,14,42,0.6);
+  }
+  .nav-tab {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 12px 18px;
+    border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+    position: relative;
+  }
+  .nav-tab:hover { color: #ffffff; border-bottom-color: rgba(232,200,74,0.4); }
+  .nav-tab.active {
+    color: var(--accent-gold2);
+    border-bottom-color: var(--accent-gold);
+    background: rgba(232,200,74,0.06);
+  }
+  .nav-tab.active::before {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 20%; right: 20%;
+    height: 2px;
+    background: var(--accent-teal);
+    border-radius: 2px 2px 0 0;
+  }
+
+  /* ========= VIEWS ========= */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ========= CARDS ========= */
+  .card {
+    background: linear-gradient(160deg, rgba(30,28,80,0.95) 0%, rgba(15,14,42,0.98) 100%);
+    border: 1px solid rgba(232,200,74,0.18);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(232,200,74,0.5), rgba(46,207,212,0.4), transparent);
+    pointer-events: none;
+  }
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-gold);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, rgba(232,200,74,0.45), transparent);
+  }
+
+  /* ========= BUTTONS ========= */
+  .btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border: 1.5px solid var(--accent-gold);
+    background: transparent;
+    color: var(--accent-gold2);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(232,200,74,0.0) 0%, rgba(232,200,74,0.08) 100%);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn:hover::before { opacity: 1; }
+  .btn:hover { border-color: var(--accent-gold2); box-shadow: 0 0 14px rgba(232,200,74,0.25), inset 0 0 8px rgba(232,200,74,0.05); color: #fff; }
+  .btn.btn-primary { 
+    background: linear-gradient(135deg, #d4a820 0%, #e8c84a 50%, #c9a010 100%); 
+    color: #0f0e2a; 
+    border-color: #e8c84a;
+    font-weight: 700;
+    box-shadow: 0 2px 16px rgba(232,200,74,0.3);
+  }
+  .btn.btn-primary:hover { background: linear-gradient(135deg, #e8c84a 0%, #f5d660 50%, #d4a820 100%); box-shadow: 0 4px 24px rgba(232,200,74,0.5); }
+  .btn.btn-hope { border-color: var(--accent-teal); color: var(--accent-teal); }
+  .btn.btn-hope:hover { background: rgba(46,207,212,0.12); box-shadow: 0 0 14px rgba(46,207,212,0.3); }
+  .btn.btn-fear { border-color: var(--accent-fear); color: var(--accent-fear); }
+  .btn.btn-fear:hover { background: rgba(224,68,68,0.12); box-shadow: 0 0 20px rgba(224,68,68,0.4); }
+  .btn.btn-teal { border-color: var(--accent-teal); color: var(--accent-teal); }
+  .btn.btn-teal:hover { background: rgba(46,207,212,0.1); }
+  .btn.btn-sm { padding: 5px 12px; font-size: 0.65rem; }
+  .btn.btn-danger { border-color: #e04444; color: #e06060; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+  /* ========= FORM ELEMENTS ========= */
+  label { display: block; font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; margin-top: 12px; }
+  label:first-child { margin-top: 0; }
+  input[type=text], input[type=number], textarea, select {
+    width: 100%;
+    background: rgba(10,9,30,0.7);
+    border: 1px solid rgba(232,200,74,0.22);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    padding: 8px 12px;
+    transition: var(--transition);
+    outline: none;
+    -webkit-appearance: none;
+  }
+  input[type=text]:focus, input[type=number]:focus, textarea:focus, select:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 2px rgba(232,200,74,0.15);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: #1e1235; color: var(--text-primary); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media(max-width: 520px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } }
+
+  /* ========= STAT DISPLAY ========= */
+  .trait-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media(max-width: 420px) { .trait-grid { grid-template-columns: repeat(2, 1fr); } }
+  .trait-box {
+    background: rgba(15,14,42,0.8);
+    border: 1px solid rgba(232,200,74,0.2);
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    transition: var(--transition);
+    cursor: default;
+  }
+  .trait-box:hover { border-color: rgba(232,200,74,0.45); }
+  .trait-name { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); }
+  .trait-val { font-family: 'Cinzel Decorative', serif; font-size: 1.7rem; color: var(--accent-gold2); line-height: 1.1; margin: 2px 0; }
+  .trait-val.negative { color: #e06060; }
+  .trait-val.positive { color: var(--accent-teal); }
+
+  /* ========= TRACKER BUBBLES ========= */
+  .bubble-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 6px; }
+  .bubble {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(232,200,74,0.25);
+    background: transparent;
+    cursor: pointer;
+    transition: var(--transition);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem;
+    font-family: 'Cinzel', serif;
+    color: transparent;
+  }
+  .bubble.hope { border-color: rgba(46,207,212,0.5); }
+  .bubble.hope.filled { background: var(--accent-teal); box-shadow: 0 0 10px rgba(46,207,212,0.5); border-color: var(--accent-teal); color: #0f0e2a; }
+  .bubble.fear { border-color: rgba(192,64,64,0.5); }
+  .bubble.fear.filled { background: var(--accent-fear); box-shadow: 0 0 10px rgba(192,64,64,0.4); border-color: var(--accent-fear); color: white; }
+  .bubble.stress { border-color: rgba(180,80,220,0.5); }
+  .bubble.stress.filled { background: #7830b0; box-shadow: 0 0 10px rgba(150,60,200,0.5); border-color: #b060e0; color: white; }
+  .bubble.armor { border-color: rgba(160,160,80,0.5); }
+  .bubble.armor.filled { background: #808030; box-shadow: 0 0 10px rgba(120,120,40,0.3); border-color: #c0c040; color: white; }
+  .bubble.hp { border-color: rgba(80,200,100,0.4); }
+  .bubble.hp.filled { background: #2a7040; border-color: #40b060; color: white; }
+  .bubble.hp.minor-dmg { background: rgba(200,150,50,0.3); border-color: rgba(200,150,50,0.7); }
+  .bubble.hp.major-dmg { background: rgba(200,60,60,0.3); border-color: rgba(200,60,60,0.7); }
+  .bubble.hp.severe-dmg { background: rgba(140,20,20,0.5); border-color: rgba(200,20,20,0.8); }
+
+  /* ========= BIG TRACKER NUMBERS ========= */
+  .tracker-section { margin-bottom: 20px; }
+  .tracker-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .tracker-label .count { color: var(--text-primary); font-family: 'Cinzel Decorative', serif; font-size: 1rem; }
+
+  /* ========= HP DAMAGE THRESHOLDS ========= */
+  .threshold-display {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .threshold-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    border: 1px solid;
+  }
+  .threshold-badge.minor { border-color: rgba(200,150,50,0.7); color: #c08030; background: rgba(200,150,50,0.1); }
+  .threshold-badge.major { border-color: rgba(200,80,60,0.7); color: #c04030; background: rgba(200,80,60,0.1); }
+  .threshold-badge.severe { border-color: rgba(180,20,20,0.8); color: #c02020; background: rgba(180,20,20,0.15); }
+
+  /* ========= ABILITY CARDS ========= */
+  .ability-list { display: flex; flex-direction: column; gap: 10px; }
+  .ability-card {
+    background: rgba(15,14,42,0.7);
+    border: 1px solid rgba(232,200,74,0.18);
+    border-radius: 8px;
+    padding: 12px 14px;
+    position: relative;
+    transition: var(--transition);
+  }
+  .ability-card:hover { border-color: rgba(232,200,74,0.45); background: rgba(30,28,80,0.8); }
+  .ability-card .ability-name { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--accent-gold2); margin-bottom: 4px; }
+  .ability-card .ability-domain { font-size: 0.7rem; color: var(--accent-teal); font-style: italic; }
+  .ability-card .ability-desc { color: var(--text-muted); font-size: 0.9rem; margin-top: 6px; }
+  .ability-card .ability-cost {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 0.7rem; font-family: 'Cinzel', serif;
+    padding: 2px 8px; border-radius: 12px;
+    border: 1px solid rgba(46,207,212,0.5);
+    color: var(--accent-teal);
+    background: rgba(46,207,212,0.08);
+  }
+  .ability-used { opacity: 0.45; }
+  .ability-used .ability-name::after { content: ' [USED]'; color: var(--accent-fear); font-size: 0.7rem; }
+
+  /* ========= EQUIPMENT LIST ========= */
+  .equip-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: rgba(15,14,42,0.6);
+    border: 1px solid rgba(232,200,74,0.18);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: var(--transition);
+  }
+  .equip-item:hover { border-color: rgba(232,200,74,0.45); }
+  .equip-item .equip-name { flex: 1; font-size: 0.95rem; }
+  .equip-item .equip-qty {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--accent-gold);
+    background: rgba(232,200,74,0.1);
+    border: 1px solid rgba(232,200,74,0.3);
+    border-radius: 4px;
+    padding: 2px 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .equip-item .equip-qty:hover { background: rgba(232,200,74,0.2); }
+
+  /* ========= CHARACTER BUILDER WIZARD ========= */
+  .wizard-progress {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 28px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(232,200,74,0.12);
+  }
+  .wizard-step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(232,200,74,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+  }
+  .wizard-step-dot::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: -18px;
+    left: 50%; transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.5rem;
+    letter-spacing: 0.05em;
+    display: none;
+  }
+  @media(min-width: 600px) { .wizard-step-dot::after { display: block; } }
+  .wizard-step-dot.done { border-color: var(--accent-gold); background: rgba(232,200,74,0.15); color: var(--accent-gold2); }
+  .wizard-step-dot.active { border-color: var(--accent-teal); background: rgba(46,207,212,0.12); color: var(--accent-teal); box-shadow: 0 0 12px rgba(46,207,212,0.3); }
+  .wizard-connector {
+    width: 20px; height: 2px;
+    background: rgba(232,200,74,0.18);
+    align-self: center;
+    margin-bottom: 18px;
+  }
+  @media(max-width: 599px) { .wizard-connector { margin-bottom: 0; } }
+  .wizard-page { display: none; animation: fadeIn 0.3s ease; }
+  .wizard-page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .wizard-nav { display: flex; justify-content: space-between; margin-top: 20px; }
+
+  /* ========= CLASS SELECTOR ========= */
+  .class-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media(max-width: 500px) { .class-grid { grid-template-columns: repeat(2, 1fr); } }
+  .class-card {
+    border: 1px solid rgba(232,200,74,0.2);
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    background: rgba(15,14,42,0.7);
+    position: relative;
+    overflow: hidden;
+  }
+  .class-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+  .class-card:hover { border-color: rgba(232,200,74,0.5); background: rgba(30,28,80,0.8); }
+  .class-card:hover::after { background: linear-gradient(to right, transparent, var(--accent-gold), transparent); }
+  .class-card.selected { border-color: var(--accent-teal); background: rgba(46,207,212,0.08); box-shadow: 0 0 20px rgba(46,207,212,0.15); }
+  .class-card.selected::after { background: linear-gradient(to right, transparent, var(--accent-teal), transparent); }
+  .class-card .class-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .class-card .class-name { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.1em; color: var(--accent-gold2); }
+  .class-card .class-domains { font-size: 0.68rem; color: var(--text-muted); margin-top: 3px; }
+  .class-card.selected .class-domains { color: var(--accent-teal); }
+
+  /* ========= SELECTION CARDS ========= */
+  .sel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media(max-width: 440px) { .sel-grid { grid-template-columns: 1fr; } }
+  .sel-card {
+    border: 1px solid rgba(232,200,74,0.18);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    background: rgba(15,14,42,0.6);
+    position: relative;
+  }
+  .sel-card:hover { border-color: rgba(232,200,74,0.45); background: rgba(30,28,80,0.8); }
+  .sel-card.selected { border-color: var(--accent-teal); background: rgba(46,207,212,0.07); box-shadow: 0 0 14px rgba(46,207,212,0.12); }
+  .sel-card .sel-name { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--accent-gold2); margin-bottom: 5px; }
+  .sel-card .sel-desc { font-size: 0.82rem; color: var(--text-muted); }
+
+  /* ========= TRAIT ASSIGNMENT ========= */
+  .trait-assign-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media(max-width: 420px) { .trait-assign-grid { grid-template-columns: 1fr; } }
+  .trait-assign-row { display: flex; align-items: center; gap: 10px; }
+  .trait-assign-name { font-family: 'Cinzel', serif; font-size: 0.72rem; width: 80px; color: var(--text-primary); }
+  .trait-assign-val {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .trait-assign-val button {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    background: rgba(0,0,0,0.3);
+    color: var(--accent-gold);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem; line-height: 1;
+    transition: var(--transition);
+  }
+  .trait-assign-val button:hover { border-color: var(--accent-gold); background: rgba(201,168,76,0.15); }
+  .trait-assign-val .val-display { font-family: 'Cinzel Decorative', serif; font-size: 1.2rem; min-width: 36px; text-align: center; color: var(--accent-gold2); }
+
+  /* ========= NOTES ========= */
+  .notes-area { min-height: 120px; }
+
+  /* ========= MODAL ========= */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 100; align-items: center; justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: linear-gradient(135deg, var(--bg-card2) 0%, var(--bg-card) 100%);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 480px; width: 100%;
+    max-height: 80vh; overflow-y: auto;
+    box-shadow: var(--shadow), 0 0 20px rgba(232,200,74,0.3);
+  }
+  .modal h3 { font-family: 'Cinzel', serif; color: var(--accent-gold2); margin-bottom: 14px; }
+  .modal-close { float: right; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; background: none; border: none; }
+  .modal-close:hover { color: var(--text-primary); }
+
+  /* ========= CHARACTERS LIST ========= */
+  .char-list-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    background: rgba(15,14,42,0.7);
+  }
+  .char-list-item:hover { border-color: rgba(232,200,74,0.45); background: rgba(30,28,80,0.8); }
+  .char-list-item .char-name { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--accent-gold2); }
+  .char-list-item .char-meta { font-size: 0.8rem; color: var(--text-muted); }
+  .char-list-item .char-actions { margin-left: auto; display: flex; gap: 6px; }
+  .char-avatar { width: 40px; height: 40px; border-radius: 50%; background: rgba(232,200,74,0.12); border: 2px solid rgba(232,200,74,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+
+  /* ========= DICE ROLLER ========= */
+  .dice-result {
+    text-align: center;
+    padding: 20px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .dice-result .result-num { font-family: 'Cinzel Decorative', serif; font-size: 3rem; line-height: 1; }
+  .dice-result .result-hope { color: var(--accent-teal); }
+  .dice-result .result-fear { color: var(--accent-fear); }
+  .dice-result .result-label { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.15em; color: var(--text-muted); margin-top: 4px; }
+  .dice-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+
+  /* ========= SCROLLBAR ========= */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+  /* ========= SECTION DIVIDER ========= */
+  .divider { height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 16px 0; }
+
+  /* ========= RESPONSIVE TRACKER GRID ========= */
+  .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width: 500px) { .tracker-grid { grid-template-columns: 1fr; } }
+
+  /* ========= TOAST ========= */
+  #toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(20,18,60,0.97);
+    border: 1px solid var(--accent-gold);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    color: var(--accent-gold2);
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
+
+  /* ========= CONDITION BADGES ========= */
+  .condition-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    border: 1px solid;
+    cursor: pointer;
+    transition: var(--transition);
+    margin: 3px;
+    user-select: none;
+  }
+  .condition-badge.inactive { border-color: var(--border); color: var(--text-muted); background: rgba(0,0,0,0.2); }
+  .condition-badge.active { box-shadow: 0 0 8px currentColor; }
+  .cond-Restrained { color: #c09040; border-color: #c09040; background: rgba(192,144,64,0.15); }
+  .cond-Vulnerable { color: #c04060; border-color: #c04060; background: rgba(192,64,96,0.15); }
+  .cond-Frightened { color: #a040c0; border-color: #a040c0; background: rgba(160,64,192,0.15); }
+  .cond-Hindered { color: #8080a0; border-color: #8080a0; background: rgba(128,128,160,0.15); }
+  .cond-Poisoned { color: #40c040; border-color: #40c040; background: rgba(64,192,64,0.1); }
+  .cond-Stunned { color: #c0c040; border-color: #c0c040; background: rgba(192,192,64,0.1); }
+  .cond-Hidden { color: #6080c0; border-color: #6080c0; background: rgba(96,128,192,0.1); }
+
+  /* ========= EMPTY STATE ========= */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+  .empty-state .big-icon { font-size: 2.5rem; margin-bottom: 12px; filter: drop-shadow(0 0 10px rgba(232,200,74,0.3)); }
+  .empty-state p { font-size: 0.9rem; margin-bottom: 16px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="app-header">
+    <div class="header-logo-row">
+      <img src="data:image/png;base64,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" alt="Daggerheart" class="header-logo-img">
+    </div>
+    <div class="header-divider"></div>
+    <div class="subtitle">Character Forge &amp; Battle Tracker</div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('characters')">Characters</button>
+    <button class="nav-tab" onclick="showView('builder')">Builder</button>
+    <button class="nav-tab" id="tab-tracker" onclick="showView('tracker')">Tracker</button>
+    <button class="nav-tab" onclick="showView('dice')">Dice</button>
+  </nav>
+
+  <!-- =========== CHARACTERS LIST VIEW =========== -->
+  <div id="view-characters" class="view active">
+    <div class="card">
+      <div class="card-title">Your Characters</div>
+      <div id="char-list">
+        <div class="empty-state">
+          <img src="data:image/png;base64,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" alt="" style="height:64px;opacity:0.7;margin-bottom:12px;filter:drop-shadow(0 0 10px rgba(46,207,212,0.25));">
+          <p>No characters yet. Begin your legend.</p>
+          <button class="btn btn-primary" onclick="newCharacter()">Create Character</button>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn" onclick="newCharacter()">+ New Character</button>
+        <button class="btn" onclick="importChar()">Import JSON</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== BUILDER VIEW =========== -->
+  <div id="view-builder" class="view">
+    <div class="card">
+      <div class="card-title">Character Builder</div>
+      <div class="wizard-progress" id="wizard-progress"></div>
+      <div id="wizard-pages"></div>
+      <div class="wizard-nav">
+        <button class="btn" id="btn-prev" onclick="wizardPrev()" style="visibility:hidden">← Previous</button>
+        <button class="btn btn-primary" id="btn-next" onclick="wizardNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== TRACKER VIEW =========== -->
+  <div id="view-tracker" class="view">
+    <div id="tracker-content">
+      <div class="empty-state">
+        <div class="big-icon">🗡</div>
+        <p>Select or create a character to begin tracking.</p>
+        <button class="btn btn-primary" onclick="showView('characters')">Go to Characters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========== DICE VIEW =========== -->
+  <div id="view-dice" class="view">
+    <div class="card">
+      <div class="card-title">Duality Dice</div>
+      <div class="dice-result" id="dice-result">
+        <div style="color:var(--text-muted); font-family:'Cinzel',serif; font-size:0.8rem; letter-spacing:0.15em;">Roll to reveal your fate...</div>
+      </div>
+      <div class="dice-row">
+        <button class="btn btn-teal" onclick="rollDuality()">⊕ Roll Duality (2d12)</button>
+      </div>
+      <div class="divider"></div>
+      <div class="card-title">Standard Dice</div>
+      <div class="dice-row">
+        <button class="btn btn-sm" onclick="rollDie(4)">d4</button>
+        <button class="btn btn-sm" onclick="rollDie(6)">d6</button>
+        <button class="btn btn-sm" onclick="rollDie(8)">d8</button>
+        <button class="btn btn-sm" onclick="rollDie(10)">d10</button>
+        <button class="btn btn-sm" onclick="rollDie(12)">d12</button>
+        <button class="btn btn-sm" onclick="rollDie(20)">d20</button>
+        <button class="btn btn-sm" onclick="rollDie(100)">d100</button>
+      </div>
+      <div id="std-result" style="margin-top:14px; text-align:center; font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:var(--accent-gold2);"></div>
+
+      <div class="divider"></div>
+      <div class="card-title">Roll with Trait</div>
+      <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
+        <div style="flex:1; min-width:140px;">
+          <label>Trait Modifier</label>
+          <input type="number" id="trait-mod" value="0" min="-3" max="5" style="width:100%">
+        </div>
+        <div style="flex:1; min-width:140px;">
+          <label>Hope Spent (+2)</label>
+          <select id="hope-spend" style="width:100%">
+            <option value="0">None</option>
+            <option value="2">+2 (Spend Hope)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="rollTrait()" style="align-self:flex-end;">Roll</button>
+      </div>
+      <div id="trait-result" style="margin-top:14px; text-align:center;"></div>
+    </div>
+  </div>
+  <footer style="text-align:center; padding:20px 0 8px; border-top:1px solid rgba(232,200,74,0.12); margin-top:20px;">
+    <img src="data:image/png;base64,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" alt="Compatible with Daggerheart" style="height:40px; opacity:0.55; filter:drop-shadow(0 0 6px rgba(46,207,212,0.2));">
+    <div style="font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.2em; color:var(--text-muted); margin-top:6px; text-transform:uppercase;">Character Forge — Unofficial Companion Tool</div>
+  </footer>
+</div>
+
+<div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// =====================================================================
+// DATA DEFINITIONS
+// =====================================================================
+// =====================================================================
+// DATA — sourced from the Daggerheart SRD (daggerheart.org / daggerheart.su)
+// =====================================================================
+const CLASSES = [
+  {
+    name: 'Bard', icon: '🎵', domains: ['Grace', 'Codex'], hp: 5, stress: 6, evasion: 10,
+    subclasses: ['Troubadour', 'Wordsmith'],
+    desc: 'Bards are the most charismatic people in all the realms — masters of captivation who specialize in singing, playing instruments, weaving tales, or telling jokes. They thrive in social situations but can just as easily tear a party apart.',
+    classItems: 'A romance novel or a letter never opened',
+    classFeature: 'Make a Scene: Spend 3 Hope to temporarily Distract a target within Close range, giving them a -2 penalty to their Difficulty.',
+    classFeature2: 'Rally: Once per session, describe how you rally the party and give yourself and each ally a Rally Die (d6 at level 1, d8 at level 5). Spend it to add its result to an action, reaction, or damage roll, or clear that many Stress.',
+    backgroundQuestions: [
+      'Who from your community taught you to have such confidence in yourself?',
+      'You were in love once. Who did you adore, and how did they hurt you?',
+      'You\'ve always looked up to another bard. Who are they, and why do you idolize them?',
+      'What made you realize we were going to be such good friends?',
+    ]
+  },
+  {
+    name: 'Druid', icon: '🌿', domains: ['Sage', 'Arcana'], hp: 6, stress: 6, evasion: 11,
+    subclasses: ['Warden of the Elements', 'Warden of Renewal'],
+    desc: 'Becoming a druid is more than an occupation — it\'s a calling to learn from and protect the magic of the wilderness. Druids cultivate abilities in small groups or alone, and can learn to transform into beasts and shape nature itself.',
+    classItems: 'A leather-bound field journal or a collection of seeds',
+    classFeature: 'Beastform: Mark a Stress to magically transform into a creature of your tier or lower. While transformed, you can\'t use weapons or cast spells from domain cards, but you can still use other features. You gain the Beastform\'s features and add their Evasion bonus to yours.',
+    classFeature2: 'Evolution (Hope): Spend 3 Hope to transform into a Beastform without marking a Stress. When you do, choose one trait to raise by +1 until you drop out of that Beastform.',
+    backgroundQuestions: [
+      'The land called to you early. What was the first sign that you were meant to be its steward?',
+      'You once witnessed the destruction of a place you loved. What happened and who was responsible?',
+      'There is a creature you feel a special kinship with. What is it and how did you meet?',
+      'Your connection to nature has cost you something. What did you sacrifice?',
+    ]
+  },
+  {
+    name: 'Guardian', icon: '🛡', domains: ['Blade', 'Valor'], hp: 8, stress: 6, evasion: 10,
+    subclasses: ['Stalwart', 'Vengeance'],
+    desc: 'Guardians are immovable warriors who put themselves between danger and those they protect. Feared and respected on the battlefield, they inspire allies through action and endurance.',
+    classItems: 'A shield with a personal insignia or a memento from someone you\'ve sworn to protect',
+    classFeature: 'Frontline Tank: Spend 3 Hope to clear 2 Armor Slots.',
+    classFeature2: 'Unstoppable (Hope): Once per long rest, you can become Unstoppable. You gain an Unstoppable Die (d4 at level 1). While Unstoppable, when you mark a Hit Point, roll the die and reduce the Hit Points marked by 1 if the result equals or exceeds the Unstoppable Die\'s current value, then increase the die value by one step.',
+    backgroundQuestions: [
+      'Who did you fail to protect, and how has that shaped you?',
+      'What is the oath that defines your purpose as a Guardian?',
+      'You\'ve faced something that nearly broke you. What was it, and how did you survive?',
+      'Who do you consider your greatest rival, and why do you respect them?',
+    ]
+  },
+  {
+    name: 'Ranger', icon: '🏹', domains: ['Sage', 'Bone'], hp: 6, stress: 6, evasion: 13,
+    subclasses: ['Beastbound', 'Wayfinder'],
+    desc: 'Rangers are masters of the natural world — trackers, hunters, and survivors who excel in ranged combat and navigating the wilderness. They track prey across any terrain and command the respect of the beasts around them.',
+    classItems: 'A handmade map of a place important to you or a trophy from your first kill',
+    classFeature: 'Ranger\'s Focus: Spend a Hope and make an attack against a target. On a success, deal normal damage and temporarily make the target your Focus. While focused: you know precisely what direction they are in; when you deal damage, they must mark a Stress; when you fail an attack against them, you can end Focus to reroll your Duality Dice.',
+    classFeature2: 'Called Shot (Hope): Spend 3 Hope to make a precise attack. On a success, choose a specific effect: the target is temporarily Restrained, Slowed, or Vulnerable.',
+    backgroundQuestions: [
+      'A terrible creature hurt your community, and you\'ve vowed to hunt them down. What are they, and what unique trail or sign do they leave behind?',
+      'Your first kill almost killed you, too. What was it, and what part of you was never the same after?',
+      'You\'ve traveled many dangerous lands, but what is the one place you refuse to go?',
+      'Who taught you to survive out there, and where are they now?',
+    ]
+  },
+  {
+    name: 'Rogue', icon: '🗡', domains: ['Midnight', 'Grace'], hp: 5, stress: 6, evasion: 13,
+    subclasses: ['Nightwalker', 'Syndicate'],
+    desc: 'Rogues are scoundrels — broadly known as liars and thieves, the best among them move through the world anonymously. They trick foes through social manipulation as easily as breaking locks or dealing underhanded blows.',
+    classItems: 'A set of lockpicks or a stolen item of personal value',
+    classFeature: 'Hide: When there\'s somewhere to hide, describe how you conceal yourself. You\'re Hidden until you take an action or are discovered. Any time you would be Hidden, you are instead Cloaked — while Cloaked, you remain unseen even if stationary when adversaries move near you.',
+    classFeature2: 'Marked for Death (Hope): Spend 3 Hope to mark a target for death. Until they\'re defeated or the scene ends, add 2d4 to all damage rolls against them.',
+    backgroundQuestions: [
+      'What did you get caught doing that had you exiled or cast out from somewhere important?',
+      'You\'ve betrayed someone\'s trust. Who was it, and do you regret it?',
+      'There\'s one job you refuse to take. What is it and why?',
+      'Who trained you, and what do you owe them?',
+    ]
+  },
+  {
+    name: 'Seraph', icon: '✨', domains: ['Valor', 'Splendor'], hp: 7, stress: 6, evasion: 11,
+    subclasses: ['Divine Wielder', 'Winged Sentinel'],
+    desc: 'Seraphs are divine fighters and healers imbued with sacred purpose. Appointed by gods, their ethos aligns with the domain of their deity — defending the weak, exacting vengeance, or upholding a particular faith. It is better to be a seraph\'s ally than their enemy.',
+    classItems: 'A holy symbol of your deity or a record of a prayer that was answered',
+    classFeature: 'Life Support: Spend 3 Hope to clear a Hit Point on an ally within Close range.',
+    classFeature2: 'Prayer Dice: At the beginning of each session, roll a number of d4s equal to your Spellcast trait. You can spend any Prayer Dice to aid yourself or an ally within Far range — use a die\'s value to reduce incoming damage, add to a roll\'s result, or gain Hope equal to the result.',
+    backgroundQuestions: [
+      'Which god did you devote yourself to? What incredible feat did they perform for you in a moment of desperation?',
+      'How did your appearance change after taking your oath?',
+      'In what strange or unique way do you communicate with your god?',
+      'What promise did you make that you must keep, should you survive?',
+    ]
+  },
+  {
+    name: 'Sorcerer', icon: '🌀', domains: ['Arcana', 'Midnight'], hp: 5, stress: 6, evasion: 12,
+    subclasses: ['Primal Origin', 'Elemental Origin'],
+    desc: 'Sorcerers channel magic from their very blood — raw, innate power that doesn\'t require study or devotion. This power is wild and unpredictable, making them dangerous allies and terrifying foes.',
+    classItems: 'A focus object tied to your magical awakening or a journal of strange visions',
+    classFeature: 'Arcane Sense: You can detect the presence of magic within Close range at will. You know if an object, creature, or area has been magically altered or imbued with power, though not the specifics.',
+    classFeature2: 'Channel Raw Power (Hope): Spend 3 Hope to add a d20 to your next Spellcast Roll.',
+    backgroundQuestions: [
+      'When did your power first manifest, and who was harmed?',
+      'You have a deep fear you hide from everyone. What is it, and how does it relate to your magic?',
+      'Someone wants the power inside you — who are they, and what do they intend to do with it?',
+      'What does it feel like when your magic surges beyond your control?',
+    ]
+  },
+  {
+    name: 'Warrior', icon: '⚔', domains: ['Blade', 'Bone'], hp: 7, stress: 6, evasion: 11,
+    subclasses: ['Call of the Brave', 'Call of the Slayer'],
+    desc: 'Warriors are the backbone of any fighting force — skilled combatants who excel at weapons and endurance. They turn the tide of battle through sheer martial prowess and unyielding determination.',
+    classItems: 'A weapon you\'ve carried into your most difficult fight or a memento of your greatest victory',
+    classFeature: 'Attack of Opportunity: When an adversary within Melee range willingly moves away from you, you may make a free attack against them as a reaction.',
+    classFeature2: 'Adrenaline Rush (Hope): Spend 3 Hope to gain an extra action on your turn.',
+    backgroundQuestions: [
+      'Who taught you to fight, and why did they stay behind?',
+      'You\'ve killed someone you didn\'t want to kill. Who were they, and why did it happen?',
+      'What are you fighting toward — not just fighting against?',
+      'There is someone who could match you in a fight. Who are they, and have you ever crossed blades?',
+    ]
+  },
+  {
+    name: 'Wizard', icon: '📚', domains: ['Arcana', 'Codex'], hp: 4, stress: 6, evasion: 12,
+    subclasses: ['School of Knowledge', 'School of War'],
+    desc: 'Wizards are scholars of the arcane who achieve power through exhaustive study. They command an arsenal of domain cards and spells through careful preparation, making them extraordinarily versatile in magic.',
+    classItems: 'A spellbook filled with notes, diagrams, and theories or a letter from your mentor',
+    classFeature: 'Prestidigitation: You can perform harmless minor magical effects at will — sparks, whispers, scents, illusions no larger than a hand.',
+    classFeature2: 'Spellbook Mastery (Hope): Spend 3 Hope to immediately swap a card from your Vault into your Loadout without paying its Recall Cost.',
+    backgroundQuestions: [
+      'What forbidden text changed how you see the world?',
+      'Your teacher gave you one piece of advice you\'ve never been able to forget. What was it?',
+      'You know something about magic that most people don\'t. What is that secret?',
+      'What sacrifice did you make in pursuit of knowledge?',
+    ]
+  },
+];
+
+const SUBCLASSES = {
+  'Troubadour': {
+    class: 'Bard', spellcast: 'Presence',
+    desc: 'The classic bard — they inspire allies and irritate enemies with song, playing an instrumental role in both combat and roleplaying.',
+    foundation: 'Gifted Performer: Describe how you perform. You can play each song once per long rest. Relaxing Song: You and all allies within Close range clear a Hit Point. Epic Song: Make a target within Close range temporarily Vulnerable. Heartbreaking Song: You and all allies within Close range gain a Hope.',
+    specialization: 'Maestro: When you give a Rally Die to an ally, they can gain a Hope or clear a Stress.',
+    mastery: 'Virtuoso: You can perform each Gifted Performer song twice instead of once per long rest.',
+  },
+  'Wordsmith': {
+    class: 'Bard', spellcast: 'Presence',
+    desc: 'The Wordsmith prefers eloquent speech and clever wordplay over song — a more narrative-focused bard who motivates through storytelling.',
+    foundation: 'Rousing Speech: Once per long rest, give a heartfelt inspiring speech. All allies within Far range clear 2 Stress.\n\nHeart of a Poet: After you make an action roll to impress, persuade, or offend someone, you can spend a Hope to add a d4 to the roll.',
+    specialization: 'Eloquent: Once per session, when you encourage an ally, choose one: allow them to find a mundane object they need; Help an Ally without spending Hope; or give them an additional downtime move during their next rest.',
+    mastery: 'Epic Poetry: Your Rally Die increases to a d10. When you Help an Ally, you can narrate as if writing their memoir — roll a d10 as your advantage die.',
+  },
+  'Warden of the Elements': {
+    class: 'Druid', spellcast: 'Instinct',
+    desc: 'The Warden of the Elements embodies the raw forces of nature — channeling fire, earth, water, or air for powerful combat and utility effects.',
+    foundation: 'Elemental Incarnation: Mark a Stress to Channel one element until you take Severe damage or rest. Fire: Adversaries within Melee that deal damage to you take 1d10 magic damage. Earth: Gain a bonus to damage thresholds equal to Proficiency. Water: When you deal damage at Melee, all other adversaries within Very Close must mark a Stress. Air: You can hover, gaining advantage on Agility Rolls.',
+    specialization: 'Elemental Aura: Once per rest while Channeling, assume an aura affecting Close range until Channeling ends — each element applies a different ongoing effect to the area.',
+    mastery: 'Elemental Dominion: While Channeling, gain an additional powerful benefit based on your element (damage bonus, HP reduction mitigation, making attackers Vulnerable, or fly + Evasion bonus).',
+  },
+  'Warden of Renewal': {
+    class: 'Druid', spellcast: 'Instinct',
+    desc: 'The Warden of Renewal is the ultimate healer, channeling the restorative power of living nature to mend wounds and protect the party.',
+    foundation: 'Clarity of Nature: Once per long rest, create a serene natural space. When you rest within it for a few minutes, clear Stress equal to your Instinct, shared between you and allies.\n\nRegeneration: Touch a creature and spend 3 Hope. That creature clears 1d4 Hit Points.',
+    specialization: 'Regenerative Reach: Target creatures within Very Close range with Regeneration.\n\nWarden\'s Protection: Once per long rest, spend 2 Hope to clear 2 Hit Points on 1d4 allies within Close range.',
+    mastery: 'Defender: When you\'re in Beastform and an ally within Close range marks 2+ Hit Points, you can mark a Stress to reduce the Hit Points they mark by 1.',
+  },
+  'Stalwart': {
+    class: 'Guardian', spellcast: null,
+    desc: 'The Stalwart embodies everything the Guardian stands for — all-in on durability and protecting allies, with extraordinary endurance.',
+    foundation: 'Unwavering: Gain a permanent +1 bonus to your damage thresholds.\n\nIron Will: When you take physical damage, you can mark an additional Armor Slot to reduce the severity.',
+    specialization: 'Unrelenting: Gain a permanent +2 bonus to damage thresholds.\n\nPartners-in-Arms: When an ally within Very Close range takes damage, you can mark an Armor Slot to reduce the severity by one threshold.',
+    mastery: 'Undaunted: Gain a permanent +3 bonus to damage thresholds.\n\nLoyal Protector: When an ally within Close range has 2 or fewer Hit Points and would take damage, you can mark a Stress to sprint to their side and take the damage instead.',
+  },
+  'Vengeance': {
+    class: 'Guardian', spellcast: null,
+    desc: 'The Vengeance Guardian combines the defensive nature of the Guardian with an aggressive offensive focused on countering enemies who dare strike you or your allies.',
+    foundation: 'At Ease: Gain an additional Stress slot.\n\nRevenge: When an adversary within Melee range succeeds on an attack against you, you can mark 2 Stress to force the attacker to mark a Hit Point.',
+    specialization: 'Act of Reprisal: When an adversary damages an ally within Melee range, you gain a +1 bonus to your Proficiency for the next successful attack against that adversary.',
+    mastery: 'Nemesis: Spend 2 Hope to Prioritize an adversary until your next rest. When you attack your Prioritized adversary, you can swap the results of your Hope and Fear Dice. Only one adversary can be Prioritized at a time.',
+  },
+  'Beastbound': {
+    class: 'Ranger', spellcast: 'Agility',
+    desc: 'The Beastbound forms a deep bond with an animal companion — together they hunt as one, sharing danger and covering each other in battle.',
+    foundation: 'Companion: You have an animal companion (at GM\'s discretion). They stay by your side unless told otherwise. Take the Ranger Companion sheet. When you level up, also choose a level-up option for your companion.',
+    specialization: 'Expert Training: Choose an additional level-up option for your companion.\n\nBattle-Bonded: When an adversary attacks you while within your companion\'s Melee range, you gain a +2 bonus to your Evasion against the attack.',
+    mastery: 'Advanced Training: Choose two additional level-up options for your companion.\n\nLoyal Friend: Once per long rest, when damage would mark your companion\'s last Stress or your last Hit Point and you\'re within Close range, either of you can rush to the other\'s side and take that damage instead.',
+  },
+  'Wayfinder': {
+    class: 'Ranger', spellcast: 'Agility',
+    desc: 'The Wayfinder is a ruthless tracker who masters terrain and exploits every advantage against their quarry — a predator in the truest sense.',
+    foundation: 'Ruthless Predator: When you make a damage roll, you can mark a Stress to gain a +1 bonus to your Proficiency. Additionally, when you deal Severe damage to an adversary, they must mark a Stress.\n\nPath Forward: When traveling to a previously visited place or carrying an object from that location, you can identify the shortest, most direct path.',
+    specialization: 'Elusive Predator: When your Focus makes an attack against you, gain a +2 bonus to your Evasion against that attack.',
+    mastery: 'Apex Predator: Before you attack your Focus, you can spend a Hope. On a successful attack, remove a Fear from the GM\'s Fear pool.',
+  },
+  'Nightwalker': {
+    class: 'Rogue', spellcast: 'Finesse',
+    desc: 'The Nightwalker lives and hunts in shadow — teleporting between darkness, creating supernatural obscurement, and striking from invisible positions.',
+    foundation: 'Shadow Stepper: When you move into an area of darkness or a shadow, you can mark a Stress to disappear and reappear inside another shadow within Far range. When you reappear, you are Cloaked.',
+    specialization: 'Dark Cloud: Make a Spellcast Roll (15). On a success, create a temporary dark cloud covering any area within Close range. No one outside can see in, and you\'re Cloaked from those the cloud blocks.\n\nAdrenaline: While Vulnerable, add your level to your damage rolls.',
+    mastery: 'Fleeting Shadow: Gain a permanent +1 to Evasion. Shadow Stepper can now reach Very Far range.\n\nVanishing Act: Mark a Stress to become Cloaked at any time. Automatically clear Restrained when Cloaked this way. Remains until you roll with Fear or rest.',
+  },
+  'Syndicate': {
+    class: 'Rogue', spellcast: 'Finesse',
+    desc: 'The Syndicate Rogue has a web of contacts everywhere they go — using criminal connections to gain information, resources, and backup in the field.',
+    foundation: 'Well-Connected: When you arrive in a prominent location, you know somebody there. Give them a name and choose one fact: they owe you a favor; they\'ll ask for something in return; they\'re always in trouble; you used to be together; you didn\'t part on good terms.',
+    specialization: 'Contacts Everywhere: Once per session, call on a shady contact for one of: a handful of gold or useful item; a +3 bonus to your next Hope or Fear Die result; or an ally who adds 2d8 to your next damage roll.',
+    mastery: 'Reliable Backup: Use Contacts Everywhere three times per session with additional options: a contact reduces Hit Points you mark by 1; or on a Presence Roll in conversation, roll a d20 as your Hope Die.',
+  },
+  'Divine Wielder': {
+    class: 'Seraph', spellcast: 'Strength',
+    desc: 'The Divine Wielder channels holy power through their weapon — sending it to strike at distance and healing allies with a sacred touch.',
+    foundation: 'Spirit Weapon: When you have an equipped weapon with Melee or Very Close range, it can fly to attack an adversary within Close range and return to you. Mark a Stress to target an additional adversary within range with the same attack roll.\n\nSparing Touch: Once per long rest, touch a creature and clear 2 Hit Points or 2 Stress from them.',
+    specialization: 'Devout: When you roll Prayer Dice, roll an additional die and discard the lowest. Use Sparing Touch twice instead of once per long rest.',
+    mastery: 'Sacred Resonance: When you roll damage for Spirit Weapon, if any dice results match, double the value of each matching die (e.g. two 5s count as two 10s).',
+  },
+  'Winged Sentinel': {
+    class: 'Seraph', spellcast: 'Strength',
+    desc: 'The Winged Sentinel soars above the battlefield on holy wings — delivering divine judgement from above and inspiring awe in allies and enemies alike.',
+    foundation: 'Wings of Light: You can fly. While flying: Mark a Stress to carry another willing creature your size or smaller. Spend a Hope to deal an extra 1d8 damage on a successful attack.',
+    specialization: 'Ethereal Visage: While flying, you have advantage on Presence Rolls. When you succeed with Hope on a Presence Roll, you can remove a Fear from the GM\'s Fear pool instead of gaining Hope.',
+    mastery: 'Ascendant: Gain a permanent +4 bonus to your Severe damage threshold.\n\nPower of the Gods: While flying, deal an extra 1d12 damage instead of 1d8 from Wings of Light.',
+  },
+  'Primal Origin': {
+    class: 'Sorcerer', spellcast: 'Instinct',
+    desc: 'The Primal Origin Sorcerer manipulates the very essence of magic — reshaping, extending, and enhancing spells in ways no trained wizard could achieve.',
+    foundation: 'Manipulate Magic: After casting a spell or making a magic damage attack, you can mark a Stress to do one of: extend the reach by one range; gain a +2 bonus to the action roll; double a damage die of your choice; or hit an additional target within range.',
+    specialization: 'Enchanted Aid: When you Help an Ally with a Spellcast Roll, roll a d8 as your advantage die. Once per long rest, after an ally makes a Spellcast Roll with your help, you can swap the results of their Duality Dice.',
+    mastery: 'Arcane Charge: When you take magic damage or spend 2 Hope, become Charged. When you successfully attack with magic while Charged, clear Charge to gain +10 to the damage roll or +3 to the Difficulty of a reaction roll the spell causes.',
+  },
+  'Elemental Origin': {
+    class: 'Sorcerer', spellcast: 'Instinct',
+    desc: 'The Elemental Origin Sorcerer channels a specific elemental force, bending air, earth, fire, lightning, or water to their will.',
+    foundation: 'Elementalist: Choose one element (Air, Earth, Fire, Lightning, Water) at character creation. You can shape it into harmless effects. Spend a Hope and describe how your element helps an action roll you\'re about to make: gain +2 to the roll or +3 to damage.',
+    specialization: 'Natural Evasion: When an attack against you succeeds, mark a Stress and describe how your element defends you. Roll a d6 and add its result to your Evasion against that attack.',
+    mastery: 'Transcendence: Once per long rest, transform into a physical manifestation of your element. Choose two benefits until your next rest: +4 to Severe threshold; +1 to a trait of your choice; +1 to Proficiency; or +2 to Evasion.',
+  },
+  'Call of the Brave': {
+    class: 'Warrior', spellcast: null,
+    desc: 'The Call of the Brave warrior draws strength from danger itself — growing more powerful the more desperate the situation becomes.',
+    foundation: 'Courage: When you fail a roll with Fear, you gain a Hope.\n\nBattle Ritual: Once per long rest, before attempting something incredibly dangerous or facing a clearly superior foe, describe your ritual or preparations. Clear 2 Stress and gain 2 Hope.',
+    specialization: 'Rise to the Challenge: While you have 2 or fewer Hit Points unmarked, you can roll a d20 as your Hope Die.',
+    mastery: 'Camaraderie: Your bravery rallies others. You can initiate a Tag Team Roll one additional time per session. When an ally initiates a Tag Team Roll with you, they only need to spend 2 Hope.',
+  },
+  'Call of the Slayer': {
+    class: 'Warrior', spellcast: null,
+    desc: 'The Call of the Slayer warrior collects battle momentum as Slayer Dice — a reservoir of lethal power to unleash at the perfect moment.',
+    foundation: 'Slayer: On a roll with Hope, you can place a d6 on this card instead of gaining Hope (max equal to Proficiency). When you make an attack or damage roll, spend any number of Slayer Dice, rolling and adding their result. At session end, clear unspent dice and gain a Hope per die.',
+    specialization: 'Weapon Specialist: When you succeed on an attack, spend a Hope to add one damage die from your secondary weapon to the damage roll. Once per long rest when you roll Slayer Dice, reroll any 1s.',
+    mastery: 'Martial Preparation: Your party gains the Martial Preparation downtime move. Describe your training — you and each ally who chooses this move gain a d6 Slayer Die they can spend on attack or damage rolls.',
+  },
+  'School of Knowledge': {
+    class: 'Wizard', spellcast: 'Knowledge',
+    desc: 'The School of Knowledge wizard is all about versatility — gaining more domain cards and enhancing the power of their Experiences.',
+    foundation: 'Prepared: Take an additional domain card of your level or lower from a domain you have access to.\n\nAdept: When you Utilize an Experience, you can mark a Stress instead of spending a Hope. If you do, double your Experience modifier for that roll.',
+    specialization: 'Accomplished: Take an additional domain card of your level or lower.\n\nPerfect Recall: Once per rest, when you recall a domain card from your Vault, reduce its Recall Cost by 1.',
+    mastery: 'Brilliant: Take an additional domain card of your level or lower.\n\nHoned Expertise: When you use an Experience, roll a d6. On a 5 or higher, you can use it without spending Hope.',
+  },
+  'School of War': {
+    class: 'Wizard', spellcast: 'Knowledge',
+    desc: 'The School of War wizard trades pure utility for raw battlefield power — gaining extra Hit Points and scaling magical damage the more their spells go awry.',
+    foundation: 'Battlemage: Gain an additional Hit Point slot.\n\nFace Your Fear: When you succeed with Fear on an attack roll, you deal an extra 1d10 magic damage.',
+    specialization: 'Conjure Shield: While you have at least 2 Hope, add your Proficiency to your Evasion.\n\nFueled by Fear: The extra magic damage from Face Your Fear increases to 2d10.',
+    mastery: 'Thrive in Chaos: When you succeed on an attack, mark a Stress after rolling damage to force the target to mark an additional Hit Point.\n\nHave No Fear: Face Your Fear increases to 3d10.',
+  },
+};
+
+const ANCESTRIES = [
+  {
+    name: 'Clank', icon: '⚙', desc: 'Sentient mechanical beings built from metal, wood, stone, or other materials. They can resemble humanoids, animals, or inanimate objects, and their lifespan extends as long as they can acquire new parts.',
+    feature1: 'Purposeful Design: Decide who made you and for what purpose. At character creation, choose one of your Experiences that best aligns with this purpose and gain a permanent +1 bonus to it.',
+    feature2: 'Efficient: When you take a short rest, you can choose a long rest move instead of a short rest move.',
+  },
+  {
+    name: 'Drakona', icon: '🐉', desc: 'Wingless dragons in humanoid form with thick scales, sharp teeth, and a powerful elemental breath. They are large in size and their elemental power passes down through generations.',
+    feature1: 'Scales: When you would take Severe damage, you can mark a Stress to mark 1 fewer Hit Points.',
+    feature2: 'Elemental Breath: Choose an element (electricity, fire, ice, etc.). Attack targets within Very Close range as an Instinct weapon dealing d8 magic damage using your Proficiency.',
+  },
+  {
+    name: 'Dwarf', icon: '⛏', desc: 'Short humanoids with square frames, dense musculature, and thick hair. Known for their love of adornments — piercings, tattoos, and embedded gemstones — and their remarkable physical fortitude.',
+    feature1: 'Thick Skin: When you take Minor damage, you can mark 2 Stress instead of marking a Hit Point.',
+    feature2: 'Increased Fortitude: Spend 3 Hope to halve incoming physical damage.',
+  },
+  {
+    name: 'Elf', icon: '🌙', desc: 'Tall humanoids with pointed ears and acutely attuned senses. Some display a Mystic Form — a physical manifestation of their specialized connection with the natural world, such as celestial freckles.',
+    feature1: 'Quick Reactions: Mark a Stress to gain advantage on a reaction roll.',
+    feature2: 'Celestial Trance: During a rest, you can drop into a trance to choose an additional downtime move.',
+  },
+  {
+    name: 'Faerie', icon: '🧚', desc: 'Winged humanoid creatures with insectile features that undergo metamorphosis within their relatively short lifespan. Known for their ability to bend luck.',
+    feature1: 'Luckbender: Once per session, after you or a willing ally within Close range makes an action roll, you can spend 3 Hope to reroll the Duality Dice.',
+    feature2: 'Wings: You can fly. While flying, you can mark a Stress after an adversary attacks you to gain +2 to your Evasion against that attack.',
+  },
+  {
+    name: 'Faun', icon: '🐐', desc: 'Humanoid goats with curving horns, square pupils, and cloven hooves. Fauns can vary wildly in appearance, from goat-headed to nearly human with only subtle animal traits.',
+    feature1: 'Caprine Leap: You can leap anywhere within Close range as though using normal movement, vaulting obstacles and crossing gaps with ease.',
+    feature2: 'Kick: When you succeed on an attack against a target within Melee range, you can mark a Stress to kick yourself off them, dealing an extra 2d6 damage and knocking back either yourself or the target to Very Close range.',
+  },
+  {
+    name: 'Firbolg', icon: '🐄', desc: 'Bovine humanoids recognized by their broad noses and long drooping ears. Firbolgs are known for their incredible strength and some use it to charge adversaries headlong.',
+    feature1: 'Charge: When you succeed on an Agility Roll to move from Far or Very Far into Melee range, you can mark a Stress to deal 1d12 physical damage to all targets within Melee range.',
+    feature2: 'Unshakable: When you would mark a Stress, roll a d6. On a result of 6, don\'t mark it.',
+  },
+  {
+    name: 'Fungril', icon: '🍄', desc: 'Humanoid mushrooms with a wide variety of shapes, sizes, and colorings. Fungril have a deep connection to death and other members of their ancestry through a mycelial network.',
+    feature1: 'Fungril Network: Make an Instinct Roll (12) to use your mycelial array to speak with others of your ancestry. On a success, communicate across any distance.',
+    feature2: 'Death Connection: While touching a recently deceased corpse, you can mark a Stress to extract one memory related to a specific emotion or sensation.',
+  },
+  {
+    name: 'Galapa', icon: '🐢', desc: 'Anthropomorphic turtles with large domed shells they can retract into. Their shells provide powerful natural protection against physical harm.',
+    feature1: 'Shell: Gain a bonus to your damage thresholds equal to your Proficiency.',
+    feature2: 'Retract: Mark a Stress to retract into your shell. While inside: resistance to physical damage, disadvantage on action rolls, and you can\'t move.',
+  },
+  {
+    name: 'Giant', icon: '🏔', desc: 'Towering humanoids with broad shoulders, long arms, and one to three eyes. Giants possess remarkable strength and reach, capable of building wonders or toppling walls.',
+    feature1: 'Endurance: Gain an additional Hit Point slot at character creation.',
+    feature2: 'Reach: Treat any weapon, ability, spell, or feature with Melee range as though it has Very Close range instead.',
+  },
+  {
+    name: 'Goblin', icon: '👺', desc: 'Small humanoids recognizable by their large eyes and massive membranous ears. Goblins thrive on adaptability, turning scraps into salvation and chaos into opportunity.',
+    feature1: 'Surefooted: You ignore disadvantage on Agility Rolls.',
+    feature2: 'Danger Sense: Once per rest, mark a Stress to force an adversary to reroll an attack against you or an ally within Very Close range.',
+  },
+  {
+    name: 'Halfling', icon: '🌼', desc: 'Small humanoids with large hairy feet and prominent rounded ears. Halflings are heart-driven — small in stature but vast in courage, and they bring luck to those around them.',
+    feature1: 'Luckbringer: At the start of each session, everyone in your party gains a Hope.',
+    feature2: 'Internal Compass: When you roll a 1 on your Hope Die, you can reroll it.',
+  },
+  {
+    name: 'Human', icon: '👤', desc: 'Humans are recognized by their dexterous hands, rounded ears, and bodies built for endurance. They come in a vast variety of builds and body types and are defined by their remarkable adaptability.',
+    feature1: 'High Stamina: Gain an additional Stress slot at character creation.',
+    feature2: 'Adaptability: When you fail a roll that utilized one of your Experiences, you can mark a Stress to reroll.',
+  },
+  {
+    name: 'Infernis', icon: '😈', desc: 'Descendants of demons from the Circles Below, Infernis possess sharp canine teeth, pointed ears, and horns. Their fearsome appearance can be turned to their advantage in intimidation.',
+    feature1: 'Fearless: When you roll with Fear, you can mark 2 Stress to change it into a roll with Hope instead.',
+    feature2: 'Dread Visage: You have advantage on rolls to intimidate hostile creatures.',
+  },
+  {
+    name: 'Katari', icon: '🐆', desc: 'Feline humanoids with retractable claws, vertically slit pupils, and high triangular ears. Katari are agile and dangerous in close combat, using natural weapons and quick reflexes.',
+    feature1: 'Feline Instincts: When you make an Agility Roll, you can spend 2 Hope to reroll your Hope Die.',
+    feature2: 'Retracting Claws: Make an Agility Roll to scratch a target within Melee range. On a success, they become temporarily Vulnerable.',
+  },
+  {
+    name: 'Orc', icon: '🪖', desc: 'Humanoids with square features and boar-like tusks from their lower jaw. Orcs combine remarkable resilience with the ability to gore opponents when pressing their advantage.',
+    feature1: 'Sturdy: When you have 1 Hit Point remaining, attacks against you have disadvantage.',
+    feature2: 'Tusks: When you succeed on an attack within Melee range, you can spend a Hope to gore the target with your tusks, dealing an extra 1d6 damage.',
+  },
+  {
+    name: 'Ribbet', icon: '🐸', desc: 'Anthropomorphic frogs with protruding eyes and webbed hands and feet. Ribbets are at home in water and can use their remarkable tongues both for communication and as weapons.',
+    feature1: 'Amphibious: You can breathe and move naturally underwater.',
+    feature2: 'Long Tongue: Use your tongue to grab things within Close range. Mark a Stress to use it as a Finesse Close weapon dealing d12 physical damage using your Proficiency.',
+  },
+  {
+    name: 'Simiah', icon: '🐒', desc: 'Anthropomorphic monkeys and apes with long limbs and prehensile feet. Simiah are exceptionally agile climbers, excelling at athletics requiring balance and coordination.',
+    feature1: 'Natural Climber: You have advantage on Agility Rolls that involve balancing and climbing.',
+    feature2: 'Nimble: Gain a permanent +1 bonus to your Evasion at character creation.',
+  },
+];
+
+const COMMUNITIES = [
+  {
+    name: 'Highborne',
+    desc: 'Life of elegance, opulence, and prestige within the upper echelons of society. Highborne control political and economic power through substantial wealth and influence.',
+    feature: 'Privilege: You have advantage on rolls to consort with nobles, negotiate prices, or leverage your reputation to get what you want.',
+  },
+  {
+    name: 'Loreborne',
+    desc: 'From a society that favors strong academic or political prowess. Loreborne communities highly value knowledge — historical preservation, political advancement, scientific study, or lore compilation.',
+    feature: 'Well-Read: You have advantage on rolls that involve the history, culture, or politics of a prominent person or place.',
+  },
+  {
+    name: 'Orderborne',
+    desc: 'From a collective focused on discipline or faith with a shared set of principles. Orderborne are frequently among the most powerful communities, aligned around a common god, doctrine, ethos, or trade.',
+    feature: 'Dedicated: Record three sayings or values your upbringing instilled in you. Once per rest, when you describe how you\'re embodying one of these principles through your current action, you can roll a d20 as your Hope Die.',
+  },
+  {
+    name: 'Ridgeborne',
+    desc: 'Called the rocky peaks and sharp cliffs of the mountainside home. Ridgeborne consider themselves hardier than most, having thrived among the most dangerous terrain many continents have to offer.',
+    feature: 'Steady: You have advantage on rolls to traverse dangerous cliffs and ledges, navigate harsh environments, and use survival knowledge.',
+  },
+  {
+    name: 'Seaborne',
+    desc: 'Lived on or near a large body of water. Some are coastal traders, others live on ships entirely. Seaborne communities are deeply tied to the ocean tides and the creatures that inhabit them.',
+    feature: 'Know the Tide: When you roll with Fear, place a token on this card (max tokens equal to your level). Before an action roll, spend any number of tokens to gain +1 to the roll for each token spent. Clear at end of each session.',
+  },
+  {
+    name: 'Slyborne',
+    desc: 'Come from a group that operates outside the law — all manner of criminals, grifters, and con artists. Slyborne know how to navigate the criminal underworld and read dishonest people.',
+    feature: 'Scoundrel: You have advantage on rolls to negotiate with criminals, detect lies, or find a safe place to hide.',
+  },
+  {
+    name: 'Underborne',
+    desc: 'From a subterranean society — cities carved from cliff faces, underground caverns, or deep fortresses. Underborne are adept in darkness and confined spaces.',
+    feature: 'Darksight: You can see clearly in dim light and partial darkness.',
+  },
+  {
+    name: 'Wanderborne',
+    desc: 'Lived as a nomad, forgoing a permanent home and experiencing a wide variety of cultures. Wanderborne carry everything they need and know how to find what they lack.',
+    feature: 'Nomadic Pack: Add a Nomadic Pack to your inventory. Once per session, spend a Hope to reach into the pack and pull out a mundane item useful to your situation. Work with the GM to determine what you find.',
+  },
+  {
+    name: 'Wildborne',
+    desc: 'Lived deep within the forest or other untamed wilderness. Wildborne move in harmony with the natural world and can pass through it without leaving a trace.',
+    feature: 'Lightfoot: Your movement is naturally silent. You have advantage on rolls to move without being heard.',
+  },
+];
+
+const CONDITIONS = ['Restrained','Vulnerable','Frightened','Hindered','Poisoned','Stunned','Hidden'];
+
+const TRAITS = ['Agility','Strength','Finesse','Instinct','Presence','Knowledge'];
+
+const ARMOR_OPTIONS = [
+  { name: 'No Armor', thresholds: [5, 10], score: 0, feature: '' },
+  { name: 'Light Armor', thresholds: [5, 11], score: 3, feature: 'Flexible: +1 Evasion' },
+  { name: 'Chain Mail', thresholds: [7, 15], score: 4, feature: 'Heavy: -1 Evasion' },
+  { name: 'Breastplate', thresholds: [6, 13], score: 3, feature: '' },
+  { name: 'Heavy Plate', thresholds: [8, 17], score: 4, feature: 'Very Heavy: -2 Evasion, -1 Agility' },
+  { name: 'Mystic Robes', thresholds: [4, 9], score: 2, feature: 'Warded: Reduce magic damage by Armor Score' },
+];
+
+const WEAPON_OPTIONS = [
+  { name: 'Shortsword', damage: '1d6', trait: 'Finesse', range: 'Melee' },
+  { name: 'Longsword', damage: '1d8', trait: 'Strength', range: 'Melee' },
+  { name: 'Greatsword', damage: '2d6', trait: 'Strength', range: 'Melee' },
+  { name: 'Shortbow', damage: '1d6', trait: 'Agility', range: 'Far' },
+  { name: 'Longbow', damage: '1d8', trait: 'Agility', range: 'Very Far' },
+  { name: 'Crossbow', damage: '1d10', trait: 'Agility', range: 'Far' },
+  { name: 'Daggers', damage: '1d4+1', trait: 'Finesse', range: 'Melee/Near' },
+  { name: 'Spear', damage: '1d8', trait: 'Strength', range: 'Melee' },
+  { name: 'Staff', damage: '1d6', trait: 'Knowledge', range: 'Melee' },
+  { name: 'Warhammer', damage: '1d10', trait: 'Strength', range: 'Melee' },
+  { name: 'Whip', damage: '1d4', trait: 'Agility', range: 'Near' },
+  { name: 'Unarmed', damage: '1d4', trait: 'Strength', range: 'Melee' },
+];
+
+// =====================================================================
+// STORAGE
+// =====================================================================
+function saveData(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+function loadData(key, def) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e) { return def; } }
+
+let characters = loadData('dh_characters', []);
+let activeCharId = loadData('dh_activeChar', null);
+
+function saveAll() { saveData('dh_characters', characters); }
+function setActive(id) { activeCharId = id; saveData('dh_activeChar', id); }
+
+function getChar(id) { return characters.find(c => c.id === id); }
+function getActive() { return getChar(activeCharId); }
+
+function newId() { return 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+function createBlankChar() {
+  return {
+    id: newId(),
+    name: '',
+    pronouns: '',
+    level: 1,
+    class: '',
+    subclass: '',
+    ancestry: '',
+    community: '',
+    traits: { Agility: 0, Strength: 0, Finesse: 0, Instinct: 0, Presence: 0, Knowledge: 0 },
+    hp: { max: 6, current: 6, marks: [] }, // marks: array of 'none'/'minor'/'major'/'severe'
+    evasion: 12,
+    stress: { max: 6, current: 0 },
+    hope: 2,
+    fear: 0,
+    armorName: 'No Armor',
+    armorScore: 0,
+    armorCurrent: 0,
+    damageThresholds: [5, 10],
+    weapons: [],
+    abilities: [],
+    equipment: [],
+    experiences: ['', ''],
+    background: '',
+    connections: '',
+    conditions: [],
+    notes: '',
+    createdAt: Date.now(),
+  };
+}
+
+// =====================================================================
+// VIEWS
+// =====================================================================
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const map = ['characters','builder','tracker','dice'];
+  const idx = map.indexOf(name);
+  if (idx >= 0) tabs[idx].classList.add('active');
+  if (name === 'tracker') renderTracker();
+  if (name === 'characters') renderCharList();
+}
+
+// =====================================================================
+// CHARACTER LIST
+// =====================================================================
+function renderCharList() {
+  const el = document.getElementById('char-list');
+  if (!characters.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">📜</div><p>No characters yet. Begin your legend.</p><button class="btn btn-primary" onclick="newCharacter()">Create Character</button></div>`;
+    return;
+  }
+  el.innerHTML = characters.map(c => {
+    const cls = CLASSES.find(x => x.name === c.class);
+    return `<div class="char-list-item" onclick="openChar('${c.id}')">
+      <div class="char-avatar">${cls ? cls.icon : '🗡'}</div>
+      <div>
+        <div class="char-name">${c.name || 'Unnamed Hero'}</div>
+        <div class="char-meta">${c.class || '—'} ${c.subclass ? '· ' + c.subclass : ''} · Level ${c.level} · ${c.ancestry || '—'}</div>
+      </div>
+      <div class="char-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-sm" onclick="openChar('${c.id}')">Track</button>
+        <button class="btn btn-sm" onclick="editChar('${c.id}')">Edit</button>
+        <button class="btn btn-sm" onclick="exportChar('${c.id}')">Export</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteChar('${c.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openChar(id) {
+  setActive(id);
+  showView('tracker');
+}
+
+function deleteChar(id) {
+  if (!confirm('Delete this character? This cannot be undone.')) return;
+  characters = characters.filter(c => c.id !== id);
+  if (activeCharId === id) { activeCharId = null; saveData('dh_activeChar', null); }
+  saveAll();
+  renderCharList();
+  toast('Character deleted.');
+}
+
+function exportChar(id) {
+  const c = getChar(id);
+  if (!c) return;
+  const blob = new Blob([JSON.stringify(c, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (c.name || 'character').replace(/\s+/g,'-').toLowerCase() + '.daggerheart.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Character exported!');
+}
+
+function importChar() {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = '.json';
+  inp.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const c = JSON.parse(ev.target.result);
+        if (!c.id) c.id = newId();
+        // merge with blank to fill missing fields
+        const blank = createBlankChar();
+        const merged = Object.assign(blank, c);
+        characters.push(merged);
+        saveAll();
+        renderCharList();
+        toast('Character imported: ' + (c.name || 'Unknown'));
+      } catch(e) { alert('Invalid file.'); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+function editChar(id) {
+  setActive(id);
+  initBuilder(id);
+  showView('builder');
+}
+
+// =====================================================================
+// BUILDER WIZARD
+// =====================================================================
+const WIZARD_STEPS = [
+  { id: 'class', label: 'Class' },
+  { id: 'subclass', label: 'Subclass' },
+  { id: 'heritage', label: 'Heritage' },
+  { id: 'traits', label: 'Traits' },
+  { id: 'equipment', label: 'Equipment' },
+  { id: 'abilities', label: 'Abilities' },
+  { id: 'background', label: 'Story' },
+  { id: 'identity', label: 'Identity' },
+  { id: 'finalize', label: 'Finalize' },
+];
+
+let wizardChar = null;
+let wizardStep = 0;
+
+function newCharacter() {
+  initBuilder(null);
+  showView('builder');
+}
+
+function initBuilder(charId) {
+  wizardChar = charId ? JSON.parse(JSON.stringify(getChar(charId))) : createBlankChar();
+  wizardStep = 0;
+  renderWizardProgress();
+  renderWizardPages();
+  updateWizardNav();
+}
+
+function renderWizardProgress() {
+  const prog = document.getElementById('wizard-progress');
+  let html = '';
+  WIZARD_STEPS.forEach((s, i) => {
+    if (i > 0) html += `<div class="wizard-connector"></div>`;
+    const cls = i < wizardStep ? 'done' : (i === wizardStep ? 'active' : '');
+    html += `<div class="wizard-step-dot ${cls}" data-label="${s.label}" onclick="jumpStep(${i})">${i < wizardStep ? '✓' : (i + 1)}</div>`;
+  });
+  prog.innerHTML = html;
+}
+
+function renderWizardPages() {
+  const pages = document.getElementById('wizard-pages');
+  pages.innerHTML = WIZARD_STEPS.map((s, i) => `<div class="wizard-page ${i===wizardStep?'active':''}" id="wpage-${i}">${buildPage(s.id, i)}</div>`).join('');
+}
+
+function jumpStep(i) {
+  if (i > wizardStep) return; // can only go back
+  wizardStep = i;
+  renderWizardProgress();
+  renderWizardPages();
+  updateWizardNav();
+}
+
+function buildPage(id, idx) {
+  switch(id) {
+    case 'class': return buildClassPage();
+    case 'subclass': return buildSubclassPage();
+    case 'heritage': return buildHeritagePage();
+    case 'traits': return buildTraitsPage();
+    case 'equipment': return buildEquipmentPage();
+    case 'abilities': return buildAbilitiesPage();
+    case 'background': return buildBackgroundPage();
+    case 'identity': return buildIdentityPage();
+    case 'finalize': return buildFinalizePage();
+    default: return '';
+  }
+}
+
+function buildClassPage() {
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:12px; font-size:1rem;">Step 1: Choose Your Class</h3>
+    <div class="class-grid">
+      ${CLASSES.map(c => `
+        <div class="class-card ${wizardChar.class===c.name?'selected':''}" onclick="selectClass('${c.name}')">
+          <div class="class-icon">${c.icon}</div>
+          <div class="class-name">${c.name}</div>
+          <div class="class-domains">${c.domains.join(' · ')}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${wizardChar.class ? (() => { const cls = CLASSES.find(c=>c.name===wizardChar.class); return `
+      <div class="card" style="margin-top:14px; background:rgba(0,0,0,0.3);">
+        <div style="font-family:'Cinzel',serif; color:var(--accent-gold2); font-size:0.9rem; margin-bottom:6px;">${cls.icon} ${cls.name} — HP: ${cls.hp} · Evasion: ${cls.evasion} · Stress: ${cls.stress}</div>
+        <div style="color:var(--text-muted); font-size:0.88rem; margin-bottom:8px;">${cls.desc}</div>
+        <div style="font-size:0.82rem; color:var(--accent-teal); margin-bottom:5px;"><strong>Class Feature:</strong> ${cls.classFeature}</div>
+        <div style="font-size:0.82rem; color:var(--accent-hope);"><strong>Hope Feature:</strong> ${cls.classFeature2}</div>
+        ${cls.classItems ? `<div style="font-size:0.78rem; color:var(--text-muted); margin-top:6px; font-style:italic;">Starting items: ${cls.classItems}</div>` : ''}
+      </div>` ; })() : ''}
+  `;
+}
+
+function selectClass(name) {
+  const cls = CLASSES.find(c => c.name === name);
+  wizardChar.class = name;
+  wizardChar.subclass = '';
+  wizardChar.hp.max = cls.hp;
+  wizardChar.hp.current = cls.hp;
+  wizardChar.stress.max = cls.stress;
+  wizardChar.evasion = cls.evasion;
+  wizardChar.abilities = [];
+  renderWizardPages();
+}
+
+function buildSubclassPage() {
+  const cls = CLASSES.find(c => c.name === wizardChar.class);
+  if (!cls) return `<p style="color:var(--text-muted)">Please select a class first.</p>`;
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:12px; font-size:1rem;">Step 2: Choose Your Subclass (Foundation)</h3>
+    <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:14px;">${cls.name} — ${cls.desc}</p>
+    <div class="sel-grid">
+      ${cls.subclasses.map(s => {
+        const sub = SUBCLASSES[s];
+        const selected = wizardChar.subclass === s;
+        return `<div class="sel-card ${selected?'selected':''}" onclick="wizardChar.subclass='${s}'; renderWizardPages();">
+          <div class="sel-name">${s}</div>
+          ${sub?.spellcast ? `<div style="font-size:0.7rem; color:var(--accent-hope); margin-bottom:5px; font-family:'Cinzel',serif;">Spellcast: ${sub.spellcast}</div>` : ''}
+          <div class="sel-desc">${sub?.desc || ''}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${wizardChar.subclass && SUBCLASSES[wizardChar.subclass] ? `
+    <div class="card" style="margin-top:14px; background:rgba(0,0,0,0.3);">
+      <div style="font-family:'Cinzel',serif; font-size:0.85rem; color:var(--accent-gold2); margin-bottom:8px;">${wizardChar.subclass} — Foundation Feature</div>
+      <div style="font-size:0.85rem; color:var(--accent-teal); white-space:pre-line;">${SUBCLASSES[wizardChar.subclass].foundation}</div>
+      <div style="font-size:0.75rem; color:var(--text-muted); margin-top:10px; border-top:1px solid var(--border); padding-top:8px;">
+        <span style="color:var(--accent-gold);">Specialization (gained on level up):</span> ${SUBCLASSES[wizardChar.subclass].specialization}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+function buildHeritagePage() {
+  const selectedAnc = ANCESTRIES.find(a => a.name === wizardChar.ancestry);
+  const selectedCom = COMMUNITIES.find(c => c.name === wizardChar.community);
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:4px; font-size:1rem;">Step 3: Heritage</h3>
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:14px;">Choose your Ancestry and Community. Each grants two features (Ancestry) or one feature (Community).</p>
+    
+    <div class="card-title">Ancestry</div>
+    <div class="class-grid" style="grid-template-columns:repeat(3,1fr);">
+      ${ANCESTRIES.map(a => `
+        <div class="class-card ${wizardChar.ancestry===a.name?'selected':''}" onclick="selectAncestry('${a.name}'); renderWizardPages();" title="${a.feature1}">
+          <div class="class-icon" style="font-size:1.2rem;">${a.icon}</div>
+          <div class="class-name" style="font-size:0.65rem;">${a.name}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${selectedAnc ? `<div class="card" style="margin-top:10px; background:rgba(0,0,0,0.3);">
+      <div style="font-family:'Cinzel',serif; font-size:0.85rem; color:var(--accent-gold2); margin-bottom:5px;">${selectedAnc.icon} ${selectedAnc.name}</div>
+      <div style="font-size:0.83rem; color:var(--text-muted); margin-bottom:8px; font-style:italic;">${selectedAnc.desc}</div>
+      <div style="font-size:0.82rem; color:var(--accent-teal); margin-bottom:4px;">✦ ${selectedAnc.feature1}</div>
+      <div style="font-size:0.82rem; color:var(--accent-teal);">✦ ${selectedAnc.feature2}</div>
+    </div>` : ''}
+
+    <div class="card-title" style="margin-top:16px;">Community</div>
+    <div class="sel-grid">
+      ${COMMUNITIES.map(c => `
+        <div class="sel-card ${wizardChar.community===c.name?'selected':''}" onclick="wizardChar.community='${c.name}'; renderWizardPages();">
+          <div class="sel-name">${c.name}</div>
+          <div class="sel-desc" style="font-size:0.78rem; margin-top:3px;">${c.feature}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${selectedCom ? `<div style="margin-top:8px; padding:8px 12px; background:rgba(0,0,0,0.2); border-radius:6px; font-size:0.82rem; color:var(--text-muted); font-style:italic;">${selectedCom.desc}</div>` : ''}
+  `;
+}
+
+function selectAncestry(name) { wizardChar.ancestry = name; }
+
+function buildTraitsPage() {
+  const pool = [2, 1, 1, 0, 0, -1];
+  const used = TRAITS.map(t => wizardChar.traits[t]);
+  const usedCounts = {};
+  pool.forEach(v => { usedCounts[v] = (usedCounts[v]||0)+1; });
+  const assignedCounts = {};
+  used.forEach(v => { assignedCounts[v] = (assignedCounts[v]||0)+1; });
+
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:4px; font-size:1rem;">Step 4: Assign Traits</h3>
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:4px;">Distribute these modifiers: <span style="color:var(--accent-gold2);">+2, +1, +1, 0, 0, −1</span></p>
+    <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:14px;">Each value can only be used as many times as listed above.</p>
+    <div class="trait-assign-grid">
+      ${TRAITS.map(t => `
+        <div class="trait-assign-row">
+          <span class="trait-assign-name">${t}</span>
+          <div class="trait-assign-val">
+            <button onclick="adjustTrait('${t}',-1)">−</button>
+            <span class="val-display">${wizardChar.traits[t] >= 0 ? '+' : ''}${wizardChar.traits[t]}</span>
+            <button onclick="adjustTrait('${t}',1)">+</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:14px; font-size:0.8rem; color:var(--text-muted);">
+      Total: <span style="color:${sumTraits()===3?'var(--accent-teal)':'var(--accent-fear)'};">${sumTraits()}/3</span>
+      ${sumTraits()===3?'<span style="color:var(--accent-teal);"> ✓ Perfect!</span>':''}
+    <button class="btn btn-sm" style="margin-left:auto;" onclick="resetTraits()">Reset Traits</button>
+    </div>
+    ${wizardChar.class ? `<div style="margin-top:10px; font-size:0.8rem; color:var(--text-muted);">Spellcast: <span style="color:var(--accent-gold);">${CLASSES.find(c=>c.name===wizardChar.class)?.spellcast||'None'}</span></div>`:''}
+  `;
+}
+
+function sumTraits() { return Object.values(wizardChar.traits).reduce((a,b)=>a+b,0); }
+
+function adjustTrait(trait, delta) {
+  const cur = wizardChar.traits[trait];
+  const next = cur + delta;
+  if (next < -1 || next > 2) return;
+
+  // Pool caps: how many times each value may appear across all traits
+  const poolLimits = { 2: 1, 1: 2, 0: 2, '-1': 1 };
+
+  // Count how many OTHER traits already use the target value
+  const othersUsingNext = Object.entries(wizardChar.traits)
+    .filter(([k]) => k !== trait)
+    .filter(([, v]) => v === next)
+    .length;
+
+  const limit = poolLimits[next] ?? 0;
+  if (othersUsingNext >= limit) {
+    toast(`Cannot assign ${next >= 0 ? '+' : ''}${next} to more traits (pool limit reached).`);
+    return;
+  }
+
+  wizardChar.traits[trait] = next;
+  renderWizardPages();
+}
+
+function buildEquipmentPage() {
+  // Ensure equipment is initialized
+  if (!Array.isArray(wizardChar.weapons)) wizardChar.weapons = [];
+  if (!Array.isArray(wizardChar.equipment)) wizardChar.equipment = [];
+  
+  const primary = wizardChar.weapons[0] || null;
+  const secondary = wizardChar.weapons[1] || null;
+
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:4px; font-size:1rem;">Step 5: Equipment</h3>
+    
+    <div class="card-title">Armor</div>
+    <div class="sel-grid">
+      ${ARMOR_OPTIONS.map(a => `
+        <div class="sel-card ${wizardChar.armorName===a.name?'selected':''}" onclick="selectArmor('${a.name}'); renderWizardPages();">
+          <div class="sel-name">${a.name}</div>
+          <div class="sel-desc">Thresholds: ${a.thresholds[0]}/${a.thresholds[1]} · Score: ${a.score}${a.feature?`<br>${a.feature}`:''}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card-title" style="margin-top:14px;">Primary Weapon</div>
+    <div class="sel-grid">
+      ${WEAPON_OPTIONS.map(w => `
+        <div class="sel-card ${primary===w.name?'selected':''}" onclick="selectWeapon(0,'${w.name}'); renderWizardPages();">
+          <div class="sel-name">${w.name}</div>
+          <div class="sel-desc">${w.damage} · ${w.trait} · ${w.range}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card-title" style="margin-top:14px;">Secondary Weapon <span style="font-size:0.7rem; color:var(--text-muted);">(optional)</span></div>
+    <div class="sel-grid">
+      <div class="sel-card ${!secondary?'selected':''}" onclick="selectWeapon(1,''); renderWizardPages();">
+        <div class="sel-name">None</div>
+        <div class="sel-desc">Single weapon fighter.</div>
+      </div>
+      ${WEAPON_OPTIONS.map(w => `
+        <div class="sel-card ${secondary===w.name?'selected':''}" onclick="selectWeapon(1,'${w.name}'); renderWizardPages();">
+          <div class="sel-name">${w.name}</div>
+          <div class="sel-desc">${w.damage} · ${w.trait} · ${w.range}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:14px;">
+      <div class="card-title" style="margin:0; flex:1;">Starting Gear</div>
+      <button class="btn btn-sm" onclick="resetEquipment()">Reset Equipment</button>
+    </div>
+    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Every character starts with: Torch, 50ft Rope, Basic Supplies, Gold Pouch, Health Potion or Stamina Potion.</div>
+    <div style="display:flex; gap:8px; align-items:flex-end;">
+      <div style="flex:1;"><label>Additional Item</label><input type="text" id="extra-gear-input" placeholder="e.g. Thieves' Tools"></div>
+      <button class="btn btn-sm" onclick="addExtraGear()">Add</button>
+    </div>
+    <div id="extra-gear-list" style="margin-top:8px;">
+      ${(wizardChar.equipment||[]).filter(e=>!['Torch','50ft Rope','Basic Supplies','Gold Pouch'].includes(e.name)).map((e,i)=>`<div class="equip-item"><span class="equip-name">${e.name}</span><button class="btn btn-sm btn-danger" onclick="removeExtraGear(${i})">✕</button></div>`).join('')}
+    </div>
+  `;
+}
+
+function selectArmor(name) {
+  const a = ARMOR_OPTIONS.find(x => x.name === name);
+  wizardChar.armorName = name;
+  wizardChar.armorScore = a.score;
+  wizardChar.armorCurrent = a.score;
+  wizardChar.damageThresholds = [a.thresholds[0] + wizardChar.level, a.thresholds[1] + wizardChar.level];
+}
+
+function selectWeapon(slot, name) {
+  if (!wizardChar.weapons) wizardChar.weapons = [];
+  if (!name) { wizardChar.weapons[slot] = undefined; wizardChar.weapons = wizardChar.weapons.filter(Boolean).filter((_,i)=>i<=slot); return; }
+  wizardChar.weapons[slot] = name;
+}
+
+function addExtraGear() {
+  const inp = document.getElementById('extra-gear-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  if (!wizardChar.equipment) wizardChar.equipment = [];
+  wizardChar.equipment.push({ name: val, qty: 1, notes: '' });
+  inp.value = '';
+  renderWizardPages();
+}
+
+function removeExtraGear(idx) {
+  // Remove the idx-th non-standard item
+  const extras = wizardChar.equipment.filter(e=>!['Torch','50ft Rope','Basic Supplies','Gold Pouch'].includes(e.name));
+  const toRemove = extras[idx];
+  wizardChar.equipment = wizardChar.equipment.filter(e => e !== toRemove);
+  renderWizardPages();
+}
+
+function buildAbilitiesPage() {
+  const cls = CLASSES.find(c => c.name === wizardChar.class);
+  if (!cls) return `<p style="color:var(--text-muted)">Select a class first.</p>`;
+  
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:4px; font-size:1rem;">Step 6: Domain Cards</h3>
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:4px;">${cls.name} has access to the <span style="color:var(--accent-teal);">${cls.domains.join(' & ')}</span> domains.</p>
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:14px;">Choose <strong style="color:var(--text-primary);">2</strong> domain cards. You gain more at each level-up (max 5 in your Loadout at a time).</p>
+    
+    <div style="margin-bottom:14px;">
+      ${cls.domains.map(domain => `
+        <div class="card-title">${domain} Domain</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px; font-style:italic;">
+          ${domain === 'Arcana' ? 'The domain of arcane mysteries and magical force.' :
+            domain === 'Blade' ? 'The domain of martial skill and weapons mastery.' :
+            domain === 'Bone' ? 'The domain of endurance, grit, and physical resilience.' :
+            domain === 'Codex' ? 'The domain of knowledge, lore, and written secrets.' :
+            domain === 'Grace' ? 'The domain of elegance, charm, and social prowess.' :
+            domain === 'Midnight' ? 'The domain of shadow, deception, and obscurity.' :
+            domain === 'Sage' ? 'The domain of nature, beasts, and the natural world.' :
+            domain === 'Splendor' ? 'The domain of life, healing, and radiant power.' :
+            domain === 'Valor' ? 'The domain of courage, divine purpose, and protection.' : ''}
+        </div>
+        <a href="https://daggerheart.org/reference/all-domain-cards#${domain}" target="_blank" rel="noopener"
+          style="display:inline-flex; align-items:center; gap:6px; margin-bottom:10px; font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent-teal); text-decoration:none; border:1px solid rgba(46,207,212,0.4); border-radius:4px; padding:5px 12px; transition:all 0.2s; background:rgba(46,207,212,0.05);" 
+          onmouseover="this.style.background='rgba(46,207,212,0.12)'; this.style.borderColor='rgba(46,207,212,0.7)';"
+          onmouseout="this.style.background='rgba(46,207,212,0.05)'; this.style.borderColor='rgba(46,207,212,0.4)';">
+          ⧉ Browse ${domain} Cards on daggerheart.org
+        </a>
+      `).join('')}
+    </div>
+
+    <div class="card-title">Add Domain Cards</div>
+    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px;">You can add cards from your physical deck or note them here. Pick 2 to start.</p>
+    ${(wizardChar.abilities||[]).map((a,i) => `
+      <div class="ability-card ${a.used?'ability-used':''}" style="margin-bottom:8px;">
+        <div class="ability-name">${a.name}</div>
+        <div class="ability-domain">${a.domain} Domain${a.cost?' · '+a.cost:''}</div>
+        <div class="ability-desc">${a.desc||'Domain card ability.'}</div>
+        <button class="btn btn-sm btn-danger" style="position:absolute;top:10px;right:10px;" onclick="removeWizardAbility(${i})">✕</button>
+      </div>
+    `).join('')}
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+      <div>
+        <label>Card Name</label>
+        <input type="text" id="new-ab-name" placeholder="e.g. Shadow Step">
+      </div>
+      <div>
+        <label>Domain</label>
+        <select id="new-ab-domain">
+          ${cls.domains.map(d => `<option value="${d}">${d}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <label>Description (optional)</label>
+    <textarea id="new-ab-desc" style="min-height:60px;" placeholder="What does this card do?"></textarea>
+    <label>Cost (optional)</label>
+    <input type="text" id="new-ab-cost" placeholder="e.g. 1 Hope, Mark a Stress">
+    <button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="addWizardAbility()">+ Add Card</button>
+    <div style="display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap;">
+    <div style="font-size:0.85rem; color:${(wizardChar.abilities||[]).length>=2?'var(--accent-teal)':'var(--text-muted)'};">
+      Cards selected: ${(wizardChar.abilities||[]).length}/2 ${(wizardChar.abilities||[]).length>=2?'✓':''}
+    </div>
+    ${(wizardChar.abilities||[]).length>0?'<button class="btn btn-sm btn-danger" onclick="clearWizardAbilities()">Clear All</button>':''}
+    </div>
+  `;
+}
+
+function addWizardAbility() {
+  const name = document.getElementById('new-ab-name')?.value?.trim();
+  const domain = document.getElementById('new-ab-domain')?.value;
+  const desc = document.getElementById('new-ab-desc')?.value?.trim();
+  const cost = document.getElementById('new-ab-cost')?.value?.trim();
+  if (!name) { toast('Enter a card name.'); return; }
+  if (!wizardChar.abilities) wizardChar.abilities = [];
+  if (wizardChar.abilities.length >= 2) { toast('You may only start with 2 domain cards.'); return; }
+  wizardChar.abilities.push({ name, domain, desc: desc||'Domain card ability.', cost: cost||'', used: false });
+  renderWizardPages();
+}
+
+function removeWizardAbility(idx) {
+  wizardChar.abilities.splice(idx, 1);
+  renderWizardPages();
+}
+
+function buildBackgroundPage() {
+  const cls = CLASSES.find(c => c.name === wizardChar.class);
+  const questions = cls?.backgroundQuestions || [
+    'What shaped your path to adventure?',
+    'Who taught you the skills you rely on most?',
+    'What do you most fear losing?',
+    'What promise have you made that keeps you going?',
+  ];
+
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:4px; font-size:1rem;">Step 7: Background & Experiences</h3>
+    
+    <div class="card-title">Background Questions</div>
+    <p style="color:var(--text-muted); font-size:0.82rem; margin-bottom:10px;">These prompts are tailored to your class. Answer any that resonate — they'll inform your Experiences and connections.</p>
+    <div style="padding:12px; background:rgba(0,0,0,0.25); border-radius:8px; border-left:3px solid var(--accent-teal); margin-bottom:14px;">
+      ${questions.map(q => `<div style="font-size:0.85rem; color:var(--accent-teal); font-style:italic; margin-bottom:6px;">• "${q}"</div>`).join('')}
+    </div>
+
+    <div class="card-title">Background Story</div>
+    <label>Your Background</label>
+    <textarea id="bg-text" placeholder="Who are you? What brought you to this life of adventure?" onchange="wizardChar.background=this.value">${wizardChar.background||''}</textarea>
+
+    <div class="card-title" style="margin-top:16px;">Experiences</div>
+    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:10px;">Choose 2 short phrases that describe your character's life experience — e.g. "Streetwise", "Reluctant Heir", "Speaks to Animals". Spend a Hope to add +2 to a relevant roll.</p>
+    <div class="form-row">
+      <div>
+        <label>Experience 1</label>
+        <input type="text" placeholder="e.g. Streetwise" value="${wizardChar.experiences?.[0]||''}" onchange="wizardChar.experiences[0]=this.value">
+      </div>
+      <div>
+        <label>Experience 2</label>
+        <input type="text" placeholder="e.g. Reluctant Heir" value="${wizardChar.experiences?.[1]||''}" onchange="wizardChar.experiences[1]=this.value">
+      </div>
+    </div>
+
+    <div class="card-title" style="margin-top:16px;">Party Connections</div>
+    <label>Connections with Other Characters</label>
+    <textarea id="conn-text" placeholder="Describe your relationships and history with other party members..." onchange="wizardChar.connections=this.value">${wizardChar.connections||''}</textarea>
+  `;
+}
+
+function buildIdentityPage() {
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:12px; font-size:1rem;">Step 8: Identity & Description</h3>
+    <div class="form-row">
+      <div>
+        <label>Character Name</label>
+        <input type="text" placeholder="What are you called?" value="${wizardChar.name||''}" onchange="wizardChar.name=this.value">
+      </div>
+      <div>
+        <label>Pronouns</label>
+        <input type="text" placeholder="e.g. she/her, they/them" value="${wizardChar.pronouns||''}" onchange="wizardChar.pronouns=this.value">
+      </div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Level</label>
+        <input type="number" min="1" max="10" value="${wizardChar.level||1}" onchange="wizardChar.level=parseInt(this.value)||1">
+      </div>
+      <div>
+        <label>Age</label>
+        <input type="text" placeholder="Young, Ancient..." value="${wizardChar.age||''}" onchange="wizardChar.age=this.value">
+      </div>
+    </div>
+    <label>Physical Description</label>
+    <textarea placeholder="What do you look like? Your build, features, style of dress..." onchange="wizardChar.description=this.value">${wizardChar.description||''}</textarea>
+    <label>Personality / Demeanor</label>
+    <textarea placeholder="How do you carry yourself? What drives you?" onchange="wizardChar.personality=this.value">${wizardChar.personality||''}</textarea>
+    <label>Notes</label>
+    <textarea placeholder="Anything else..." onchange="wizardChar.notes=this.value">${wizardChar.notes||''}</textarea>
+  `;
+}
+
+function buildFinalizePage() {
+  const cls = CLASSES.find(c => c.name === wizardChar.class);
+  const sub = wizardChar.subclass ? SUBCLASSES[wizardChar.subclass] : null;
+  const anc = ANCESTRIES.find(a => a.name === wizardChar.ancestry);
+  const com = COMMUNITIES.find(c => c.name === wizardChar.community);
+  return `
+    <h3 style="font-family:'Cinzel',serif; color:var(--accent-gold2); margin-bottom:14px; font-size:1rem;">Step 9: Finalize</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+      <div class="trait-box"><div class="trait-name">Name</div><div style="font-family:'Cinzel',serif; font-size:0.9rem; color:var(--accent-gold2); margin-top:4px;">${wizardChar.name||'—'}</div></div>
+      <div class="trait-box"><div class="trait-name">Class</div><div style="font-family:'Cinzel',serif; font-size:0.9rem; color:var(--accent-gold2); margin-top:4px;">${wizardChar.class||'—'} ${cls?cls.icon:''}</div></div>
+      <div class="trait-box"><div class="trait-name">Subclass</div><div style="font-family:'Cinzel',serif; font-size:0.85rem; color:var(--text-primary); margin-top:4px;">${wizardChar.subclass||'—'}${sub?' ('+sub.spellcast+')':''}</div></div>
+      <div class="trait-box"><div class="trait-name">Heritage</div><div style="font-family:'Cinzel',serif; font-size:0.85rem; color:var(--text-primary); margin-top:4px;">${wizardChar.ancestry||'—'} · ${wizardChar.community||'—'}</div></div>
+      <div class="trait-box"><div class="trait-name">HP</div><div class="trait-val">${wizardChar.hp?.max||'—'}</div></div>
+      <div class="trait-box"><div class="trait-name">Evasion</div><div class="trait-val">${wizardChar.evasion||'—'}</div></div>
+    </div>
+    <div class="card-title">Traits</div>
+    <div class="trait-grid" style="margin-bottom:14px;">
+      ${TRAITS.map(t => {
+        const v = wizardChar.traits[t]||0;
+        const isSpell = sub?.spellcast === t;
+        return `<div class="trait-box" style="${isSpell?'border-color:rgba(46,207,212,0.5);':''}">
+          <div class="trait-name">${t}${isSpell?' ✦':''}</div>
+          <div class="trait-val ${v>0?'positive':v<0?'negative':''}">${v>=0?'+':''}${v}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    ${sub ? `<div class="card-title">Foundation Feature</div><p style="font-size:0.82rem; color:var(--accent-teal); white-space:pre-line; margin-bottom:10px;">${sub.foundation}</p>` : ''}
+    ${anc ? `<div class="card-title">Ancestry Features (${anc.name})</div>
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:2px;">✦ ${anc.feature1}</p>
+      <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px;">✦ ${anc.feature2}</p>` : ''}
+    ${com ? `<div class="card-title">Community Feature (${com.name})</div><p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:10px;">${com.feature}</p>` : ''}
+    ${wizardChar.abilities?.length ? `<div class="card-title">Domain Cards</div><p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:14px;">${wizardChar.abilities.map(a=>a.name+' ('+a.domain+')').join(', ')}</p>` : ''}
+    <div style="padding:14px; background:rgba(64,192,176,0.08); border:1px solid rgba(64,192,176,0.3); border-radius:8px; font-family:'Cinzel',serif; font-size:0.8rem; color:var(--accent-teal);">
+      ✦ Ready to begin your adventure? Click "Save Character" to add this character to your roster.
+    </div>
+    <button class="btn btn-primary" style="margin-top:14px; width:100%;" onclick="saveBuiltChar()">⚔ Save Character ⚔</button>
+  `;
+}
+
+function updateWizardNav() {
+  const prev = document.getElementById('btn-prev');
+  const next = document.getElementById('btn-next');
+  prev.style.visibility = wizardStep === 0 ? 'hidden' : 'visible';
+  const isLast = wizardStep === WIZARD_STEPS.length - 1;
+  next.textContent = isLast ? 'Save →' : 'Next →';
+  next.onclick = isLast ? saveBuiltChar : wizardNext;
+}
+
+function wizardNext() {
+  if (wizardStep < WIZARD_STEPS.length - 1) {
+    // sync any inputs
+    syncWizardInputs();
+    wizardStep++;
+    renderWizardProgress();
+    renderWizardPages();
+    updateWizardNav();
+  }
+}
+
+function wizardPrev() {
+  if (wizardStep > 0) {
+    syncWizardInputs();
+    wizardStep--;
+    renderWizardProgress();
+    renderWizardPages();
+    updateWizardNav();
+  }
+}
+
+function syncWizardInputs() {
+  // sync textarea values
+  const bgText = document.getElementById('bg-text');
+  if (bgText) wizardChar.background = bgText.value;
+  const connText = document.getElementById('conn-text');
+  if (connText) wizardChar.connections = connText.value;
+}
+
+function saveBuiltChar() {
+  syncWizardInputs();
+  if (!wizardChar.name) { toast('Please give your character a name!'); return; }
+  if (!wizardChar.class) { toast('Please choose a class!'); return; }
+  
+  // Add default starting gear
+  const defaults = ['Torch','50ft Rope','Basic Supplies','Gold Pouch'];
+  defaults.forEach(name => {
+    if (!wizardChar.equipment.find(e => e.name === name)) {
+      wizardChar.equipment.unshift({ name, qty: 1, notes: '' });
+    }
+  });
+  // Add potion if not present
+  if (!wizardChar.equipment.find(e => e.name.includes('Potion'))) {
+    wizardChar.equipment.push({ name: 'Minor Health Potion', qty: 1, notes: '' });
+  }
+
+  const existing = characters.findIndex(c => c.id === wizardChar.id);
+  if (existing >= 0) {
+    characters[existing] = wizardChar;
+    toast('Character updated!');
+  } else {
+    characters.push(wizardChar);
+    toast('Character saved: ' + wizardChar.name);
+  }
+  saveAll();
+  setActive(wizardChar.id);
+  showView('tracker');
+}
+
+// =====================================================================
+// TRACKER
+// =====================================================================
+function renderTracker() {
+  const char = getActive();
+  const tc = document.getElementById('tracker-content');
+  if (!char) {
+    tc.innerHTML = `<div class="empty-state"><div class="big-icon">🗡</div><p>No character selected.</p><button class="btn btn-primary" onclick="showView('characters')">Select Character</button></div>`;
+    return;
+  }
+  const cls = CLASSES.find(c => c.name === char.class);
+
+  tc.innerHTML = `
+    <!-- Character Header -->
+    <div class="card" style="border-color:rgba(201,168,76,0.4);">
+      <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+        <div class="char-avatar" style="width:52px;height:52px;font-size:1.6rem;">${cls?cls.icon:'⚔'}</div>
+        <div style="flex:1;">
+          <div style="font-family:'Cinzel Decorative',serif; font-size:1.2rem; color:var(--accent-gold2);">${char.name}</div>
+          <div style="color:var(--text-muted); font-size:0.85rem;">${char.class} · ${char.subclass||''} · Level ${char.level} · ${char.ancestry||''} ${char.community?'('+char.community+')':''} ${char.pronouns?'· '+char.pronouns:''}</div>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-sm" onclick="editChar('${char.id}')">Edit</button>
+          <button class="btn btn-sm" onclick="exportChar('${char.id}')">Export</button>
+          <button class="btn btn-sm" onclick="showLevelUp('${char.id}')">Level Up</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hope & Fear -->
+    <div class="tracker-grid">
+      <div class="card">
+        <div class="card-title">Hope</div>
+        <div class="tracker-label">
+          <span>Current</span>
+          <span class="count" style="color:var(--accent-teal);">${char.hope}</span>
+        </div>
+        <div class="bubble-row">
+          ${Array.from({length:6},(_,i)=>`<div class="bubble hope ${i<char.hope?'filled':''}" onclick="setHope(${i+1})" style="font-size:0.55rem;">◆</div>`).join('')}
+          <div class="bubble hope" style="border-style:dashed;opacity:0.4;" onclick="setHope(${char.hope+1})">+</div>
+        </div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn btn-sm btn-teal" onclick="changeHope(1)">+Hope</button>
+          <button class="btn btn-sm" onclick="changeHope(-1)">−Hope</button>
+          <button class="btn btn-sm" onclick="setHope(0)" title="Reset Hope to 0">Reset</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Stress</div>
+        <div class="tracker-label">
+          <span>Current</span>
+          <span class="count" style="color:#c060c0;">${char.stress.current}/${char.stress.max}</span>
+        </div>
+        <div class="bubble-row">
+          ${Array.from({length:char.stress.max},(_,i)=>`<div class="bubble stress ${i<char.stress.current?'filled':''}" onclick="setStress(${i+1})">✦</div>`).join('')}
+        </div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn btn-sm btn-fear" onclick="changeStress(1)">+Stress</button>
+          <button class="btn btn-sm" onclick="changeStress(-1)">−Stress</button>
+          <button class="btn btn-sm" onclick="setStress(0)" title="Clear all Stress">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HP -->
+    <div class="card">
+      <div class="card-title">Hit Points & Damage</div>
+      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+        <div class="tracker-label">
+          <span>HP</span>
+          <span class="count" style="color:#40b060;">${char.hp.current}/${char.hp.max}</span>
+        </div>
+        <div class="btn-row" style="margin:0;">
+          <button class="btn btn-sm btn-teal" onclick="changeHP(1)">+</button>
+          <button class="btn btn-sm btn-fear" onclick="changeHP(-1)">−</button>
+        </div>
+      </div>
+      <div class="bubble-row">
+        ${Array.from({length:char.hp.max},(_,i)=>`<div class="bubble hp ${i<char.hp.current?'filled':''}" onclick="setHP(${i+1})"></div>`).join('')}
+      </div>
+      <div class="card-title" style="margin-top:14px;">Damage Thresholds</div>
+      <div class="threshold-display">
+        <div class="threshold-badge minor">Minor ≤ ${char.damageThresholds?.[0]||5}</div>
+        <div class="threshold-badge major">Major ≤ ${char.damageThresholds?.[1]||10}</div>
+        <div class="threshold-badge severe">Severe > ${char.damageThresholds?.[1]||10}</div>
+      </div>
+      <div class="card-title" style="margin-top:14px;">Damage Marks</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;">
+        <button class="btn btn-sm" style="border-color:rgba(200,150,50,0.7);color:#c08030;" onclick="addMark('minor')">+ Minor</button>
+        <button class="btn btn-sm" style="border-color:rgba(200,80,60,0.7);color:#c04030;" onclick="addMark('major')">+ Major</button>
+        <button class="btn btn-sm btn-fear" onclick="addMark('severe')">+ Severe</button>
+        <button class="btn btn-sm" onclick="clearMarks()">Clear Marks</button>
+      </div>
+      <div id="damage-marks" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+        ${(char.hp.marks||[]).map((m,i)=>`<span class="threshold-badge ${m}" style="cursor:pointer;" onclick="removeMark(${i})" title="Click to remove">${m} ✕</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- Armor -->
+    <div class="card">
+      <div class="card-title">Armor</div>
+      <div style="display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:8px;">
+        <div>
+          <div style="font-family:'Cinzel',serif; font-size:0.78rem; color:var(--text-muted);">TYPE</div>
+          <div style="color:var(--accent-gold2);">${char.armorName||'No Armor'}</div>
+        </div>
+        <div>
+          <div style="font-family:'Cinzel',serif; font-size:0.78rem; color:var(--text-muted);">SCORE</div>
+          <div style="font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:var(--accent-gold2);">${char.armorCurrent||0}/${char.armorScore||0}</div>
+        </div>
+        <div>
+          <div style="font-family:'Cinzel',serif; font-size:0.78rem; color:var(--text-muted);">EVASION</div>
+          <div style="font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:var(--accent-teal);">${char.evasion}</div>
+        </div>
+      </div>
+      <div class="bubble-row">
+        ${Array.from({length:char.armorScore||0},(_,i)=>`<div class="bubble armor ${i<(char.armorCurrent||0)?'filled':''}" onclick="setArmor(${i+1})">🛡</div>`).join('')}
+      </div>
+      <div class="btn-row" style="margin-top:8px;">
+        <button class="btn btn-sm" onclick="changeArmor(1)">+Score</button>
+        <button class="btn btn-sm btn-fear" onclick="changeArmor(-1)">−Score</button>
+        <button class="btn btn-sm" onclick="restoreArmor()">Restore All</button>
+      </div>
+    </div>
+
+    <!-- Traits -->
+    <div class="card">
+      <div class="card-title">Traits</div>
+      <div class="trait-grid">
+        ${TRAITS.map(t => {
+          const v = char.traits[t]||0;
+          const sub2 = char.subclass ? SUBCLASSES[char.subclass] : null;
+          const isSpell = sub2?.spellcast === t;
+          return `<div class="trait-box" style="${isSpell?'border-color:rgba(46,207,212,0.4);':''}">
+            <div class="trait-name">${t}${isSpell?' ✦':''}</div>
+            <div class="trait-val ${v>0?'positive':v<0?'negative':''}">${v>=0?'+':''}${v}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Weapons -->
+    ${(char.weapons||[]).filter(Boolean).length ? `
+    <div class="card">
+      <div class="card-title">Weapons</div>
+      ${(char.weapons||[]).filter(Boolean).map(wname => {
+        const w = WEAPON_OPTIONS.find(x=>x.name===wname);
+        return w ? `<div class="equip-item">
+          <span class="equip-name"><strong>${w.name}</strong></span>
+          <span style="color:var(--text-muted); font-size:0.85rem;">${w.damage} · ${w.trait} · ${w.range}</span>
+        </div>` : '';
+      }).join('')}
+    </div>` : ''}
+
+    <!-- Conditions -->
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;width:100%;">Conditions <button class="btn btn-sm" onclick="clearConditions()" style="margin-left:auto;font-size:0.6rem;">Clear All</button></div>
+      <div style="display:flex; flex-wrap:wrap; margin-top:4px;">
+        ${CONDITIONS.map(c => {
+          const active = (char.conditions||[]).includes(c);
+          return `<span class="condition-badge ${active?'cond-'+c:'inactive'}" onclick="toggleCondition('${c}')">${active?'◉':''} ${c}</span>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Abilities -->
+    <div class="card">
+      <div class="card-title">Abilities & Domain Cards</div>
+      ${!(char.abilities?.length) ? '<p style="color:var(--text-muted);font-size:0.9rem;">No abilities yet.</p>' :
+        `<div class="ability-list">
+          ${char.abilities.map((a,i) => `
+            <div class="ability-card ${a.used?'ability-used':''}" onclick="toggleAbilityUsed(${i})">
+              <div class="ability-name">${a.name}</div>
+              <div class="ability-domain">${a.domain} Domain</div>
+              <div class="ability-desc">${a.desc||'Domain card ability.'}</div>
+              ${a.cost?`<div class="ability-cost">${a.cost}</div>`:''}
+            </div>
+          `).join('')}
+        </div>`
+      }
+      <div class="btn-row">
+        <button class="btn btn-sm" onclick="showAddAbility('${char.id}')">+ Add Ability</button>
+        <button class="btn btn-sm" onclick="resetAbilities()" title="Clear all used marks">Reset Used</button>
+        <button class="btn btn-sm btn-danger" onclick="markAllAbilitiesUsed()" title="Mark all abilities as used">Mark All Used</button>
+      </div>
+    </div>
+
+    <!-- Equipment -->
+    <div class="card">
+      <div class="card-title">Equipment & Inventory</div>
+      <div id="equip-list">
+        ${(char.equipment||[]).map((e,i) => `
+          <div class="equip-item">
+            <span class="equip-name">${e.name}${e.notes?` <span style="color:var(--text-muted);font-size:0.8rem;">— ${e.notes}</span>`:''}</span>
+            <span class="equip-qty" onclick="adjustEquipQty(${i},1)">×${e.qty||1}</span>
+            <button class="btn btn-sm btn-fear" onclick="adjustEquipQty(${i},-1)">−</button>
+            <button class="btn btn-sm btn-danger" onclick="removeEquip(${i})">✕</button>
+          </div>
+        `).join('')}
+      </div>
+      <div style="display:flex; gap:6px; margin-top:8px; margin-bottom:4px; flex-wrap:wrap;">
+        <button class="btn btn-sm btn-danger" onclick="clearAllEquip()">Clear All Items</button>
+        <button class="btn btn-sm" onclick="resetEquipQty()">Reset Quantities</button>
+      </div>
+      <div style="display:flex; gap:8px; align-items:flex-end; margin-top:6px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:140px;"><label>Item Name</label><input type="text" id="new-equip-name" placeholder="Rope, Potion..."></div>
+        <div style="width:70px;"><label>Qty</label><input type="number" id="new-equip-qty" min="1" value="1"></div>
+        <button class="btn btn-sm" onclick="addEquipItem()">Add</button>
+      </div>
+    </div>
+
+    <!-- Experiences -->
+    <div class="card">
+      <div class="card-title">Experiences</div>
+      ${(char.experiences||[]).filter(Boolean).map((e,i) => `
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+          <span style="font-size:0.9rem; flex:1;">✦ ${e}</span>
+          <span style="font-size:0.75rem; color:var(--accent-teal); font-family:'Cinzel',serif;">+2 (spend Hope)</span>
+        </div>
+      `).join('')}
+      ${!(char.experiences||[]).filter(Boolean).length ? '<p style="color:var(--text-muted);font-size:0.9rem;">No experiences defined.</p>' : ''}
+    </div>
+
+    <!-- Notes -->
+    <div class="card">
+      <div class="card-title">Session Notes</div>
+      <textarea class="notes-area" placeholder="Track session events, GM notes, party info..." oninput="saveNotes(this.value)">${char.notes||''}</textarea>
+    </div>
+
+    <!-- Rest -->
+    <div class="card">
+      <div class="card-title">Rest & Recovery</div>
+      <div class="btn-row">
+        <button class="btn btn-teal" onclick="shortRest()">Short Rest</button>
+        <button class="btn btn-primary" onclick="longRest()">Long Rest</button>
+      </div>
+      <div style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;">Short Rest: Restore HP equal to Stress cleared. Long Rest: Restore all HP, Armor, reset abilities.</div>
+    </div>
+  `;
+}
+
+// =====================================================================
+// TRACKER ACTIONS
+// =====================================================================
+function withChar(fn) {
+  const c = getActive();
+  if (!c) return;
+  fn(c);
+  saveAll();
+  renderTracker();
+}
+
+function setHope(v) { withChar(c => { c.hope = Math.max(0, Math.min(12, v)); }); }
+function changeHope(d) { withChar(c => { c.hope = Math.max(0, Math.min(12, (c.hope||0)+d)); }); }
+function setStress(v) { withChar(c => { c.stress.current = Math.max(0, Math.min(c.stress.max, v)); }); }
+function changeStress(d) { withChar(c => { c.stress.current = Math.max(0, Math.min(c.stress.max, (c.stress.current||0)+d)); }); }
+function setHP(v) { withChar(c => { c.hp.current = Math.max(0, Math.min(c.hp.max, v)); }); }
+function changeHP(d) { withChar(c => { c.hp.current = Math.max(0, Math.min(c.hp.max, (c.hp.current||0)+d)); }); }
+function setArmor(v) { withChar(c => { c.armorCurrent = Math.max(0, Math.min(c.armorScore, v)); }); }
+function changeArmor(d) { withChar(c => { c.armorCurrent = Math.max(0, Math.min(c.armorScore, (c.armorCurrent||0)+d)); }); }
+function restoreArmor() { withChar(c => { c.armorCurrent = c.armorScore; }); }
+
+function addMark(type) { withChar(c => { if (!c.hp.marks) c.hp.marks = []; c.hp.marks.push(type); }); }
+function removeMark(idx) { withChar(c => { c.hp.marks.splice(idx, 1); }); }
+function clearMarks() { withChar(c => { c.hp.marks = []; }); }
+
+function toggleCondition(cond) {
+  withChar(c => {
+    if (!c.conditions) c.conditions = [];
+    const idx = c.conditions.indexOf(cond);
+    if (idx >= 0) c.conditions.splice(idx, 1);
+    else c.conditions.push(cond);
+  });
+}
+
+function toggleAbilityUsed(idx) {
+  withChar(c => { c.abilities[idx].used = !c.abilities[idx].used; });
+}
+function resetAbilities() { withChar(c => { c.abilities.forEach(a => a.used = false); }); }
+
+function adjustEquipQty(idx, delta) {
+  withChar(c => {
+    c.equipment[idx].qty = Math.max(0, (c.equipment[idx].qty||1) + delta);
+    if (c.equipment[idx].qty === 0) { c.equipment.splice(idx, 1); }
+  });
+}
+function removeEquip(idx) { withChar(c => { c.equipment.splice(idx, 1); }); }
+function addEquipItem() {
+  const name = document.getElementById('new-equip-name')?.value?.trim();
+  const qty = parseInt(document.getElementById('new-equip-qty')?.value) || 1;
+  if (!name) return;
+  withChar(c => { c.equipment.push({ name, qty, notes: '' }); });
+  const ni = document.getElementById('new-equip-name');
+  if (ni) ni.value = '';
+}
+
+function saveNotes(val) {
+  const c = getActive();
+  if (!c) return;
+  c.notes = val;
+  saveAll();
+}
+
+function shortRest() {
+  withChar(c => {
+    const stressCleared = c.stress.current;
+    c.stress.current = 0;
+    const healed = stressCleared;
+    c.hp.current = Math.min(c.hp.max, (c.hp.current||0) + healed);
+    toast(`Short rest: +${healed} HP, stress cleared.`);
+  });
+}
+
+function longRest() {
+  withChar(c => {
+    c.hp.current = c.hp.max;
+    c.stress.current = 0;
+    c.armorCurrent = c.armorScore;
+    c.hp.marks = [];
+    c.conditions = [];
+    c.abilities.forEach(a => a.used = false);
+    toast('Long rest complete. Fully restored!');
+  });
+}
+
+function showAddAbility(charId) {
+  const c = getChar(charId);
+  if (!c) return;
+  const cls = CLASSES.find(x => x.name === c.class);
+  
+  let html = `<h3>Add Domain Card</h3>
+    <div class="card-title">Custom Card</div>
+    <label>Name</label><input type="text" id="custom-ab-name">
+    <label>Domain</label>
+    <select id="custom-ab-domain">
+      ${cls ? cls.domains.map(d=>`<option value="${d}">${d}</option>`).join('') : '<option>—</option>'}
+    </select>
+    <label>Description</label><textarea id="custom-ab-desc"></textarea>
+    <label>Cost (e.g. 1 Hope, Mark a Stress)</label><input type="text" id="custom-ab-cost">
+    <button class="btn btn-primary" style="margin-top:10px;" onclick="addCustomAbility('${charId}')">Add Card</button>`;
+  showModal(html);
+}
+
+function addAbilityToChar(charId, name, domain) {
+  const c = getChar(charId);
+  if (!c) return;
+  c.abilities.push({ name, domain, used: false, desc: 'Domain card ability.', cost: '' });
+  saveAll();
+  closeModal();
+  renderTracker();
+  toast(`Added: ${name}`);
+}
+
+function addCustomAbility(charId) {
+  const c = getChar(charId);
+  if (!c) return;
+  const name = document.getElementById('custom-ab-name')?.value?.trim();
+  const domain = document.getElementById('custom-ab-domain')?.value?.trim();
+  const desc = document.getElementById('custom-ab-desc')?.value?.trim();
+  const cost = document.getElementById('custom-ab-cost')?.value?.trim();
+  if (!name) { toast('Enter an ability name.'); return; }
+  c.abilities.push({ name, domain, desc, cost, used: false });
+  saveAll();
+  closeModal();
+  renderTracker();
+  toast(`Added: ${name}`);
+}
+
+function showLevelUp(charId) {
+  const c = getChar(charId);
+  if (!c) return;
+  const html = `
+    <h3>Level Up</h3>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:14px;">Current Level: <strong style="color:var(--accent-gold2);">${c.level}</strong></p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="doLevelUp('${charId}')">Level Up to ${c.level+1}</button>
+    </div>
+    <div style="margin-top:12px;font-size:0.85rem;color:var(--text-muted);">At each level: +1 HP max, gain a new Domain card, +1 to one trait (every even level).</div>
+  `;
+  showModal(html);
+}
+
+function doLevelUp(charId) {
+  const c = getChar(charId);
+  if (!c) return;
+  c.level++;
+  c.hp.max++;
+  c.hp.current++;
+  // Update damage thresholds
+  const armor = ARMOR_OPTIONS.find(a => a.name === c.armorName);
+  if (armor) c.damageThresholds = [armor.thresholds[0] + c.level, armor.thresholds[1] + c.level];
+  saveAll();
+  closeModal();
+  renderTracker();
+  toast(`Leveled up to ${c.level}! Gain a new Domain card and update abilities.`);
+}
+
+// =====================================================================
+// DICE ROLLER
+// =====================================================================
+function rollDuality() {
+  const hope = Math.floor(Math.random()*12)+1;
+  const fear = Math.floor(Math.random()*12)+1;
+  const total = hope + fear;
+  const higher = hope >= fear ? 'hope' : 'fear';
+  const el = document.getElementById('dice-result');
+  el.innerHTML = `
+    <div style="display:flex;gap:20px;justify-content:center;margin-bottom:10px;">
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--accent-hope);">HOPE</div>
+        <div class="result-num ${higher==='hope'?'result-hope':'result-fear'}" style="color:var(--accent-teal);">${hope}</div>
+      </div>
+      <div style="align-self:center;color:var(--text-muted);font-family:'Cinzel',serif;">+</div>
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--accent-fear);">FEAR</div>
+        <div class="result-num" style="color:var(--accent-fear);">${fear}</div>
+      </div>
+    </div>
+    <div class="result-num ${higher==='hope'?'result-hope':'result-fear'}">${total}</div>
+    <div class="result-label">${higher==='hope'?'✦ WITH HOPE ✦':'⚠ WITH FEAR ⚠'}</div>
+    <div style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);">${higher==='hope'?'Add a Hope token to the party pool.':'The GM gains a Fear token.'}</div>
+  `;
+}
+
+function rollDie(sides) {
+  const roll = Math.floor(Math.random()*sides)+1;
+  document.getElementById('std-result').innerHTML = `d${sides}: <span style="color:var(--accent-gold2);">${roll}</span>`;
+}
+
+function rollTrait() {
+  const mod = parseInt(document.getElementById('trait-mod')?.value)||0;
+  const hopeBonus = parseInt(document.getElementById('hope-spend')?.value)||0;
+  const hope = Math.floor(Math.random()*12)+1;
+  const fear = Math.floor(Math.random()*12)+1;
+  const base = hope + fear;
+  const total = base + mod + hopeBonus;
+  const higher = hope >= fear ? 'hope' : 'fear';
+  const el = document.getElementById('trait-result');
+  el.innerHTML = `
+    <div style="display:flex;gap:12px;justify-content:center;align-items:center;flex-wrap:wrap;">
+      <div style="color:var(--accent-hope);font-family:'Cinzel',serif;font-size:0.8rem;">Hope: ${hope}</div>
+      <div style="color:var(--accent-fear);font-family:'Cinzel',serif;font-size:0.8rem;">Fear: ${fear}</div>
+      <div style="color:var(--text-muted);font-size:0.8rem;">+Mod: ${mod>=0?'+':''}${mod}</div>
+      ${hopeBonus?`<div style="color:var(--accent-hope);font-size:0.8rem;">+Hope: +${hopeBonus}</div>`:''}
+    </div>
+    <div style="font-family:'Cinzel Decorative',serif;font-size:2.5rem;color:${higher==='hope'?'var(--accent-teal)':'var(--accent-fear)'};margin-top:6px;">${total}</div>
+    <div style="font-family:'Cinzel',serif;font-size:0.8rem;color:var(--text-muted);">${higher==='hope'?'WITH HOPE':'WITH FEAR'}</div>
+  `;
+}
+
+// =====================================================================
+// MODAL
+// =====================================================================
+function showModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+// =====================================================================
+// TOAST
+// =====================================================================
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+
+function resetTraits() {
+  TRAITS.forEach(t => { wizardChar.traits[t] = 0; });
+  renderWizardPages();
+  toast('Traits reset to zero.');
+}
+
+function clearWizardAbilities() {
+  wizardChar.abilities = [];
+  renderWizardPages();
+  toast('Domain cards cleared.');
+}
+
+function resetEquipment() {
+  wizardChar.weapons = [];
+  wizardChar.armorName = 'No Armor';
+  wizardChar.armorScore = 0;
+  wizardChar.armorCurrent = 0;
+  wizardChar.damageThresholds = [5, 10];
+  wizardChar.equipment = [];
+  renderWizardPages();
+  toast('Equipment reset.');
+}
+
+function clearConditions() {
+  withChar(c => { c.conditions = []; });
+  toast('All conditions cleared.');
+}
+
+function markAllAbilitiesUsed() {
+  withChar(c => { c.abilities.forEach(a => a.used = true); });
+  toast('All abilities marked as used.');
+}
+
+function clearAllEquip() {
+  if (!confirm('Remove all items from inventory?')) return;
+  withChar(c => { c.equipment = []; });
+  toast('Inventory cleared.');
+}
+
+function resetEquipQty() {
+  withChar(c => { c.equipment.forEach(e => { e.qty = 1; }); });
+  toast('All quantities reset to 1.');
+}
+
+// =====================================================================
+// INIT
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderCharList();
+  if (activeCharId) {
+    // Pre-render tracker
+  }
+  // Add button listener for prev
+  document.getElementById('btn-prev').addEventListener('click', wizardPrev);
+});
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (document.getElementById('modal-overlay').classList.contains('open') && e.key === 'Escape') {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
