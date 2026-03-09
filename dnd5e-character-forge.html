@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DnD 5e Character Forge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    :root {
+      --ink-black:  #14181dff;
+      --jet-black:  #232b2eff;
+      --light-gold: #eacf8bff;
+      --racing-red: #e30812ff;
+      --white:      #ffffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, var(--jet-black), var(--ink-black));
+      color: var(--light-gold);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: var(--light-gold);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    header {
+      background: var(--jet-black);
+      border-bottom: 2px solid var(--light-gold);
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .header-title {
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-size: 0.95rem;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+    }
+
+    main {
+      flex: 1;
+      padding: 1rem;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      border-radius: 4px 4px 0 0;
+      border: 1px solid var(--light-gold);
+      border-bottom: none;
+      background: rgba(20, 24, 29, 0.7);
+      color: var(--light-gold);
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .tab-button.active {
+      background: var(--ink-black);
+      font-weight: 600;
+    }
+
+    .panel {
+      background: rgba(20, 24, 29, 0.9);
+      border: 1px solid var(--light-gold);
+      border-radius: 0 6px 6px 6px;
+      padding: 1rem;
+    }
+
+    .panel.hidden {
+      display: none;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      color: var(--light-gold);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.85rem;
+    }
+
+    .field label {
+      opacity: 0.9;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      background: var(--jet-black);
+      border: 1px solid rgba(234, 207, 139, 0.5);
+      border-radius: 4px;
+      padding: 0.35rem 0.5rem;
+      color: var(--light-gold);
+      font-size: 0.85rem;
+    }
+
+    .field textarea {
+      min-height: 4rem;
+      resize: vertical;
+    }
+
+    .field input[type="number"] {
+      max-width: 5rem;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .btn {
+      border-radius: 4px;
+      border: 1px solid var(--light-gold);
+      background: var(--jet-black);
+      color: var(--light-gold);
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--racing-red);
+      border-color: var(--racing-red);
+      color: var(--white);
+    }
+
+    .btn-outline {
+      background: transparent;
+    }
+
+    .stepper {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .step-pill {
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(234, 207, 139, 0.4);
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    .step-pill.active {
+      background: var(--light-gold);
+      color: var(--ink-black);
+      opacity: 1;
+      font-weight: 600;
+    }
+
+    .builder-step {
+      display: none;
+    }
+
+    .builder-step.active {
+      display: block;
+    }
+
+    .tracker-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
+      gap: 1rem;
+    }
+
+    .card {
+      border-radius: 6px;
+      border: 1px solid rgba(234, 207, 139, 0.4);
+      padding: 0.75rem;
+      background: rgba(35, 43, 46, 0.7);
+      font-size: 0.85rem;
+    }
+
+    .card-header {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+
+    .ability-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    .ability-box {
+      border-radius: 4px;
+      border: 1px solid rgba(234, 207, 139, 0.4);
+      padding: 0.4rem;
+      text-align: center;
+    }
+
+    .ability-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+    }
+
+    .ability-score {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .ability-mod {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .small-input {
+      width: 3.5rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+    }
+
+    .tag {
+      border-radius: 999px;
+      border: 1px solid rgba(234, 207, 139, 0.4);
+      padding: 0.1rem 0.45rem;
+      opacity: 0.85;
+    }
+
+    footer {
+      padding: 0.5rem 1rem 0.75rem;
+      font-size: 0.7rem;
+      opacity: 0.7;
+      text-align: center;
+    }
+
+    @media (max-width: 800px) {
+      .tracker-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .tab-button {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-title">DnD 5e Character Forge</div>
+    <div class="header-links">
+      <a href="https://crazitalk.github.io/hamster-rpg.github.io/daggerheart-character-forge.html">
+        ⟵ Hamster RPG Home
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="tab-bar">
+      <button class="tab-button active" data-tab="builder">Builder</button>
+      <button class="tab-button" data-tab="tracker">Tracker</button>
+    </div>
+
+    <!-- BUILDER PANEL -->
+    <section id="builder-panel" class="panel">
+      <div class="stepper" id="builder-stepper">
+        <div class="step-pill active" data-step="0">1 · Basics</div>
+        <div class="step-pill" data-step="1">2 · Abilities</div>
+        <div class="step-pill" data-step="2">3 · Skills & Combat</div>
+        <div class="step-pill" data-step="3">4 · Spells & Notes</div>
+      </div>
+
+      <!-- STEP 1: BASICS -->
+      <div class="builder-step active" data-step="0">
+        <div class="section-title">Basics</div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="b-name">Character Name</label>
+            <input id="b-name" type="text" />
+          </div>
+          <div class="field">
+            <label for="b-level">Level</label>
+            <input id="b-level" type="number" min="1" max="20" value="1" />
+          </div>
+          <div class="field">
+            <label for="b-class">Class</label>
+            <input id="b-class" type="text" placeholder="Fighter, Wizard, etc." />
+          </div>
+          <div class="field">
+            <label for="b-race">Race</label>
+            <input id="b-race" type="text" placeholder="Human, Elf, etc." />
+          </div>
+          <div class="field">
+            <label for="b-background">Background</label>
+            <input id="b-background" type="text" />
+          </div>
+          <div class="field">
+            <label for="b-alignment">Alignment</label>
+            <input id="b-alignment" type="text" placeholder="Neutral Good, etc." />
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="btn btn-primary" id="builder-next-0">Next: Abilities</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: ABILITIES -->
+      <div class="builder-step" data-step="1">
+        <div class="section-title">Ability Scores</div>
+        <div class="grid-3">
+          <div class="field">
+            <label for="b-str">Strength (STR)</label>
+            <input id="b-str" type="number" min="1" max="30" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-dex">Dexterity (DEX)</label>
+            <input id="b-dex" type="number" min="1" max="30" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-con">Constitution (CON)</label>
+            <input id="b-con" type="number" min="1" max="30" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-int">Intelligence (INT)</label>
+            <input id="b-int" type="number" min="1" max="30" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-wis">Wisdom (WIS)</label>
+            <input id="b-wis" type="number" min="1" max="30" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-cha">Charisma (CHA)</label>
+            <input id="b-cha" type="number" min="1" max="30" value="10" />
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="btn" id="builder-back-1">Back</button>
+          <button class="btn btn-primary" id="builder-next-1">Next: Skills & Combat</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: SKILLS & COMBAT -->
+      <div class="builder-step" data-step="2">
+        <div class="section-title">Skills & Combat</div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="b-prof-bonus">Proficiency Bonus</label>
+            <input id="b-prof-bonus" type="number" value="2" />
+          </div>
+          <div class="field">
+            <label for="b-ac">Armor Class (AC)</label>
+            <input id="b-ac" type="number" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-hp-max">Max HP</label>
+            <input id="b-hp-max" type="number" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-hp-current">Current HP</label>
+            <input id="b-hp-current" type="number" value="10" />
+          </div>
+          <div class="field">
+            <label for="b-hit-dice">Hit Dice</label>
+            <input id="b-hit-dice" type="text" placeholder="1d10, 2d8, etc." />
+          </div>
+          <div class="field">
+            <label for="b-speed">Speed</label>
+            <input id="b-speed" type="text" placeholder="30 ft." />
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:0.75rem;">
+          <label for="b-skills">Skill Proficiencies (comma-separated)</label>
+          <input id="b-skills" type="text" placeholder="Perception, Stealth, Arcana" />
+        </div>
+
+        <div class="field">
+          <label for="b-features">Features / Feats</label>
+          <textarea id="b-features" placeholder="Fighting Style, Second Wind, etc."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="b-equipment">Equipment & Ammo</label>
+          <textarea id="b-equipment" placeholder="Longsword, Shield, 20 Arrows, Explorer's Pack"></textarea>
+        </div>
+
+        <div class="button-row">
+          <button class="btn" id="builder-back-2">Back</button>
+          <button class="btn btn-primary" id="builder-next-2">Next: Spells & Notes</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: SPELLS & NOTES -->
+      <div class="builder-step" data-step="3">
+        <div class="section-title">Spells & Notes</div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="b-spell-ability">Spellcasting Ability</label>
+            <select id="b-spell-ability">
+              <option value="">None</option>
+              <option value="STR">STR</option>
+              <option value="DEX">DEX</option>
+              <option value="CON">CON</option>
+              <option value="INT">INT</option>
+              <option value="WIS">WIS</option>
+              <option value="CHA">CHA</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="b-spell-save-dc">Spell Save DC</label>
+            <input id="b-spell-save-dc" type="number" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="b-cantrips">Cantrips (comma-separated)</label>
+          <textarea id="b-cantrips" placeholder="Fire Bolt, Mage Hand"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="b-spells">Spells (comma-separated)</label>
+          <textarea id="b-spells" placeholder="Magic Missile, Shield, Cure Wounds"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="b-notes">Notes</label>
+          <textarea id="b-notes" placeholder="Personality traits, ideals, bonds, flaws, etc."></textarea>
+        </div>
+
+        <div class="button-row">
+          <button class="btn" id="builder-back-3">Back</button>
+          <button class="btn btn-primary" id="builder-finish">Save & Open in Tracker</button>
+        </div>
+      </div>
+
+      <hr style="border-color: rgba(234,207,139,0.3); margin:1rem 0;" />
+
+      <div class="section-title">Character File</div>
+      <div class="button-row">
+        <button class="btn btn-outline" id="btn-export">Export JSON</button>
+        <label class="btn btn-outline" style="cursor:pointer;">
+          Import JSON
+          <input id="file-import" type="file" accept="application/json" style="display:none;" />
+        </label>
+      </div>
+    </section>
+
+    <!-- TRACKER PANEL -->
+    <section id="tracker-panel" class="panel hidden">
+      <div class="section-title">Character Tracker</div>
+      <div class="tracker-layout">
+        <!-- LEFT COLUMN -->
+        <div class="card">
+          <div class="card-header">Identity</div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="t-name">Name</label>
+              <input id="t-name" type="text" />
+            </div>
+            <div class="field">
+              <label for="t-level">Level</label>
+              <input id="t-level" type="number" min="1" max="20" />
+            </div>
+            <div class="field">
+              <label for="t-class">Class</label>
+              <input id="t-class" type="text" />
+            </div>
+            <div class="field">
+              <label for="t-race">Race</label>
+              <input id="t-race" type="text" />
+            </div>
+            <div class="field">
+              <label for="t-background">Background</label>
+              <input id="t-background" type="text" />
+            </div>
+            <div class="field">
+              <label for="t-alignment">Alignment</label>
+              <input id="t-alignment" type="text" />
+            </div>
+          </div>
+
+          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
+
+          <div class="card-header">Abilities</div>
+          <div class="ability-grid">
+            <div class="ability-box">
+              <div class="ability-name">STR</div>
+              <input id="t-str" type="number" class="small-input" />
+              <div class="ability-mod" id="t-str-mod">+0</div>
+            </div>
+            <div class="ability-box">
+              <div class="ability-name">DEX</div>
+              <input id="t-dex" type="number" class="small-input" />
+              <div class="ability-mod" id="t-dex-mod">+0</div>
+            </div>
+            <div class="ability-box">
+              <div class="ability-name">CON</div>
+              <input id="t-con" type="number" class="small-input" />
+              <div class="ability-mod" id="t-con-mod">+0</div>
+            </div>
+            <div class="ability-box">
+              <div class="ability-name">INT</div>
+              <input id="t-int" type="number" class="small-input" />
+              <div class="ability-mod" id="t-int-mod">+0</div>
+            </div>
+            <div class="ability-box">
+              <div class="ability-name">WIS</div>
+              <input id="t-wis" type="number" class="small-input" />
+              <div class="ability-mod" id="t-wis-mod">+0</div>
+            </div>
+            <div class="ability-box">
+              <div class="ability-name">CHA</div>
+              <input id="t-cha" type="number" class="small-input" />
+              <div class="ability-mod" id="t-cha-mod">+0</div>
+            </div>
+          </div>
+
+          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
+
+          <div class="card-header">Defenses & Movement</div>
+          <div class="grid-3">
+            <div class="field">
+              <label for="t-ac">AC</label>
+              <input id="t-ac" type="number" />
+            </div>
+            <div class="field">
+              <label for="t-speed">Speed</label>
+              <input id="t-speed" type="text" />
+            </div>
+            <div class="field">
+              <label for="t-prof-bonus">Prof. Bonus</label>
+              <input id="t-prof-bonus" type="number" />
+            </div>
+          </div>
+
+          <div class="grid-3" style="margin-top:0.5rem;">
+            <div class="field">
+              <label for="t-hp-max">Max HP</label>
+              <input id="t-hp-max" type="number" />
+            </div>
+            <div class="field">
+              <label for="t-hp-current">Current HP</label>
+              <input id="t-hp-current" type="number" />
+            </div>
+            <div class="field">
+              <label for="t-hit-dice">Hit Dice</label>
+              <input id="t-hit-dice" type="text" />
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="card">
+          <div class="card-header">Skills & Features</div>
+          <div class="field">
+            <label for="t-skills">Skill Proficiencies</label>
+            <textarea id="t-skills" placeholder="Perception, Stealth, Arcana"></textarea>
+          </div>
+          <div class="field">
+            <label for="t-features">Features / Feats</label>
+            <textarea id="t-features"></textarea>
+          </div>
+
+          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
+
+          <div class="card-header">Equipment & Ammo</div>
+          <div class="field">
+            <label for="t-equipment">Equipment & Ammo</label>
+            <textarea id="t-equipment"></textarea>
+          </div>
+
+          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
+
+          <div class="card-header">Spells</div>
+          <div class="grid-3">
+            <div class="field">
+              <label for="t-spell-ability">Spell Ability</label>
+              <select id="t-spell-ability">
+                <option value="">None</option>
+                <option value="STR">STR</option>
+                <option value="DEX">DEX</option>
+                <option value="CON">CON</option>
+                <option value="INT">INT</option>
+                <option value="WIS">WIS</option>
+                <option value="CHA">CHA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="t-spell-save-dc">Spell Save DC</label>
+              <input id="t-spell-save-dc" type="number" />
+            </div>
+            <div class="field">
+              <label for="t-spell-attack">Spell Attack</label>
+              <input id="t-spell-attack" type="number" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="t-cantrips">Cantrips</label>
+            <textarea id="t-cantrips"></textarea>
+          </div>
+          <div class="field">
+            <label for="t-spells">Spells</label>
+            <textarea id="t-spells"></textarea>
+          </div>
+
+          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
+
+          <div class="card-header">Notes</div>
+          <div class="field">
+            <label for="t-notes">Notes</label>
+            <textarea id="t-notes"></textarea>
+          </div>
+
+          <div class="button-row" style="margin-top:0.75rem;">
+            <button class="btn btn-primary" id="tracker-save">Save to Local Storage</button>
+            <button class="btn btn-outline" id="tracker-sync-builder">Sync Back to Builder</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    dnd5e-character-forge · Single-file offline-friendly character builder & tracker (SRD-based fields, no rules text)
+  </footer>
+
+  <script>
+    // --- Core character model ---
+    let character = {
+      meta: {
+        name: "",
+        class: "",
+        level: 1,
+        background: "",
+        race: "",
+        alignment: ""
+      },
+      abilities: {
+        STR: 10,
+        DEX: 10,
+        CON: 10,
+        INT: 10,
+        WIS: 10,
+        CHA: 10
+      },
+      hp: {
+        max: 10,
+        current: 10,
+        hitDice: ""
+      },
+      ac: 10,
+      speed: "",
+      proficiencyBonus: 2,
+      skills: "",
+      features: "",
+      equipment: "",
+      spells: {
+        ability: "",
+        saveDC: "",
+        attackBonus: "",
+        cantrips: "",
+        spells: ""
+      },
+      notes: ""
+    };
+
+    const STORAGE_KEY = "dnd5e-character-forge";
+
+    function abilityMod(score) {
+      const s = parseInt(score || 10, 10);
+      const mod = Math.floor((s - 10) / 2);
+      return (mod >= 0 ? "+" : "") + mod;
+    }
+
+    // --- Tabs ---
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const builderPanel = document.getElementById("builder-panel");
+    const trackerPanel = document.getElementById("tracker-panel");
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        tabButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        if (tab === "builder") {
+          builderPanel.classList.remove("hidden");
+          trackerPanel.classList.add("hidden");
+        } else {
+          builderPanel.classList.add("hidden");
+          trackerPanel.classList.remove("hidden");
+          syncTrackerFromModel();
+        }
+      });
+    });
+
+    // --- Builder stepper ---
+    const steps = document.querySelectorAll(".builder-step");
+    const stepPills = document.querySelectorAll(".step-pill");
+    let currentStep = 0;
+
+    function showStep(idx) {
+      currentStep = idx;
+      steps.forEach(s => s.classList.remove("active"));
+      stepPills.forEach(p => p.classList.remove("active"));
+      const step = document.querySelector('.builder-step[data-step="' + idx + '"]');
+      const pill = document.querySelector('.step-pill[data-step="' + idx + '"]');
+      if (step) step.classList.add("active");
+      if (pill) pill.classList.add("active");
+    }
+
+    document.getElementById("builder-next-0").onclick = () => showStep(1);
+    document.getElementById("builder-next-1").onclick = () => showStep(2);
+    document.getElementById("builder-next-2").onclick = () => showStep(3);
+    document.getElementById("builder-back-1").onclick = () => showStep(0);
+    document.getElementById("builder-back-2").onclick = () => showStep(1);
+    document.getElementById("builder-back-3").onclick = () => showStep(2);
+
+    // --- Builder -> model ---
+    function updateModelFromBuilder() {
+      character.meta.name = document.getElementById("b-name").value.trim();
+      character.meta.level = parseInt(document.getElementById("b-level").value || "1", 10);
+      character.meta.class = document.getElementById("b-class").value.trim();
+      character.meta.race = document.getElementById("b-race").value.trim();
+      character.meta.background = document.getElementById("b-background").value.trim();
+      character.meta.alignment = document.getElementById("b-alignment").value.trim();
+
+      character.abilities.STR = parseInt(document.getElementById("b-str").value || "10", 10);
+      character.abilities.DEX = parseInt(document.getElementById("b-dex").value || "10", 10);
+      character.abilities.CON = parseInt(document.getElementById("b-con").value || "10", 10);
+      character.abilities.INT = parseInt(document.getElementById("b-int").value || "10", 10);
+      character.abilities.WIS = parseInt(document.getElementById("b-wis").value || "10", 10);
+      character.abilities.CHA = parseInt(document.getElementById("b-cha").value || "10", 10);
+
+      character.proficiencyBonus = parseInt(document.getElementById("b-prof-bonus").value || "2", 10);
+      character.ac = parseInt(document.getElementById("b-ac").value || "10", 10);
+      character.hp.max = parseInt(document.getElementById("b-hp-max").value || "10", 10);
+      character.hp.current = parseInt(document.getElementById("b-hp-current").value || "10", 10);
+      character.hp.hitDice = document.getElementById("b-hit-dice").value.trim();
+      character.speed = document.getElementById("b-speed").value.trim();
+
+      character.skills = document.getElementById("b-skills").value.trim();
+      character.features = document.getElementById("b-features").value.trim();
+      character.equipment = document.getElementById("b-equipment").value.trim();
+
+      character.spells.ability = document.getElementById("b-spell-ability").value;
+      character.spells.saveDC = document.getElementById("b-spell-save-dc").value.trim();
+      character.spells.cantrips = document.getElementById("b-cantrips").value.trim();
+      character.spells.spells = document.getElementById("b-spells").value.trim();
+      character.notes = document.getElementById("b-notes").value.trim();
+    }
+
+    document.getElementById("builder-finish").onclick = () => {
+      updateModelFromBuilder();
+      saveToLocalStorage();
+      syncTrackerFromModel();
+      // Switch to tracker tab
+      tabButtons.forEach(b => {
+        if (b.dataset.tab === "tracker") b.click();
+      });
+    };
+
+    // --- Model -> tracker ---
+    function syncTrackerFromModel() {
+      document.getElementById("t-name").value = character.meta.name;
+      document.getElementById("t-level").value = character.meta.level;
+      document.getElementById("t-class").value = character.meta.class;
+      document.getElementById("t-race").value = character.meta.race;
+      document.getElementById("t-background").value = character.meta.background;
+      document.getElementById("t-alignment").value = character.meta.alignment;
+
+      document.getElementById("t-str").value = character.abilities.STR;
+      document.getElementById("t-dex").value = character.abilities.DEX;
+      document.getElementById("t-con").value = character.abilities.CON;
+      document.getElementById("t-int").value = character.abilities.INT;
+      document.getElementById("t-wis").value = character.abilities.WIS;
+      document.getElementById("t-cha").value = character.abilities.CHA;
+
+      document.getElementById("t-ac").value = character.ac;
+      document.getElementById("t-speed").value = character.speed;
+      document.getElementById("t-prof-bonus").value = character.proficiencyBonus;
+      document.getElementById("t-hp-max").value = character.hp.max;
+      document.getElementById("t-hp-current").value = character.hp.current;
+      document.getElementById("t-hit-dice").value = character.hp.hitDice;
+
+      document.getElementById("t-skills").value = character.skills;
+      document.getElementById("t-features").value = character.features;
+      document.getElementById("t-equipment").value = character.equipment;
+
+      document.getElementById("t-spell-ability").value = character.spells.ability || "";
+      document.getElementById("t-spell-save-dc").value = character.spells.saveDC || "";
+      document.getElementById("t-spell-attack").value = character.spells.attackBonus || "";
+      document.getElementById("t-cantrips").value = character.spells.cantrips || "";
+      document.getElementById("t-spells").value = character.spells.spells || "";
+      document.getElementById("t-notes").value = character.notes || "";
+
+      updateAllAbilityMods();
+    }
+
+    // --- Tracker -> model ---
+    function updateModelFromTracker() {
+      character.meta.name = document.getElementById("t-name").value.trim();
+      character.meta.level = parseInt(document.getElementById("t-level").value || "1", 10);
+      character.meta.class = document.getElementById("t-class").value.trim();
+      character.meta.race = document.getElementById("t-race").value.trim();
+      character.meta.background = document.getElementById("t-background").value.trim();
+      character.meta.alignment = document.getElementById("t-alignment").value.trim();
+
+      character.abilities.STR = parseInt(document.getElementById("t-str").value || "10", 10);
+      character.abilities.DEX = parseInt(document.getElementById("t-dex").value || "10", 10);
+      character.abilities.CON = parseInt(document.getElementById("t-con").value || "10", 10);
+      character.abilities.INT = parseInt(document.getElementById("t-int").value || "10", 10);
+      character.abilities.WIS = parseInt(document.getElementById("t-wis").value || "10", 10);
+      character.abilities.CHA = parseInt(document.getElementById("t-cha").value || "10", 10);
+
+      character.ac = parseInt(document.getElementById("t-ac").value || "10", 10);
+      character.speed = document.getElementById("t-speed").value.trim();
+      character.proficiencyBonus = parseInt(document.getElementById("t-prof-bonus").value || "2", 10);
+      character.hp.max = parseInt(document.getElementById("t-hp-max").value || "10", 10);
+      character.hp.current = parseInt(document.getElementById("t-hp-current").value || "10", 10);
+      character.hp.hitDice = document.getElementById("t-hit-dice").value.trim();
+
+      character.skills = document.getElementById("t-skills").value.trim();
+      character.features = document.getElementById("t-features").value.trim();
+      character.equipment = document.getElementById("t-equipment").value.trim();
+
+      character.spells.ability = document.getElementById("t-spell-ability").value;
+      character.spells.saveDC = document.getElementById("t-spell-save-dc").value.trim();
+      character.spells.attackBonus = document.getElementById("t-spell-attack").value.trim();
+      character.spells.cantrips = document.getElementById("t-cantrips").value.trim();
+      character.spells.spells = document.getElementById("t-spells").value.trim();
+      character.notes = document.getElementById("t-notes").value.trim();
+    }
+
+    document.getElementById("tracker-save").onclick = () => {
+      updateModelFromTracker();
+      saveToLocalStorage();
+      alert("Character saved to local storage.");
+    };
+
+    document.getElementById("tracker-sync-builder").onclick = () => {
+      updateModelFromTracker();
+      syncBuilderFromModel();
+      tabButtons.forEach(b => {
+        if (b.dataset.tab === "builder") b.click();
+      });
+    };
+
+    function syncBuilderFromModel() {
+      document.getElementById("b-name").value = character.meta.name;
+      document.getElementById("b-level").value = character.meta.level;
+      document.getElementById("b-class").value = character.meta.class;
+      document.getElementById("b-race").value = character.meta.race;
+      document.getElementById("b-background").value = character.meta.background;
+      document.getElementById("b-alignment").value = character.meta.alignment;
+
+      document.getElementById("b-str").value = character.abilities.STR;
+      document.getElementById("b-dex").value = character.abilities.DEX;
+      document.getElementById("b-con").value = character.abilities.CON;
+      document.getElementById("b-int").value = character.abilities.INT;
+      document.getElementById("b-wis").value = character.abilities.WIS;
+      document.getElementById("b-cha").value = character.abilities.CHA;
+
+      document.getElementById("b-prof-bonus").value = character.proficiencyBonus;
+      document.getElementById("b-ac").value = character.ac;
+      document.getElementById("b-hp-max").value = character.hp.max;
+      document.getElementById("b-hp-current").value = character.hp.current;
+      document.getElementById("b-hit-dice").value = character.hp.hitDice;
+      document.getElementById("b-speed").value = character.speed;
+
+      document.getElementById("b-skills").value = character.skills;
+      document.getElementById("b-features").value = character.features;
+      document.getElementById("b-equipment").value = character.equipment;
+
+      document.getElementById("b-spell-ability").value = character.spells.ability || "";
+      document.getElementById("b-spell-save-dc").value = character.spells.saveDC || "";
+      document.getElementById("b-cantrips").value = character.spells.cantrips || "";
+      document.getElementById("b-spells").value = character.spells.spells || "";
+      document.getElementById("b-notes").value = character.notes || "";
+    }
+
+    // --- Ability mod live updates ---
+    const abilityIds = ["str", "dex", "con", "int", "wis", "cha"];
+    abilityIds.forEach(id => {
+      const input = document.getElementById("t-" + id);
+      input.addEventListener("input", () => {
+        document.getElementById("t-" + id + "-mod").textContent = abilityMod(input.value);
+      });
+    });
+
+    function updateAllAbilityMods() {
+      abilityIds.forEach(id => {
+        const input = document.getElementById("t-" + id);
+        document.getElementById("t-" + id + "-mod").textContent = abilityMod(input.value);
+      });
+    }
+
+    // --- Local storage ---
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(character));
+      } catch (e) {
+        console.warn("Could not save to localStorage", e);
+      }
+    }
+
+    function loadFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data && typeof data === "object") {
+          character = Object.assign(character, data);
+          // Deep-ish merge for nested objects
+          character.meta = Object.assign({}, character.meta, data.meta || {});
+          character.abilities = Object.assign({}, character.abilities, data.abilities || {});
+          character.hp = Object.assign({}, character.hp, data.hp || {});
+          character.spells = Object.assign({}, character.spells, data.spells || {});
+        }
+      } catch (e) {
+        console.warn("Could not load from localStorage", e);
+      }
+    }
+
+    // --- Export / Import ---
+    document.getElementById("btn-export").onclick = () => {
+      updateModelFromBuilder();
+      const blob = new Blob([JSON.stringify(character, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const safeName = character.meta.name || "dnd5e-character";
+      a.href = url;
+      a.download = safeName.replace(/[^a-z0-9_\-]+/gi, "_") + ".json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    document.getElementById("file-import").addEventListener("change", (ev) => {
+      const file = ev.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (data && typeof data === "object") {
+            character = Object.assign(character, data);
+            character.meta = Object.assign({}, character.meta, data.meta || {});
+            character.abilities = Object.assign({}, character.abilities, data.abilities || {});
+            character.hp = Object.assign({}, character.hp, data.hp || {});
+            character.spells = Object.assign({}, character.spells, data.spells || {});
+            syncBuilderFromModel();
+            syncTrackerFromModel();
+            alert("Character imported.");
+          }
+        } catch (e) {
+          alert("Could not parse JSON file.");
+        }
+      };
+      reader.readAsText(file);
+      ev.target.value = "";
+    });
+
+    // --- Inline service worker (optional, for hosted use) ---
+    if ("serviceWorker" in navigator) {
+      const swCode = `
+        const CACHE_NAME = "dnd5e-character-forge-v1";
+        self.addEventListener("install", event => {
+          event.waitUntil(self.skipWaiting());
+        });
+        self.addEventListener("activate", event => {
+          event.waitUntil(self.clients.claim());
+        });
+        self.addEventListener("fetch", event => {
+          event.respondWith(
+            caches.open(CACHE_NAME).then(cache =>
+              cache.match(event.request).then(resp => {
+                const fetchPromise = fetch(event.request).then(networkResp => {
+                  try { cache.put(event.request, networkResp.clone()); } catch (e) {}
+                  return networkResp;
+                }).catch(() => resp || Promise.reject());
+                return resp || fetchPromise;
+              })
+            )
+          );
+        });
+      `;
+      const blob = new Blob([swCode], { type: "text/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(() => {});
+    }
+
+    // --- Init ---
+    loadFromLocalStorage();
+    syncBuilderFromModel();
+    syncTrackerFromModel();
+  </script>
+</body>
+</html>
