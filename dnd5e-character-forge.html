@@ -99,7 +99,7 @@
     width: auto;
     filter: drop-shadow(0 0 12px rgba(234,207,139,0.3));
   }
-  .header-dragon { font-size: clamp(1.8rem, 5vw, 2.8rem); filter: drop-shadow(0 0 14px rgba(227,8,18,0.5)); animation: breathe 4s ease-in-out infinite; }
+  .header-emoji { font-size: clamp(1.8rem, 5vw, 2.8rem); filter: drop-shadow(0 0 14px rgba(227,8,18,0.5)); animation: breathe 4s ease-in-out infinite; }
   @keyframes breathe { 0%,100%{filter:drop-shadow(0 0 10px rgba(227,8,18,0.4));} 50%{filter:drop-shadow(0 0 22px rgba(227,8,18,0.7));} }
   .header-divider {
     width: 240px; height: 1px;
@@ -577,17 +577,22 @@
 </style>
 </head>
 <body>
+ <!-- ===== Banner ===== -->
+<div style="background:#0d0221;padding:10px 20px;">
+  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Hamster RPG Home</a>
+</div>
+<hr style="border:none;border-top:1px solid #511a91;margin:0;">
 <div id="app">
 
   <!-- ===== HEADER ===== -->
   <header class="app-header">
     <div class="header-logo-row">
       <img src="ref/logo.png" alt="Hamster RPG Logo" class="header-logo-img" onerror="this.style.display='none'">
-      <div class="header-dragon">🐉</div>
+      <div class="header-emoji">🐲</div>
     </div>
     <div class="app-title">D&amp;D 5e Character Forge</div>
     <div class="header-divider"></div>
-    <div class="subtitle">Fifth Edition · System Reference Document 5.2.1</div>
+    <div class="subtitle">Fifth Edition · <a href="https://www.dndbeyond.com/srd?srsltid=AfmBOopjlLIPYHaEqZc0qHxAnxzLku7iMyWhIvMJcW-xiV4Rjg2h9YLY" target="_blank">System Reference Document</a></div>
   </header>
 
   <!-- ===== NAV ===== -->
