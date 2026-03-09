@@ -1,1062 +1,2303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>DnD 5e Character Forge</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#14181d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>D&D 5e — Character Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink-black:    #14181d;
+    --jet-black:    #232b2e;
+    --light-gold:   #eacf8b;
+    --light-gold2:  #f5e4b0;
+    --racing-red:   #e30812;
+    --racing-red2:  #ff1a23;
+    --white:        #ffffff;
+    --parchment:    #f7f0e0;
+    --bg-deep:      var(--ink-black);
+    --bg-card:      #1c2226;
+    --bg-card2:     #252e32;
+    --text-primary: var(--white);
+    --text-muted:   #9aabaa;
+    --text-gold:    var(--light-gold);
+    --border:       rgba(234,207,139,0.2);
+    --border-bright:rgba(234,207,139,0.55);
+    --shadow:       0 8px 40px rgba(0,0,0,0.7);
+    --glow-gold:    0 0 20px rgba(234,207,139,0.25);
+    --glow-red:     0 0 20px rgba(227,8,18,0.4);
+    --transition:   all 0.25s cubic-bezier(0.4,0,0.2,1);
+    --radius:       8px;
+  }
 
-  <style>
-    :root {
-      --ink-black:  #14181dff;
-      --jet-black:  #232b2eff;
-      --light-gold: #eacf8bff;
-      --racing-red: #e30812ff;
-      --white:      #ffffffff;
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    * {
-      box-sizing: border-box;
-    }
+  body {
+    background: var(--bg-deep);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    color: var(--text-primary);
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, var(--jet-black), var(--ink-black));
-      color: var(--light-gold);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 10% 0%,  rgba(227,8,18,0.1)    0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 90% 100%, rgba(234,207,139,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 60% at 50% 50%,  rgba(35,43,46,0.5)   0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    a {
-      color: var(--light-gold);
-      text-decoration: none;
-    }
+  #app { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 0 12px 80px; }
 
-    a:hover {
-      text-decoration: underline;
-    }
+  /* ========= HEADER ========= */
+  .app-header {
+    text-align: center;
+    padding: 20px 20px 14px;
+    border-bottom: 2px solid rgba(234,207,139,0.3);
+    background: linear-gradient(180deg, rgba(227,8,18,0.1) 0%, transparent 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .app-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      105deg, transparent 0px, transparent 60px,
+      rgba(234,207,139,0.02) 60px, rgba(234,207,139,0.02) 61px
+    );
+    pointer-events: none;
+  }
+  .app-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 8%; right: 8%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--racing-red), var(--light-gold), var(--racing-red), transparent);
+  }
+  .header-logo-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .header-logo-img {
+    height: clamp(28px, 5vw, 44px);
+    width: auto;
+    filter: drop-shadow(0 0 12px rgba(234,207,139,0.3));
+  }
+  .header-dragon { font-size: clamp(1.8rem, 5vw, 2.8rem); filter: drop-shadow(0 0 14px rgba(227,8,18,0.5)); animation: breathe 4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{filter:drop-shadow(0 0 10px rgba(227,8,18,0.4));} 50%{filter:drop-shadow(0 0 22px rgba(227,8,18,0.7));} }
+  .header-divider {
+    width: 240px; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(234,207,139,0.5), transparent);
+    margin: 6px auto 8px;
+  }
+  .app-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.4rem, 5vw, 2.2rem);
+    font-weight: 700;
+    color: var(--light-gold2);
+    text-shadow: 0 0 30px rgba(234,207,139,0.4), 0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+    animation: fade-down 0.6s ease both;
+  }
+  .app-header .subtitle {
+    font-family: 'Cinzel', serif;
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    animation: fade-up 0.8s 0.15s ease both;
+  }
+  @keyframes fade-down { from{opacity:0;transform:translateY(-12px);} to{opacity:1;transform:none;} }
+  @keyframes fade-up   { from{opacity:0;transform:translateY(10px);}  to{opacity:1;transform:none;} }
 
-    header {
-      background: var(--jet-black);
-      border-bottom: 2px solid var(--light-gold);
-      padding: 0.75rem 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
+  /* ========= NAV TABS ========= */
+  .nav-tabs {
+    display: flex; gap: 2px; padding: 0;
+    border-bottom: 1px solid rgba(234,207,139,0.15);
+    margin-bottom: 20px;
+    flex-wrap: wrap; justify-content: center;
+    background: rgba(20,24,29,0.7);
+    position: sticky; top: 0; z-index: 90;
+    backdrop-filter: blur(8px);
+  }
+  .nav-tab {
+    font-family: 'Cinzel', serif; font-size: 0.65rem;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 12px 18px; border: none;
+    border-bottom: 3px solid transparent;
+    background: transparent; color: var(--text-muted);
+    cursor: pointer; transition: var(--transition);
+    white-space: nowrap; position: relative;
+  }
+  .nav-tab:hover { color: var(--white); border-bottom-color: rgba(234,207,139,0.35); }
+  .nav-tab.active { color: var(--light-gold2); border-bottom-color: var(--light-gold); background: rgba(234,207,139,0.05); }
+  .nav-tab.active::before {
+    content: '';
+    position: absolute; bottom: -1px; left: 20%; right: 20%;
+    height: 2px; background: var(--racing-red); border-radius: 2px 2px 0 0;
+  }
 
-    .header-title {
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      font-size: 0.95rem;
-    }
+  /* ========= VIEWS ========= */
+  .view { display: none; }
+  .view.active { display: block; }
 
-    .header-links {
-      display: flex;
-      gap: 1rem;
-      font-size: 0.85rem;
-    }
+  /* ========= CARDS ========= */
+  .card {
+    background: linear-gradient(160deg, rgba(28,34,38,0.97) 0%, rgba(20,24,29,0.99) 100%);
+    border: 1px solid rgba(234,207,139,0.18);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, transparent, rgba(234,207,139,0.5), rgba(227,8,18,0.35), transparent);
+    pointer-events: none;
+  }
+  .card-title {
+    font-family: 'Cinzel', serif; font-size: 0.68rem;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--light-gold); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, rgba(234,207,139,0.4), transparent);
+  }
 
-    main {
-      flex: 1;
-      padding: 1rem;
-      max-width: 1100px;
-      width: 100%;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+  /* ========= BUTTONS ========= */
+  .btn {
+    font-family: 'Cinzel', serif; font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 9px 18px; border: 1.5px solid var(--light-gold);
+    background: transparent; color: var(--light-gold2);
+    cursor: pointer; border-radius: 3px; transition: var(--transition);
+    position: relative; overflow: hidden;
+  }
+  .btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(234,207,139,0) 0%, rgba(234,207,139,0.08) 100%);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .btn:hover::before { opacity: 1; }
+  .btn:hover { border-color: var(--light-gold2); box-shadow: 0 0 12px rgba(234,207,139,0.2); color: var(--white); }
+  .btn.btn-primary {
+    background: linear-gradient(135deg, #c9a050 0%, #eacf8b 50%, #b8902a 100%);
+    color: var(--ink-black); border-color: var(--light-gold); font-weight: 700;
+    box-shadow: 0 2px 16px rgba(234,207,139,0.25);
+  }
+  .btn.btn-primary:hover { background: linear-gradient(135deg, #eacf8b 0%, #f5e4b0 50%, #c9a050 100%); box-shadow: 0 4px 24px rgba(234,207,139,0.45); }
+  .btn.btn-red { border-color: var(--racing-red); color: #ff6060; }
+  .btn.btn-red:hover { background: rgba(227,8,18,0.12); box-shadow: 0 0 14px rgba(227,8,18,0.3); }
+  .btn.btn-danger { border-color: #e04444; color: #e06060; }
+  .btn.btn-sm { padding: 5px 11px; font-size: 0.62rem; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
-    .tab-bar {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
+  /* ========= FORM ELEMENTS ========= */
+  label { display: block; font-family: 'Cinzel', serif; font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; margin-top: 12px; }
+  label:first-child { margin-top: 0; }
+  input[type=text], input[type=number], textarea, select {
+    width: 100%;
+    background: rgba(10,12,15,0.8);
+    border: 1px solid rgba(234,207,139,0.2);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    padding: 7px 11px;
+    transition: var(--transition);
+    outline: none; -webkit-appearance: none;
+  }
+  input[type=text]:focus, input[type=number]:focus, textarea:focus, select:focus {
+    border-color: var(--light-gold);
+    box-shadow: 0 0 0 2px rgba(234,207,139,0.12);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: #1c2226; color: var(--text-primary); }
+  .form-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .form-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; }
+  @media(max-width: 520px) { .form-row,.form-row-3,.form-row-4 { grid-template-columns: 1fr; } }
 
-    .tab-button {
-      flex: 1;
-      padding: 0.5rem 0.75rem;
-      border-radius: 4px 4px 0 0;
-      border: 1px solid var(--light-gold);
-      border-bottom: none;
-      background: rgba(20, 24, 29, 0.7);
-      color: var(--light-gold);
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
+  /* ========= ABILITY SCORE BOXES ========= */
+  .ability-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
+  @media(max-width: 540px) { .ability-grid { grid-template-columns: repeat(3, 1fr); } }
+  .ability-box {
+    background: rgba(20,24,29,0.9);
+    border: 1px solid rgba(234,207,139,0.2);
+    border-radius: var(--radius); padding: 10px 6px;
+    text-align: center; transition: var(--transition); cursor: default;
+  }
+  .ability-box:hover { border-color: rgba(234,207,139,0.5); }
+  .ability-box.saving-throw { border-color: rgba(227,8,18,0.4); }
+  .ability-name { font-family: 'Cinzel', serif; font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+  .ability-score { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--light-gold2); line-height: 1.1; margin: 3px 0 1px; }
+  .ability-mod { font-family: 'Cinzel', serif; font-size: 0.75rem; color: var(--text-muted); }
+  .ability-mod.positive { color: var(--light-gold); }
+  .ability-mod.negative { color: #e06060; }
 
-    .tab-button.active {
-      background: var(--ink-black);
-      font-weight: 600;
-    }
+  /* ========= HP / AC / SAVE TRACKERS ========= */
+  .stat-bubbles { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+  .stat-bubble {
+    background: rgba(20,24,29,0.85);
+    border: 1px solid rgba(234,207,139,0.2);
+    border-radius: var(--radius); padding: 10px 14px;
+    text-align: center; min-width: 76px;
+  }
+  .stat-bubble .sb-label { font-family: 'Cinzel', serif; font-size: 0.52rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .stat-bubble .sb-val { font-family: 'Cinzel', serif; font-size: 1.6rem; color: var(--light-gold2); line-height: 1.1; }
+  .stat-bubble.red-stat .sb-val { color: #ff6060; }
+  .stat-bubble.red-stat { border-color: rgba(227,8,18,0.4); }
 
-    .panel {
-      background: rgba(20, 24, 29, 0.9);
-      border: 1px solid var(--light-gold);
-      border-radius: 0 6px 6px 6px;
-      padding: 1rem;
-    }
+  /* ========= HP BUBBLES ========= */
+  .hp-track { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .hp-pip {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid rgba(234,207,139,0.3);
+    background: transparent; cursor: pointer;
+    transition: var(--transition); flex-shrink: 0;
+  }
+  .hp-pip.filled { background: rgba(234,207,139,0.2); border-color: var(--light-gold); }
+  .hp-pip.dmg    { background: rgba(227,8,18,0.35); border-color: var(--racing-red); }
+  .hp-pip.temp   { background: rgba(80,160,240,0.35); border-color: rgba(80,160,240,0.8); }
 
-    .panel.hidden {
-      display: none;
-    }
+  /* ========= DEATH SAVE TRACKER ========= */
+  .death-saves { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+  .ds-group { display: flex; gap: 6px; align-items: center; }
+  .ds-label { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-right: 4px; }
+  .ds-pip {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid rgba(234,207,139,0.3); cursor: pointer; transition: var(--transition);
+  }
+  .ds-pip.success { background: rgba(80,200,100,0.5); border-color: #40b060; }
+  .ds-pip.fail    { background: rgba(227,8,18,0.5);   border-color: var(--racing-red); }
 
-    .section-title {
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
-      color: var(--light-gold);
-    }
+  /* ========= SKILLS ========= */
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+  @media(max-width: 440px) { .skills-grid { grid-template-columns: 1fr; } }
+  .skill-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: var(--transition);
+  }
+  .skill-row:hover { background: rgba(234,207,139,0.06); }
+  .skill-pip {
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 1.5px solid rgba(234,207,139,0.3); flex-shrink: 0; cursor: pointer;
+    transition: var(--transition);
+  }
+  .skill-pip.proficient { background: var(--light-gold); border-color: var(--light-gold); }
+  .skill-pip.expert     { background: var(--racing-red); border-color: var(--racing-red); }
+  .skill-name { flex: 1; font-size: 0.85rem; color: var(--text-primary); }
+  .skill-ability { font-family: 'Cinzel', serif; font-size: 0.56rem; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
+  .skill-bonus { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--light-gold); min-width: 28px; text-align: right; }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 0.75rem;
-    }
+  /* ========= SPELL SLOTS ========= */
+  .spell-slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  @media(max-width: 440px) { .spell-slots-grid { grid-template-columns: repeat(2, 1fr); } }
+  .spell-slot-box {
+    background: rgba(20,24,29,0.8);
+    border: 1px solid rgba(234,207,139,0.18);
+    border-radius: 6px; padding: 8px;
+    text-align: center;
+  }
+  .ssl-level { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.14em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+  .ssl-pips  { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+  .ssl-pip {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1.5px solid rgba(234,207,139,0.3);
+    background: transparent; cursor: pointer; transition: var(--transition);
+  }
+  .ssl-pip.used { background: rgba(227,8,18,0.4); border-color: var(--racing-red); }
+  .ssl-pip.avail { background: rgba(234,207,139,0.2); border-color: var(--light-gold); }
 
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.75rem;
-    }
+  /* ========= ABILITY / SPELL CARDS ========= */
+  .feat-list { display: flex; flex-direction: column; gap: 8px; }
+  .feat-card {
+    background: rgba(20,24,29,0.75);
+    border: 1px solid rgba(234,207,139,0.16);
+    border-radius: 6px; padding: 11px 13px;
+    position: relative; transition: var(--transition);
+  }
+  .feat-card:hover { border-color: rgba(234,207,139,0.4); }
+  .feat-card .feat-name { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--light-gold2); margin-bottom: 3px; }
+  .feat-card .feat-source { font-size: 0.7rem; color: #888faa; font-style: italic; margin-bottom: 4px; }
+  .feat-card .feat-desc { color: var(--text-muted); font-size: 0.88rem; }
+  .feat-card .feat-tag {
+    position: absolute; top: 9px; right: 9px;
+    font-size: 0.62rem; font-family: 'Cinzel', serif; letter-spacing: 0.08em;
+    padding: 2px 7px; border-radius: 10px; border: 1px solid;
+  }
+  .tag-spell { color: #88aaff; border-color: rgba(100,140,255,0.4); background: rgba(100,140,255,0.08); }
+  .tag-action { color: var(--light-gold); border-color: rgba(234,207,139,0.4); background: rgba(234,207,139,0.07); }
+  .tag-bonus  { color: #88ffcc; border-color: rgba(80,240,160,0.4); background: rgba(80,240,160,0.06); }
+  .tag-react  { color: #ffaa60; border-color: rgba(255,160,80,0.4); background: rgba(255,160,80,0.07); }
+  .tag-passive{ color: var(--text-muted); border-color: rgba(155,160,180,0.3); background: rgba(155,160,180,0.05); }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      font-size: 0.85rem;
-    }
+  /* ========= EQUIPMENT ========= */
+  .equip-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px;
+    background: rgba(20,24,29,0.65);
+    border: 1px solid rgba(234,207,139,0.16);
+    border-radius: 6px; margin-bottom: 6px; transition: var(--transition);
+  }
+  .equip-item:hover { border-color: rgba(234,207,139,0.4); }
+  .equip-item .equip-name { flex: 1; font-size: 0.95rem; }
+  .equip-item .equip-qty {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; color: var(--light-gold);
+    background: rgba(234,207,139,0.1); border: 1px solid rgba(234,207,139,0.3);
+    border-radius: 4px; padding: 2px 7px; cursor: pointer; user-select: none;
+  }
+  .equip-item .equip-qty:hover { background: rgba(234,207,139,0.2); }
 
-    .field label {
-      opacity: 0.9;
-    }
+  /* ========= WIZARD PROGRESS ========= */
+  .wizard-progress {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 4px;
+    margin-bottom: 26px; padding: 12px 0;
+    border-bottom: 1px solid rgba(234,207,139,0.12);
+  }
+  .wizard-step-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid rgba(234,207,139,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 0.58rem;
+    color: var(--text-muted); cursor: pointer; transition: var(--transition); position: relative;
+  }
+  .wizard-step-dot::after {
+    content: attr(data-label);
+    position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; font-size: 0.48rem; letter-spacing: 0.05em; display: none;
+  }
+  @media(min-width: 600px) { .wizard-step-dot::after { display: block; } }
+  .wizard-step-dot.done { border-color: var(--light-gold); background: rgba(234,207,139,0.14); color: var(--light-gold2); }
+  .wizard-step-dot.active { border-color: var(--racing-red); background: rgba(227,8,18,0.1); color: #ff6060; box-shadow: 0 0 10px rgba(227,8,18,0.25); }
+  .wizard-connector { width: 18px; height: 2px; background: rgba(234,207,139,0.18); align-self: center; margin-bottom: 18px; }
+  @media(max-width: 599px) { .wizard-connector { margin-bottom: 0; } }
+  .wizard-page { display: none; animation: fadeIn 0.3s ease; }
+  .wizard-page.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
+  .wizard-nav { display: flex; justify-content: space-between; margin-top: 20px; }
+  .wizard-step-title {
+    font-family: 'Cinzel', serif; color: var(--light-gold2);
+    margin-bottom: 12px; font-size: 1rem;
+  }
 
-    .field input,
-    .field select,
-    .field textarea {
-      background: var(--jet-black);
-      border: 1px solid rgba(234, 207, 139, 0.5);
-      border-radius: 4px;
-      padding: 0.35rem 0.5rem;
-      color: var(--light-gold);
-      font-size: 0.85rem;
-    }
+  /* ========= CLASS SELECTOR ========= */
+  .class-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media(max-width: 500px) { .class-grid { grid-template-columns: repeat(2, 1fr); } }
+  .class-card {
+    border: 1px solid rgba(234,207,139,0.18); border-radius: 6px; padding: 12px 8px;
+    text-align: center; cursor: pointer; transition: var(--transition);
+    background: rgba(20,24,29,0.75); position: relative; overflow: hidden;
+  }
+  .class-card:hover { border-color: rgba(234,207,139,0.5); background: rgba(28,34,38,0.9); }
+  .class-card.selected { border-color: var(--racing-red); background: rgba(227,8,18,0.07); box-shadow: 0 0 18px rgba(227,8,18,0.12); }
+  .class-card .class-icon { font-size: 1.5rem; margin-bottom: 5px; }
+  .class-card .class-name { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--light-gold2); }
+  .class-card .class-sub  { font-size: 0.64rem; color: var(--text-muted); margin-top: 2px; }
 
-    .field textarea {
-      min-height: 4rem;
-      resize: vertical;
-    }
+  /* ========= SELECTION CARDS ========= */
+  .sel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media(max-width: 440px) { .sel-grid { grid-template-columns: 1fr; } }
+  .sel-card {
+    border: 1px solid rgba(234,207,139,0.16); border-radius: 6px; padding: 11px;
+    cursor: pointer; transition: var(--transition); background: rgba(20,24,29,0.65);
+  }
+  .sel-card:hover { border-color: rgba(234,207,139,0.45); background: rgba(28,34,38,0.85); }
+  .sel-card.selected { border-color: var(--racing-red); background: rgba(227,8,18,0.07); box-shadow: 0 0 12px rgba(227,8,18,0.1); }
+  .sel-card .sel-name { font-family: 'Cinzel', serif; font-size: 0.76rem; color: var(--light-gold2); margin-bottom: 4px; }
+  .sel-card .sel-desc { font-size: 0.82rem; color: var(--text-muted); }
 
-    .field input[type="number"] {
-      max-width: 5rem;
-    }
+  /* ========= TRAIT ASSIGN ========= */
+  .trait-assign-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  @media(max-width: 420px) { .trait-assign-grid { grid-template-columns: 1fr; } }
+  .trait-assign-row { display: flex; align-items: center; gap: 8px; }
+  .trait-assign-name { font-family: 'Cinzel', serif; font-size: 0.68rem; color: var(--text-primary); min-width: 90px; }
+  .trait-assign-val { display: flex; align-items: center; gap: 6px; }
+  .trait-assign-val button {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1px solid rgba(234,207,139,0.3); background: transparent;
+    color: var(--light-gold); cursor: pointer; font-size: 0.9rem; line-height: 1; transition: var(--transition);
+  }
+  .trait-assign-val button:hover { background: rgba(234,207,139,0.12); }
+  .trait-assign-val .tv { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--light-gold2); min-width: 32px; text-align: center; }
 
-    .button-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.75rem;
-    }
+  /* ========= CHAR LIST ========= */
+  .char-list-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px; margin-bottom: 10px;
+    background: rgba(28,34,38,0.85);
+    border: 1px solid rgba(234,207,139,0.15);
+    border-radius: var(--radius); cursor: pointer; transition: var(--transition);
+  }
+  .char-list-item:hover { border-color: rgba(234,207,139,0.45); background: rgba(37,46,50,0.95); transform: translateX(3px); }
+  .char-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(234,207,139,0.08);
+    border: 2px solid rgba(234,207,139,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+  }
+  .char-name { font-family: 'Cinzel', serif; font-size: 0.95rem; color: var(--light-gold2); }
+  .char-meta { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+  .char-actions { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
 
-    .btn {
-      border-radius: 4px;
-      border: 1px solid var(--light-gold);
-      background: var(--jet-black);
-      color: var(--light-gold);
-      padding: 0.4rem 0.75rem;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
+  /* ========= EMPTY STATE ========= */
+  .empty-state {
+    text-align: center; padding: 50px 20px;
+    color: var(--text-muted); font-size: 0.95rem;
+  }
+  .empty-state .big-icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.4; }
+  .empty-state p { margin-bottom: 18px; }
 
-    .btn-primary {
-      background: var(--racing-red);
-      border-color: var(--racing-red);
-      color: var(--white);
-    }
+  /* ========= TRACKER GRID ========= */
+  .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media(max-width: 520px) { .tracker-grid { grid-template-columns: 1fr; } }
+  .tracker-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  @media(max-width: 520px) { .tracker-3 { grid-template-columns: 1fr; } }
 
-    .btn-outline {
-      background: transparent;
-    }
+  /* ========= CURRENCY ========= */
+  .currency-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .currency-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; min-width: 60px;
+    background: rgba(20,24,29,0.7); border: 1px solid rgba(234,207,139,0.18);
+    border-radius: 6px; padding: 8px 6px;
+  }
+  .currency-item .c-label { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .currency-item input { background: transparent; border: none; text-align: center; font-family: 'Cinzel', serif; font-size: 1rem; color: var(--light-gold2); width: 100%; padding: 0; outline: none; }
 
-    .stepper {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 0.75rem;
-      flex-wrap: wrap;
-    }
+  /* ========= DICE ROLLER ========= */
+  .dice-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  @media(max-width: 400px) { .dice-grid { grid-template-columns: repeat(2, 1fr); } }
+  .die-btn {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.08em;
+    padding: 14px 8px; border: 1.5px solid rgba(234,207,139,0.25);
+    background: rgba(28,34,38,0.8); color: var(--light-gold2);
+    border-radius: 6px; cursor: pointer; transition: var(--transition);
+    text-align: center;
+  }
+  .die-btn:hover { border-color: var(--light-gold); background: rgba(234,207,139,0.08); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(234,207,139,0.15); }
+  .die-btn:active { transform: translateY(0); }
+  .die-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+  .result-display {
+    text-align: center; padding: 24px;
+    background: rgba(20,24,29,0.9);
+    border: 1px solid rgba(234,207,139,0.2);
+    border-radius: var(--radius); margin-bottom: 14px; min-height: 90px;
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+  }
+  .result-num { font-family: 'Cinzel', serif; font-size: 3rem; color: var(--light-gold2); line-height: 1; }
+  .result-num.crit { color: var(--racing-red2); text-shadow: 0 0 20px rgba(227,8,18,0.6); animation: pulse 0.5s ease; }
+  .result-num.fumble { color: #e06060; }
+  .result-label { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.2em; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.15);} }
 
-    .step-pill {
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid rgba(234, 207, 139, 0.4);
-      font-size: 0.75rem;
-      opacity: 0.7;
-    }
+  /* ========= MODAL ========= */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+    z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: linear-gradient(160deg, var(--bg-card) 0%, var(--ink-black) 100%);
+    border: 1px solid rgba(234,207,139,0.3);
+    border-radius: var(--radius); padding: 24px;
+    max-width: 560px; width: 100%; max-height: 90vh;
+    overflow-y: auto; position: relative;
+  }
+  .modal::before { content:''; position:absolute; top:0;left:0;right:0;height:2px; background:linear-gradient(to right,transparent,var(--racing-red),var(--light-gold),var(--racing-red),transparent); }
+  .modal-close { position:absolute; top:12px;right:12px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem; padding:4px 8px; border-radius:4px; transition:color 0.2s; }
+  .modal-close:hover { color:var(--white); }
+  .modal h3 { font-family:'Cinzel',serif; color:var(--light-gold2); margin-bottom:12px; font-size:1rem; }
 
-    .step-pill.active {
-      background: var(--light-gold);
-      color: var(--ink-black);
-      opacity: 1;
-      font-weight: 600;
-    }
+  /* ========= TOAST ========= */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--jet-black); border: 1px solid rgba(234,207,139,0.35);
+    color: var(--light-gold2); font-family: 'Cinzel', serif; font-size: 0.72rem;
+    letter-spacing: 0.1em; padding: 10px 22px; border-radius: 4px;
+    box-shadow: var(--shadow); z-index: 300;
+    transition: transform 0.3s ease; pointer-events: none;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
 
-    .builder-step {
-      display: none;
-    }
+  /* ========= FOOTER ========= */
+  .app-footer {
+    text-align: center; padding: 24px 20px;
+    border-top: 1px solid rgba(234,207,139,0.12);
+    background: rgba(20,24,29,0.7); margin-top: 20px;
+  }
 
-    .builder-step.active {
-      display: block;
-    }
+  /* ========= CONDITION BADGES ========= */
+  .condition-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .condition-badge {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 12px;
+    border: 1px solid rgba(227,8,18,0.5); color: #ff7070;
+    background: rgba(227,8,18,0.1); cursor: pointer; transition: var(--transition);
+  }
+  .condition-badge:hover { background: rgba(227,8,18,0.2); }
 
-    .tracker-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
-      gap: 1rem;
-    }
+  /* ========= INSPIRATION ========= */
+  .inspiration-gem {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid rgba(234,207,139,0.3); cursor: pointer;
+    transition: var(--transition); display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .inspiration-gem.lit { background: rgba(234,207,139,0.25); border-color: var(--light-gold); box-shadow: 0 0 14px rgba(234,207,139,0.4); }
 
-    .card {
-      border-radius: 6px;
-      border: 1px solid rgba(234, 207, 139, 0.4);
-      padding: 0.75rem;
-      background: rgba(35, 43, 46, 0.7);
-      font-size: 0.85rem;
-    }
-
-    .card-header {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 0.5rem;
-      opacity: 0.9;
-    }
-
-    .ability-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.5rem;
-    }
-
-    .ability-box {
-      border-radius: 4px;
-      border: 1px solid rgba(234, 207, 139, 0.4);
-      padding: 0.4rem;
-      text-align: center;
-    }
-
-    .ability-name {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.8;
-    }
-
-    .ability-score {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .ability-mod {
-      font-size: 0.8rem;
-      opacity: 0.9;
-    }
-
-    .small-input {
-      width: 3.5rem;
-    }
-
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.25rem;
-      font-size: 0.75rem;
-    }
-
-    .tag {
-      border-radius: 999px;
-      border: 1px solid rgba(234, 207, 139, 0.4);
-      padding: 0.1rem 0.45rem;
-      opacity: 0.85;
-    }
-
-    footer {
-      padding: 0.5rem 1rem 0.75rem;
-      font-size: 0.7rem;
-      opacity: 0.7;
-      text-align: center;
-    }
-
-    @media (max-width: 800px) {
-      .tracker-layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
-    }
-
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .tab-button {
-        font-size: 0.8rem;
-      }
-    }
-  </style>
+  /* ========= INFO CALLOUT ========= */
+  .info-box {
+    padding: 11px 14px; border-radius: 6px;
+    border-left: 3px solid var(--racing-red);
+    background: rgba(227,8,18,0.07);
+    font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;
+  }
+  .info-box.gold { border-left-color: var(--light-gold); background: rgba(234,207,139,0.06); }
+</style>
 </head>
 <body>
-  <header>
-    <div class="header-title">DnD 5e Character Forge</div>
-    <div class="header-links">
-      <a href="https://crazitalk.github.io/hamster-rpg.github.io/daggerheart-character-forge.html">
-        ⟵ Hamster RPG Home
-      </a>
+<div id="app">
+
+  <!-- ===== HEADER ===== -->
+  <header class="app-header">
+    <div class="header-logo-row">
+      <img src="ref/logo.png" alt="Hamster RPG Logo" class="header-logo-img" onerror="this.style.display='none'">
+      <div class="header-dragon">🐉</div>
     </div>
+    <div class="app-title">D&amp;D 5e Character Forge</div>
+    <div class="header-divider"></div>
+    <div class="subtitle">Fifth Edition · System Reference Document 5.2.1</div>
   </header>
 
-  <main>
-    <div class="tab-bar">
-      <button class="tab-button active" data-tab="builder">Builder</button>
-      <button class="tab-button" data-tab="tracker">Tracker</button>
+  <!-- ===== NAV ===== -->
+  <nav class="nav-tabs" aria-label="Main navigation">
+    <button class="nav-tab active" onclick="showView('characters')">⚔ Characters</button>
+    <button class="nav-tab" onclick="showView('builder')">✦ Builder</button>
+    <button class="nav-tab" onclick="showView('tracker')">🛡 Tracker</button>
+    <button class="nav-tab" onclick="showView('dice')">🎲 Dice</button>
+  </nav>
+
+  <!-- ===== VIEWS ===== -->
+
+  <!-- CHARACTERS LIST -->
+  <div id="view-characters" class="view active">
+    <div class="card">
+      <div class="card-title">Your Characters</div>
+      <div id="char-list"></div>
     </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="newCharacter()">+ New Character</button>
+      <button class="btn" onclick="importChar()">↑ Import</button>
+    </div>
+  </div>
 
-    <!-- BUILDER PANEL -->
-    <section id="builder-panel" class="panel">
-      <div class="stepper" id="builder-stepper">
-        <div class="step-pill active" data-step="0">1 · Basics</div>
-        <div class="step-pill" data-step="1">2 · Abilities</div>
-        <div class="step-pill" data-step="2">3 · Skills & Combat</div>
-        <div class="step-pill" data-step="3">4 · Spells & Notes</div>
+  <!-- BUILDER WIZARD -->
+  <div id="view-builder" class="view">
+    <div class="card">
+      <div class="card-title">Character Builder</div>
+      <div id="wizard-progress" class="wizard-progress"></div>
+      <div id="wizard-pages"></div>
+      <div class="wizard-nav">
+        <button class="btn" id="btn-prev" style="visibility:hidden;">← Back</button>
+        <button class="btn btn-primary" id="btn-next" onclick="wizardNext()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRACKER -->
+  <div id="view-tracker" class="view">
+    <div id="tracker-content">
+      <div class="empty-state">
+        <div class="big-icon">🐉</div>
+        <p>No character selected. Create or load one first.</p>
+        <button class="btn btn-primary" onclick="showView('characters')">Select Character</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICE ROLLER -->
+  <div id="view-dice" class="view">
+    <div class="card">
+      <div class="card-title">Dice Roller</div>
+      <div class="dice-grid">
+        <button class="die-btn" onclick="rollDie(4)"><span class="die-icon">◆</span>d4</button>
+        <button class="die-btn" onclick="rollDie(6)"><span class="die-icon">⬡</span>d6</button>
+        <button class="die-btn" onclick="rollDie(8)"><span class="die-icon">◈</span>d8</button>
+        <button class="die-btn" onclick="rollDie(10)"><span class="die-icon">🔟</span>d10</button>
+        <button class="die-btn" onclick="rollDie(12)"><span class="die-icon">✦</span>d12</button>
+        <button class="die-btn" onclick="rollDie(20)"><span class="die-icon">🎲</span>d20</button>
+        <button class="die-btn" onclick="rollDie(100)"><span class="die-icon">💯</span>d100</button>
+        <button class="die-btn" onclick="rollAdvDisadv(true)"  style="border-color:rgba(80,200,120,0.4);color:#80e0a0;"><span class="die-icon">↑</span>Adv</button>
+        <button class="die-btn" onclick="rollAdvDisadv(false)" style="border-color:rgba(227,8,18,0.4);color:#ff8080;"><span class="die-icon">↓</span>Dis</button>
+        <button class="die-btn" onclick="rollDamage()" style="border-color:rgba(227,8,18,0.3);"><span class="die-icon">⚔</span>Dmg</button>
+        <button class="die-btn" onclick="rollInitiative()" style="border-color:rgba(234,207,139,0.5);"><span class="die-icon">⚡</span>Init</button>
+        <button class="die-btn" onclick="rollSave()" style="border-color:rgba(100,180,255,0.4);color:#88ccff;"><span class="die-icon">🛡</span>Save</button>
       </div>
 
-      <!-- STEP 1: BASICS -->
-      <div class="builder-step active" data-step="0">
-        <div class="section-title">Basics</div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="b-name">Character Name</label>
-            <input id="b-name" type="text" />
-          </div>
-          <div class="field">
-            <label for="b-level">Level</label>
-            <input id="b-level" type="number" min="1" max="20" value="1" />
-          </div>
-          <div class="field">
-            <label for="b-class">Class</label>
-            <input id="b-class" type="text" placeholder="Fighter, Wizard, etc." />
-          </div>
-          <div class="field">
-            <label for="b-race">Race</label>
-            <input id="b-race" type="text" placeholder="Human, Elf, etc." />
-          </div>
-          <div class="field">
-            <label for="b-background">Background</label>
-            <input id="b-background" type="text" />
-          </div>
-          <div class="field">
-            <label for="b-alignment">Alignment</label>
-            <input id="b-alignment" type="text" placeholder="Neutral Good, etc." />
-          </div>
-        </div>
-        <div class="button-row">
-          <button class="btn btn-primary" id="builder-next-0">Next: Abilities</button>
-        </div>
+      <div class="result-display" id="dice-result">
+        <div style="color:var(--text-muted); font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.2em;">Select a die to roll</div>
       </div>
 
-      <!-- STEP 2: ABILITIES -->
-      <div class="builder-step" data-step="1">
-        <div class="section-title">Ability Scores</div>
-        <div class="grid-3">
-          <div class="field">
-            <label for="b-str">Strength (STR)</label>
-            <input id="b-str" type="number" min="1" max="30" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-dex">Dexterity (DEX)</label>
-            <input id="b-dex" type="number" min="1" max="30" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-con">Constitution (CON)</label>
-            <input id="b-con" type="number" min="1" max="30" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-int">Intelligence (INT)</label>
-            <input id="b-int" type="number" min="1" max="30" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-wis">Wisdom (WIS)</label>
-            <input id="b-wis" type="number" min="1" max="30" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-cha">Charisma (CHA)</label>
-            <input id="b-cha" type="number" min="1" max="30" value="10" />
-          </div>
-        </div>
-        <div class="button-row">
-          <button class="btn" id="builder-back-1">Back</button>
-          <button class="btn btn-primary" id="builder-next-1">Next: Skills & Combat</button>
-        </div>
-      </div>
-
-      <!-- STEP 3: SKILLS & COMBAT -->
-      <div class="builder-step" data-step="2">
-        <div class="section-title">Skills & Combat</div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="b-prof-bonus">Proficiency Bonus</label>
-            <input id="b-prof-bonus" type="number" value="2" />
-          </div>
-          <div class="field">
-            <label for="b-ac">Armor Class (AC)</label>
-            <input id="b-ac" type="number" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-hp-max">Max HP</label>
-            <input id="b-hp-max" type="number" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-hp-current">Current HP</label>
-            <input id="b-hp-current" type="number" value="10" />
-          </div>
-          <div class="field">
-            <label for="b-hit-dice">Hit Dice</label>
-            <input id="b-hit-dice" type="text" placeholder="1d10, 2d8, etc." />
-          </div>
-          <div class="field">
-            <label for="b-speed">Speed</label>
-            <input id="b-speed" type="text" placeholder="30 ft." />
-          </div>
-        </div>
-
-        <div class="field" style="margin-top:0.75rem;">
-          <label for="b-skills">Skill Proficiencies (comma-separated)</label>
-          <input id="b-skills" type="text" placeholder="Perception, Stealth, Arcana" />
-        </div>
-
-        <div class="field">
-          <label for="b-features">Features / Feats</label>
-          <textarea id="b-features" placeholder="Fighting Style, Second Wind, etc."></textarea>
-        </div>
-
-        <div class="field">
-          <label for="b-equipment">Equipment & Ammo</label>
-          <textarea id="b-equipment" placeholder="Longsword, Shield, 20 Arrows, Explorer's Pack"></textarea>
-        </div>
-
-        <div class="button-row">
-          <button class="btn" id="builder-back-2">Back</button>
-          <button class="btn btn-primary" id="builder-next-2">Next: Spells & Notes</button>
-        </div>
-      </div>
-
-      <!-- STEP 4: SPELLS & NOTES -->
-      <div class="builder-step" data-step="3">
-        <div class="section-title">Spells & Notes</div>
-        <div class="grid-2">
-          <div class="field">
-            <label for="b-spell-ability">Spellcasting Ability</label>
-            <select id="b-spell-ability">
-              <option value="">None</option>
-              <option value="STR">STR</option>
-              <option value="DEX">DEX</option>
-              <option value="CON">CON</option>
-              <option value="INT">INT</option>
-              <option value="WIS">WIS</option>
-              <option value="CHA">CHA</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="b-spell-save-dc">Spell Save DC</label>
-            <input id="b-spell-save-dc" type="number" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="b-cantrips">Cantrips (comma-separated)</label>
-          <textarea id="b-cantrips" placeholder="Fire Bolt, Mage Hand"></textarea>
-        </div>
-
-        <div class="field">
-          <label for="b-spells">Spells (comma-separated)</label>
-          <textarea id="b-spells" placeholder="Magic Missile, Shield, Cure Wounds"></textarea>
-        </div>
-
-        <div class="field">
-          <label for="b-notes">Notes</label>
-          <textarea id="b-notes" placeholder="Personality traits, ideals, bonds, flaws, etc."></textarea>
-        </div>
-
-        <div class="button-row">
-          <button class="btn" id="builder-back-3">Back</button>
-          <button class="btn btn-primary" id="builder-finish">Save & Open in Tracker</button>
-        </div>
-      </div>
-
-      <hr style="border-color: rgba(234,207,139,0.3); margin:1rem 0;" />
-
-      <div class="section-title">Character File</div>
-      <div class="button-row">
-        <button class="btn btn-outline" id="btn-export">Export JSON</button>
-        <label class="btn btn-outline" style="cursor:pointer;">
-          Import JSON
-          <input id="file-import" type="file" accept="application/json" style="display:none;" />
-        </label>
-      </div>
-    </section>
-
-    <!-- TRACKER PANEL -->
-    <section id="tracker-panel" class="panel hidden">
-      <div class="section-title">Character Tracker</div>
-      <div class="tracker-layout">
-        <!-- LEFT COLUMN -->
-        <div class="card">
-          <div class="card-header">Identity</div>
-          <div class="grid-2">
-            <div class="field">
-              <label for="t-name">Name</label>
-              <input id="t-name" type="text" />
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div>
+          <div class="card-title" style="margin-bottom:10px;">Custom Roll</div>
+          <div class="form-row">
+            <div>
+              <label>Count</label>
+              <input type="number" id="roll-count" value="1" min="1" max="20" style="text-align:center;">
             </div>
-            <div class="field">
-              <label for="t-level">Level</label>
-              <input id="t-level" type="number" min="1" max="20" />
-            </div>
-            <div class="field">
-              <label for="t-class">Class</label>
-              <input id="t-class" type="text" />
-            </div>
-            <div class="field">
-              <label for="t-race">Race</label>
-              <input id="t-race" type="text" />
-            </div>
-            <div class="field">
-              <label for="t-background">Background</label>
-              <input id="t-background" type="text" />
-            </div>
-            <div class="field">
-              <label for="t-alignment">Alignment</label>
-              <input id="t-alignment" type="text" />
-            </div>
-          </div>
-
-          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
-
-          <div class="card-header">Abilities</div>
-          <div class="ability-grid">
-            <div class="ability-box">
-              <div class="ability-name">STR</div>
-              <input id="t-str" type="number" class="small-input" />
-              <div class="ability-mod" id="t-str-mod">+0</div>
-            </div>
-            <div class="ability-box">
-              <div class="ability-name">DEX</div>
-              <input id="t-dex" type="number" class="small-input" />
-              <div class="ability-mod" id="t-dex-mod">+0</div>
-            </div>
-            <div class="ability-box">
-              <div class="ability-name">CON</div>
-              <input id="t-con" type="number" class="small-input" />
-              <div class="ability-mod" id="t-con-mod">+0</div>
-            </div>
-            <div class="ability-box">
-              <div class="ability-name">INT</div>
-              <input id="t-int" type="number" class="small-input" />
-              <div class="ability-mod" id="t-int-mod">+0</div>
-            </div>
-            <div class="ability-box">
-              <div class="ability-name">WIS</div>
-              <input id="t-wis" type="number" class="small-input" />
-              <div class="ability-mod" id="t-wis-mod">+0</div>
-            </div>
-            <div class="ability-box">
-              <div class="ability-name">CHA</div>
-              <input id="t-cha" type="number" class="small-input" />
-              <div class="ability-mod" id="t-cha-mod">+0</div>
-            </div>
-          </div>
-
-          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
-
-          <div class="card-header">Defenses & Movement</div>
-          <div class="grid-3">
-            <div class="field">
-              <label for="t-ac">AC</label>
-              <input id="t-ac" type="number" />
-            </div>
-            <div class="field">
-              <label for="t-speed">Speed</label>
-              <input id="t-speed" type="text" />
-            </div>
-            <div class="field">
-              <label for="t-prof-bonus">Prof. Bonus</label>
-              <input id="t-prof-bonus" type="number" />
-            </div>
-          </div>
-
-          <div class="grid-3" style="margin-top:0.5rem;">
-            <div class="field">
-              <label for="t-hp-max">Max HP</label>
-              <input id="t-hp-max" type="number" />
-            </div>
-            <div class="field">
-              <label for="t-hp-current">Current HP</label>
-              <input id="t-hp-current" type="number" />
-            </div>
-            <div class="field">
-              <label for="t-hit-dice">Hit Dice</label>
-              <input id="t-hit-dice" type="text" />
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div class="card">
-          <div class="card-header">Skills & Features</div>
-          <div class="field">
-            <label for="t-skills">Skill Proficiencies</label>
-            <textarea id="t-skills" placeholder="Perception, Stealth, Arcana"></textarea>
-          </div>
-          <div class="field">
-            <label for="t-features">Features / Feats</label>
-            <textarea id="t-features"></textarea>
-          </div>
-
-          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
-
-          <div class="card-header">Equipment & Ammo</div>
-          <div class="field">
-            <label for="t-equipment">Equipment & Ammo</label>
-            <textarea id="t-equipment"></textarea>
-          </div>
-
-          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
-
-          <div class="card-header">Spells</div>
-          <div class="grid-3">
-            <div class="field">
-              <label for="t-spell-ability">Spell Ability</label>
-              <select id="t-spell-ability">
-                <option value="">None</option>
-                <option value="STR">STR</option>
-                <option value="DEX">DEX</option>
-                <option value="CON">CON</option>
-                <option value="INT">INT</option>
-                <option value="WIS">WIS</option>
-                <option value="CHA">CHA</option>
+            <div>
+              <label>Sides</label>
+              <select id="roll-sides">
+                <option value="4">d4</option>
+                <option value="6">d6</option>
+                <option value="8">d8</option>
+                <option value="10">d10</option>
+                <option value="12">d12</option>
+                <option value="20" selected>d20</option>
+                <option value="100">d100</option>
               </select>
             </div>
-            <div class="field">
-              <label for="t-spell-save-dc">Spell Save DC</label>
-              <input id="t-spell-save-dc" type="number" />
-            </div>
-            <div class="field">
-              <label for="t-spell-attack">Spell Attack</label>
-              <input id="t-spell-attack" type="number" />
-            </div>
           </div>
-
-          <div class="field">
-            <label for="t-cantrips">Cantrips</label>
-            <textarea id="t-cantrips"></textarea>
+          <div>
+            <label>Modifier</label>
+            <input type="number" id="roll-mod" value="0" style="text-align:center;">
           </div>
-          <div class="field">
-            <label for="t-spells">Spells</label>
-            <textarea id="t-spells"></textarea>
+          <button class="btn btn-primary" style="width:100%;margin-top:10px;" onclick="rollCustom()">Roll</button>
+        </div>
+        <div>
+          <div class="card-title" style="margin-bottom:10px;">Ability Check</div>
+          <div>
+            <label>Ability</label>
+            <select id="check-ability">
+              <option value="STR">Strength</option>
+              <option value="DEX">Dexterity</option>
+              <option value="CON">Constitution</option>
+              <option value="INT">Intelligence</option>
+              <option value="WIS">Wisdom</option>
+              <option value="CHA">Charisma</option>
+            </select>
           </div>
-
-          <hr style="border-color: rgba(234,207,139,0.3); margin:0.75rem 0;" />
-
-          <div class="card-header">Notes</div>
-          <div class="field">
-            <label for="t-notes">Notes</label>
-            <textarea id="t-notes"></textarea>
+          <div>
+            <label>Proficient?</label>
+            <select id="check-prof">
+              <option value="0">No</option>
+              <option value="1">Proficient</option>
+              <option value="2">Expertise</option>
+            </select>
           </div>
+          <button class="btn" style="width:100%;margin-top:10px;" onclick="rollAbilityCheck()">Check</button>
+        </div>
+      </div>
 
-          <div class="button-row" style="margin-top:0.75rem;">
-            <button class="btn btn-primary" id="tracker-save">Save to Local Storage</button>
-            <button class="btn btn-outline" id="tracker-sync-builder">Sync Back to Builder</button>
+      <div id="roll-history-section" style="margin-top:18px;">
+        <div class="card-title">Recent Rolls</div>
+        <div id="roll-history" style="font-family:'Cinzel',serif; font-size:0.7rem; color:var(--text-muted); display:flex; flex-direction:column; gap:3px; max-height:120px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <div style="font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-muted);">
+      Hamster RPG · D&amp;D 5e Character Forge
+    </div>
+    <div style="font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.18em; color:rgba(154,171,170,0.4); margin-top:6px; text-transform:uppercase;">
+      Uses material from the SRD 5.2.1 by Wizards of the Coast LLC · CC-BY-4.0 · Unofficial Companion Tool
+    </div>
+  </footer>
+
+</div><!-- /app -->
+
+<div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// =====================================================================
+// D&D 5e SRD 5.2.1 DATA
+// =====================================================================
+
+const CLASSES = [
+  {
+    name:'Barbarian', icon:'🪓', hitDie:12, primaryAbility:'STR',
+    savingThrows:['STR','CON'],
+    armorProfs:'Light armor, medium armor, shields',
+    weaponProfs:'Simple weapons, martial weapons',
+    spellcasting:null,
+    subclasses:['Path of the Berserker'],
+    desc:'A fierce warrior of primitive background who can enter a battle rage, granting extra damage and resistance.',
+    features:[
+      {lvl:1, name:'Rage', desc:'Bonus action to rage for 1 min. Adv. on STR checks/saves, +2 dmg melee, resistance to bludgeoning/piercing/slashing. Can\'t use spells during rage.', tag:'bonus'},
+      {lvl:1, name:'Unarmored Defense', desc:'While not wearing armor: AC = 10 + DEX mod + CON mod.', tag:'passive'},
+      {lvl:2, name:'Reckless Attack', desc:'First attack each turn: adv. on STR melee attacks, but attackers have adv. against you until next turn.', tag:'action'},
+      {lvl:2, name:'Danger Sense', desc:'Adv. on DEX saves vs. effects you can see. Not while blinded/deafened/incapacitated.', tag:'passive'},
+      {lvl:3, name:'Primal Path', desc:'Choose a subclass (Primal Path).', tag:'passive'},
+    ],
+    startingEquipment:'(a) greataxe or (b) martial melee weapon; (a) 2 handaxes or (b) simple weapon; explorer\'s pack, 4 javelins',
+  },
+  {
+    name:'Bard', icon:'🎵', hitDie:8, primaryAbility:'CHA',
+    savingThrows:['DEX','CHA'],
+    armorProfs:'Light armor',
+    weaponProfs:'Simple weapons, hand crossbows, longswords, rapiers, shortswords',
+    spellcasting:'CHA', spellcastingFull:true,
+    subclasses:['College of Lore'],
+    desc:'An inspiring magician whose power echoes the music of creation. Masters of performance and magic.',
+    features:[
+      {lvl:1, name:'Bardic Inspiration', desc:'Bonus action: give an ally a Bardic Inspiration die (d6→d12 as you level). They add it to one ability check, attack, or save within 10 minutes. Uses = CHA mod (min 1), regain on long rest.', tag:'bonus'},
+      {lvl:1, name:'Spellcasting (CHA)', desc:'Cantrips known: 2. Spell slots scale per Bard table. Primary ability: Charisma.', tag:'spell'},
+      {lvl:2, name:'Jack of All Trades', desc:'Add half proficiency bonus (rounded down) to any ability check where you\'re not already proficient.', tag:'passive'},
+      {lvl:2, name:'Song of Rest', desc:'If you play during a short rest, allies regain extra HP when spending HD: d6 (→d12 at higher levels).', tag:'passive'},
+      {lvl:3, name:'Bard College', desc:'Choose a Bard College subclass.', tag:'passive'},
+    ],
+    startingEquipment:'(a) rapier, (b) longsword, or (c) simple weapon; (a) diplomat\'s pack or (b) entertainer\'s pack; (a) lute or musical instrument; leather armor, dagger',
+  },
+  {
+    name:'Cleric', icon:'✝', hitDie:8, primaryAbility:'WIS',
+    savingThrows:['WIS','CHA'],
+    armorProfs:'Light armor, medium armor, shields',
+    weaponProfs:'Simple weapons',
+    spellcasting:'WIS', spellcastingFull:true,
+    subclasses:['Life Domain'],
+    desc:'A priestly champion who wields divine magic in service of a higher power. Heals allies and smites foes.',
+    features:[
+      {lvl:1, name:'Spellcasting (WIS)', desc:'Cantrips known: 3. Prepare spells = WIS mod + Cleric level. Spell slots per Cleric table.', tag:'spell'},
+      {lvl:1, name:'Divine Domain', desc:'Choose a Divine Domain subclass at level 1 (gains extra spells and a Channel Divinity option).', tag:'passive'},
+      {lvl:2, name:'Channel Divinity', desc:'Once per rest (more at higher levels). Use a Channel Divinity option granted by your domain. All clerics know Turn Undead.', tag:'action'},
+      {lvl:2, name:'Turn Undead', desc:'Channel Divinity: each undead within 30 ft. that can see/hear you must make a WIS save (DC = 8+prof+WIS mod) or be turned for 1 min.', tag:'action'},
+    ],
+    startingEquipment:'(a) mace or (b) warhammer; (a) scale mail, (b) leather armor, or (c) chain mail; (a) light crossbow+20 bolts or (b) simple weapon; (a) priest\'s pack or (b) explorer\'s pack; shield, holy symbol',
+  },
+  {
+    name:'Druid', icon:'🌿', hitDie:8, primaryAbility:'WIS',
+    savingThrows:['INT','WIS'],
+    armorProfs:'Light armor, medium armor, shields (non-metal)',
+    weaponProfs:'Clubs, daggers, darts, javelins, maces, quarterstaffs, scimitars, sickles, slings, spears',
+    spellcasting:'WIS', spellcastingFull:true,
+    subclasses:['Circle of the Land'],
+    desc:'A priest of the Old Faith wielding the powers of nature and adopting animal forms.',
+    features:[
+      {lvl:1, name:'Druidic', desc:'You know Druidic, a secret language known only to druids.', tag:'passive'},
+      {lvl:1, name:'Spellcasting (WIS)', desc:'Cantrips known: 2. Prepare spells = WIS mod + Druid level.', tag:'spell'},
+      {lvl:2, name:'Wild Shape', desc:'Action: magically transform into a beast you\'ve seen. CR limit and restrictions vary by level. Lasts up to twice your Druid level in hours or until you drop to 0 HP.', tag:'action'},
+      {lvl:2, name:'Druid Circle', desc:'Choose a Druid Circle subclass.', tag:'passive'},
+    ],
+    startingEquipment:'(a) wooden shield or (b) simple weapon; (a) scimitar or (b) simple melee weapon; leather armor, explorer\'s pack, druidic focus',
+  },
+  {
+    name:'Fighter', icon:'⚔', hitDie:10, primaryAbility:'STR or DEX',
+    savingThrows:['STR','CON'],
+    armorProfs:'All armor, shields',
+    weaponProfs:'Simple weapons, martial weapons',
+    spellcasting:null,
+    subclasses:['Champion'],
+    desc:'A master of martial combat, skilled with a variety of weapons and armor.',
+    features:[
+      {lvl:1, name:'Fighting Style', desc:'Choose a Fighting Style: Archery (+2 ranged attack rolls), Defense (+1 AC in armor), Dueling (+2 dmg with one-handed weapon), Great Weapon Fighting, Protection, Two-Weapon Fighting.', tag:'passive'},
+      {lvl:1, name:'Second Wind', desc:'Bonus action: regain 1d10+Fighter level HP once per short or long rest.', tag:'bonus'},
+      {lvl:2, name:'Action Surge', desc:'Take one additional action on your turn. Uses = 1 (2 at level 17). Refresh on short or long rest.', tag:'action'},
+      {lvl:3, name:'Martial Archetype', desc:'Choose a Fighter subclass.', tag:'passive'},
+      {lvl:5, name:'Extra Attack', desc:'Attack twice when you take the Attack action (3× at 11th, 4× at 20th).', tag:'action'},
+    ],
+    startingEquipment:'(a) chain mail or (b) leather armor+longbow+20 arrows; (a) martial weapon+shield or (b) 2 martial weapons; (a) light crossbow+20 bolts or (b) 2 handaxes; (a) dungeoneer\'s pack or (b) explorer\'s pack',
+  },
+  {
+    name:'Monk', icon:'👊', hitDie:8, primaryAbility:'DEX & WIS',
+    savingThrows:['STR','DEX'],
+    armorProfs:'None',
+    weaponProfs:'Simple weapons, shortswords',
+    spellcasting:null,
+    subclasses:['Warrior of the Open Hand'],
+    desc:'A master of martial arts, harnessing the power of the body in pursuit of physical and spiritual perfection.',
+    features:[
+      {lvl:1, name:'Unarmored Defense', desc:'While not wearing armor and no shield: AC = 10 + DEX mod + WIS mod.', tag:'passive'},
+      {lvl:1, name:'Martial Arts', desc:'Use DEX for unarmed strikes and monk weapons. Unarmed strike = d4 (scales up). Bonus action unarmed strike after Attack action with monk weapon.', tag:'action'},
+      {lvl:2, name:'Ki', desc:'Ki points = Monk level. Refresh on short/long rest. Spend to: Flurry of Blows (2 unarmed bonus action), Patient Defense (Dodge as bonus action), Step of the Wind (Dash/Disengage as bonus action).', tag:'bonus'},
+      {lvl:2, name:'Unarmored Movement', desc:'+10 ft. speed when not in armor or shield (increases as you level).', tag:'passive'},
+      {lvl:3, name:'Monastic Tradition', desc:'Choose a subclass.', tag:'passive'},
+    ],
+    startingEquipment:'(a) shortsword or (b) simple weapon; (a) dungeoneer\'s pack or (b) explorer\'s pack; 10 darts',
+  },
+  {
+    name:'Paladin', icon:'🏛', hitDie:10, primaryAbility:'STR & CHA',
+    savingThrows:['WIS','CHA'],
+    armorProfs:'All armor, shields',
+    weaponProfs:'Simple weapons, martial weapons',
+    spellcasting:'CHA', spellcastingHalf:true,
+    subclasses:['Oath of Devotion'],
+    desc:'A holy warrior bound to a sacred oath. Combines martial prowess with divine magic and healing.',
+    features:[
+      {lvl:1, name:'Divine Sense', desc:'Action: detect celestials/fiends/undead within 60 ft. Uses = 1+CHA mod, regain on long rest.', tag:'action'},
+      {lvl:1, name:'Lay on Hands', desc:'Pool of HP = Paladin level × 5. Touch to restore HP or cure disease/poison (5 HP from pool). Refreshes on long rest.', tag:'action'},
+      {lvl:2, name:'Fighting Style', desc:'Choose: Defense, Dueling, Great Weapon Fighting, or Protection.', tag:'passive'},
+      {lvl:2, name:'Spellcasting (CHA)', desc:'Half-caster. Prepare spells = CHA mod + half Paladin level (rounded down, min 1).', tag:'spell'},
+      {lvl:2, name:'Divine Smite', desc:'When you hit with a melee weapon, expend a spell slot to deal +2d8 radiant damage (+1d8 per slot level above 1st, +1d8 vs. undead/fiends, max +5d8).', tag:'action'},
+      {lvl:3, name:'Sacred Oath', desc:'Take your Sacred Oath — Oath of Devotion or another subclass.', tag:'passive'},
+    ],
+    startingEquipment:'(a) martial weapon+shield or (b) 2 martial weapons; (a) 5 javelins or (b) simple melee weapon; (a) priest\'s pack or (b) explorer\'s pack; chain mail, holy symbol',
+  },
+  {
+    name:'Ranger', icon:'🏹', hitDie:10, primaryAbility:'DEX & WIS',
+    savingThrows:['STR','DEX'],
+    armorProfs:'Light armor, medium armor, shields',
+    weaponProfs:'Simple weapons, martial weapons',
+    spellcasting:'WIS', spellcastingHalf:true,
+    subclasses:['Hunter'],
+    desc:'A warrior of the wilderness skilled in tracking, hunting, and surviving the wild. Masters of ranged combat.',
+    features:[
+      {lvl:1, name:'Favored Enemy', desc:'Choose a type of favored enemy. Adv. on Survival checks to track them. Adv. on INT checks to recall info about them.', tag:'passive'},
+      {lvl:1, name:'Natural Explorer', desc:'Choose a favored terrain. Proficiency bonus doubled for INT/WIS checks related to it. Various exploration benefits.', tag:'passive'},
+      {lvl:2, name:'Fighting Style', desc:'Choose: Archery, Defense, Dueling, or Two-Weapon Fighting.', tag:'passive'},
+      {lvl:2, name:'Spellcasting (WIS)', desc:'Half-caster. Spells known per Ranger table.', tag:'spell'},
+      {lvl:3, name:'Ranger Archetype', desc:'Choose a Ranger subclass.', tag:'passive'},
+      {lvl:5, name:'Extra Attack', desc:'Attack twice when you take the Attack action.', tag:'action'},
+    ],
+    startingEquipment:'(a) scale mail or (b) leather armor; (a) 2 shortswords or (b) 2 simple melee weapons; (a) dungeoneer\'s pack or (b) explorer\'s pack; longbow, quiver of 20 arrows',
+  },
+  {
+    name:'Rogue', icon:'🗡', hitDie:8, primaryAbility:'DEX',
+    savingThrows:['DEX','INT'],
+    armorProfs:'Light armor',
+    weaponProfs:'Simple weapons, hand crossbows, longswords, rapiers, shortswords',
+    spellcasting:null,
+    subclasses:['Thief'],
+    desc:'A scoundrel who uses stealth and trickery to overcome obstacles and enemies. Master of skills.',
+    features:[
+      {lvl:1, name:'Expertise', desc:'Double your proficiency bonus for two skill proficiencies of your choice (or one skill + thieves\' tools).', tag:'passive'},
+      {lvl:1, name:'Sneak Attack', desc:'Once per turn, deal +1d6 damage when you have adv. on the attack, or an ally is adjacent to the target. Increases by 1d6 every odd Rogue level.', tag:'action'},
+      {lvl:1, name:'Thieves\' Cant', desc:'A secret mix of dialect, jargon, and code that allows you to hide messages in conversation.', tag:'passive'},
+      {lvl:2, name:'Cunning Action', desc:'Bonus action each turn: Dash, Disengage, or Hide.', tag:'bonus'},
+      {lvl:3, name:'Roguish Archetype', desc:'Choose a Rogue subclass.', tag:'passive'},
+      {lvl:5, name:'Uncanny Dodge', desc:'Reaction: halve the damage of an attack you can see hitting you (once per attack).', tag:'react'},
+    ],
+    startingEquipment:'(a) rapier or (b) shortsword; (a) shortbow+quiver of 20 arrows or (b) shortsword; (a) burglar\'s pack, (b) dungeoneer\'s pack, or (c) explorer\'s pack; leather armor, 2 daggers, thieves\' tools',
+  },
+  {
+    name:'Sorcerer', icon:'🌀', hitDie:6, primaryAbility:'CHA',
+    savingThrows:['CON','CHA'],
+    armorProfs:'None',
+    weaponProfs:'Daggers, darts, slings, quarterstaffs, light crossbows',
+    spellcasting:'CHA', spellcastingFull:true,
+    subclasses:['Draconic Sorcery'],
+    desc:'A spellcaster who draws on inherent magic from a gift or bloodline, manipulating the substance of raw magic.',
+    features:[
+      {lvl:1, name:'Spellcasting (CHA)', desc:'Cantrips known: 4. Spells known per Sorcerer table. Spell slots per Sorcerer table.', tag:'spell'},
+      {lvl:1, name:'Sorcerous Origin', desc:'Choose a subclass that shapes the source of your magic.', tag:'passive'},
+      {lvl:2, name:'Font of Magic', desc:'Sorcery points = Sorcerer level. Flexible Casting: convert spell slots to/from sorcery points. 1 SP = 1 1st-level slot, etc.', tag:'action'},
+      {lvl:3, name:'Metamagic', desc:'Choose 2 Metamagic options: Careful, Distant, Empowered, Extended, Heightened, Quickened, Subtle, or Twinned. Spend sorcery points to apply.', tag:'action'},
+    ],
+    startingEquipment:'(a) light crossbow+20 bolts or (b) simple weapon; (a) component pouch or (b) arcane focus; (a) dungeoneer\'s pack or (b) explorer\'s pack; 2 daggers',
+  },
+  {
+    name:'Warlock', icon:'👁', hitDie:8, primaryAbility:'CHA',
+    savingThrows:['WIS','CHA'],
+    armorProfs:'Light armor',
+    weaponProfs:'Simple weapons',
+    spellcasting:'CHA', spellcastingPact:true,
+    subclasses:['Fiend Patron'],
+    desc:'A wielder of magic derived from a bargain with an extraplanar entity. Short-rest spell slots and invocations.',
+    features:[
+      {lvl:1, name:'Otherworldly Patron', desc:'Choose a subclass. Grants expanded spell list and patron features.', tag:'passive'},
+      {lvl:1, name:'Pact Magic', desc:'Spell slots regain on short or long rest. Slots = 1 (scale to 4). All slot are same level (up to 5th). Slots used are highest available.', tag:'spell'},
+      {lvl:2, name:'Eldritch Invocations', desc:'Learn 2 invocations (gain more as you level). Each grants a constant or reusable ability.', tag:'passive'},
+      {lvl:3, name:'Pact Boon', desc:'Choose: Pact of the Chain (familiar), Pact of the Blade (conjure weapon), or Pact of the Tome (Book of Shadows with 3 cantrips).', tag:'passive'},
+    ],
+    startingEquipment:'(a) light crossbow+20 bolts or (b) simple weapon; (a) component pouch or (b) arcane focus; (a) scholar\'s pack or (b) dungeoneer\'s pack; leather armor, simple weapon, 2 daggers',
+  },
+  {
+    name:'Wizard', icon:'📚', hitDie:6, primaryAbility:'INT',
+    savingThrows:['INT','WIS'],
+    armorProfs:'None',
+    weaponProfs:'Daggers, darts, slings, quarterstaffs, light crossbows',
+    spellcasting:'INT', spellcastingFull:true,
+    subclasses:['Evoker'],
+    desc:'A scholarly magic-user capable of manipulating the structures of reality. Prepares spells from a spellbook.',
+    features:[
+      {lvl:1, name:'Spellcasting (INT)', desc:'Cantrips known: 3. Spellbook: 6 spells at 1st level, +2 each level. Prepare spells = INT mod + Wizard level.', tag:'spell'},
+      {lvl:1, name:'Arcane Recovery', desc:'Once per day during short rest: recover expended spell slots with total level ≤ half Wizard level (rounded up, max slot level 5).', tag:'action'},
+      {lvl:2, name:'Arcane Tradition', desc:'Choose a Wizard subclass.', tag:'passive'},
+    ],
+    startingEquipment:'(a) quarterstaff or (b) dagger; (a) component pouch or (b) arcane focus; (a) scholar\'s pack or (b) explorer\'s pack; spellbook',
+  },
+];
+
+const SUBCLASSES = {
+  'Path of the Berserker': {
+    class:'Barbarian',
+    desc:'Channels rage into violent frenzy. Extra attack as bonus action while raging; resilience against charm and fear.',
+    features:[
+      {lvl:3, name:'Frenzy', desc:'Frenzied Rage: make a bonus action melee attack each turn while raging, but suffer one level of exhaustion when rage ends.'},
+      {lvl:6, name:'Mindless Rage', desc:'Can\'t be charmed or frightened while raging. Any such effect is suspended during rage.'},
+      {lvl:10, name:'Intimidating Presence', desc:'Action: frighten a creature within 30 ft. (WIS save vs. 8+prof+CHA mod) for 1 min.'},
+      {lvl:14, name:'Retaliation', desc:'When you take damage from a creature within 5 ft., you can make a melee attack against it as a reaction.'},
+    ]
+  },
+  'College of Lore': {
+    class:'Bard',
+    desc:'Plumbs the depths of magical knowledge, collecting spells and secrets from any source.',
+    features:[
+      {lvl:3, name:'Bonus Proficiencies', desc:'Gain proficiency in 3 skills of your choice.'},
+      {lvl:3, name:'Cutting Words', desc:'Reaction: use a Bardic Inspiration die to subtract it from an attack roll, ability check, or damage roll of a creature within 60 ft.'},
+      {lvl:6, name:'Additional Magical Secrets', desc:'Learn 2 spells from any class spell list.'},
+      {lvl:14, name:'Peerless Skill', desc:'When making an ability check, add a Bardic Inspiration die to the roll.'},
+    ]
+  },
+  'Life Domain': {
+    class:'Cleric',
+    desc:'Focused on the positive energy that sustains all life. Best healer in the game.',
+    features:[
+      {lvl:1, name:'Bonus Proficiency', desc:'Proficiency with heavy armor.'},
+      {lvl:1, name:'Disciple of Life', desc:'Healing spells you cast restore additional HP equal to 2 + the spell\'s level.'},
+      {lvl:2, name:'Preserve Life', desc:'Channel Divinity: restore HP totaling 5× your Cleric level, divided among creatures within 30 ft. (each up to half their max HP).'},
+      {lvl:6, name:'Blessed Healer', desc:'When you cast a healing spell on another creature, you regain 2 + spell level HP.'},
+    ]
+  },
+  'Circle of the Land': {
+    class:'Druid',
+    desc:'Mystically connected to the land; recovers magic swiftly and gains bonus spells from chosen terrain.',
+    features:[
+      {lvl:2, name:'Natural Recovery', desc:'After a short rest, regain expended spell slots with combined level ≤ half your Druid level (max 5th level, once per long rest).'},
+      {lvl:3, name:'Circle Spells', desc:'Always have additional prepared spells based on your chosen terrain type (Arctic, Coast, Desert, Forest, Grassland, Mountain, Swamp, or Underdark).'},
+      {lvl:6, name:'Land\'s Stride', desc:'Moving through nonmagical difficult terrain costs no extra movement. Pass through nonmagical plants without damage. Adv. on saves vs. magically created plants.'},
+    ]
+  },
+  'Champion': {
+    class:'Fighter',
+    desc:'Pushes the limits of physical excellence. Crits on 19-20, gains extra fighting styles, and near-miraculous resilience.',
+    features:[
+      {lvl:3, name:'Improved Critical', desc:'Weapon attacks score a critical hit on a roll of 19 or 20.'},
+      {lvl:7, name:'Remarkable Athlete', desc:'Add half proficiency bonus to any STR/DEX/CON check you\'re not proficient in. Running jump distance increases by +STR mod feet.'},
+      {lvl:10, name:'Additional Fighting Style', desc:'Choose a second Fighting Style option.'},
+      {lvl:15, name:'Superior Critical', desc:'Weapon attacks score a critical hit on a roll of 18–20.'},
+      {lvl:18, name:'Survivor', desc:'Regain HP equal to 5+CON mod at start of each turn if you have ≤ half max HP and at least 1 HP.'},
+    ]
+  },
+  'Warrior of the Open Hand': {
+    class:'Monk',
+    desc:'Masters of unarmed combat, using ki to manipulate the energy of their foes.',
+    features:[
+      {lvl:3, name:'Open Hand Technique', desc:'Whenever you Flurry of Blows, impose one effect per hit: prone on DEX save fail, push 15 ft. on STR save fail, or can\'t take reactions until end of your next turn.'},
+      {lvl:6, name:'Wholeness of Body', desc:'Once per long rest, as an action, regain HP equal to 3× your Monk level.'},
+      {lvl:11, name:'Tranquility', desc:'At end of a long rest, gain Sanctuary spell effect (WIS save = 8+prof+WIS mod) until next long rest or you attack.'},
+      {lvl:17, name:'Quivering Palm', desc:'Set up lethal vibrations in a creature you hit. Spend 3 ki: reduce creature to 0 HP (CON save vs. your ki save DC negates, dealing 10d10 necrotic instead).'},
+    ]
+  },
+  'Oath of Devotion': {
+    class:'Paladin',
+    desc:'The quintessential knight in shining armor. Upholds the highest ideals of justice and order.',
+    features:[
+      {lvl:3, name:'Sacred Weapon', desc:'Channel Divinity: bonus action, imbue a weapon with holy power for 1 min. Add CHA mod to attack rolls. Weapon emits bright light 20 ft., dim 20 more. Cannot be disarmed.'},
+      {lvl:3, name:'Turn the Unholy', desc:'Channel Divinity: undead/fiends within 30 ft. must succeed on a WIS save or be turned for 1 min.'},
+      {lvl:7, name:'Aura of Devotion', desc:'You and allies within 10 ft. (30 ft. at 18th) can\'t be charmed while you\'re conscious.'},
+      {lvl:15, name:'Purity of Spirit', desc:'Always under the effects of Protection from Evil and Good.'},
+      {lvl:20, name:'Holy Nimbus', desc:'Action: emanate sunlight 30 ft., dim 30 more for 1 hr. Enemies starting turn in bright light take 10 radiant. Adv. on saves vs. fiends/undead.'},
+    ]
+  },
+  'Hunter': {
+    class:'Ranger',
+    desc:'Stalks the most dangerous quarry, learning techniques to fight superior foes.',
+    features:[
+      {lvl:3, name:'Hunter\'s Prey', desc:'Choose: Colossus Slayer (+1d8 dmg vs. damaged enemy), Giant Killer (reaction attack vs. Large+ that misses you), or Horde Breaker (extra attack vs. second adjacent enemy once per turn).'},
+      {lvl:7, name:'Defensive Tactics', desc:'Choose: Escape the Horde (opportunity attacks have disadv.), Multiattack Defense (+4 AC vs. subsequent attacks after first hit), or Steel Will (adv. on saves vs. frightened).'},
+      {lvl:11, name:'Multiattack', desc:'Choose: Volley (ranged attack vs. all creatures in 10 ft. radius) or Whirlwind Attack (melee attack vs. all creatures within 5 ft.).'},
+      {lvl:15, name:'Superior Hunter\'s Defense', desc:'Choose: Evasion, Stand Against the Tide, or Uncanny Dodge.'},
+    ]
+  },
+  'Thief': {
+    class:'Rogue',
+    desc:'Refines your skills in the larcenous arts. Faster, more mobile, and can use magic items of any class.',
+    features:[
+      {lvl:3, name:'Fast Hands', desc:'Cunning Action: also use your bonus action to make a Sleight of Hand check, use thieves\' tools, or Use an Object action.'},
+      {lvl:3, name:'Second-Story Work', desc:'Climb at full speed. Running jump distance += DEX mod feet.'},
+      {lvl:9, name:'Supreme Sneak', desc:'Adv. on Stealth checks when moving at half speed or less.'},
+      {lvl:13, name:'Use Magic Device', desc:'Ignore all class/race/level requirements on the use of magic items.'},
+      {lvl:17, name:'Thief\'s Reflexes', desc:'Take two turns in the first round of any combat (one at normal initiative, one at initiative − 10).'},
+    ]
+  },
+  'Draconic Sorcery': {
+    class:'Sorcerer',
+    desc:'Magic from a draconic bloodline manifests as scales, elemental power, and wings at higher levels.',
+    features:[
+      {lvl:1, name:'Draconic Ancestor', desc:'Choose a dragon type. You gain a related damage type. You can speak, read, write Draconic.'},
+      {lvl:1, name:'Draconic Resilience', desc:'Max HP +1 per Sorcerer level. When not wearing armor: AC = 13 + DEX mod.'},
+      {lvl:6, name:'Elemental Affinity', desc:'When casting a spell that deals your ancestor\'s damage type, add CHA mod to damage. Spend 1 SP for resistance to that damage for 1 hour.'},
+      {lvl:14, name:'Dragon Wings', desc:'Action: sprout dragon wings, gaining a flying speed equal to your current speed.'},
+      {lvl:18, name:'Draconic Presence', desc:'Spend 5 SP: exude an aura of awe or fear (60 ft., WIS save vs. spell save DC) for 1 min.'},
+    ]
+  },
+  'Fiend Patron': {
+    class:'Warlock',
+    desc:'Bargained with a fiend of the Lower Planes. Gains dark magic, temporary HP on kills, and fiendish resilience.',
+    features:[
+      {lvl:1, name:'Dark One\'s Blessing', desc:'When you reduce a creature to 0 HP, gain temp HP = CHA mod + Warlock level (min 1).'},
+      {lvl:6, name:'Dark One\'s Own Luck', desc:'Once per short/long rest, add 1d10 to an ability check or saving throw.'},
+      {lvl:10, name:'Fiendish Resilience', desc:'Choose a damage type after a short/long rest. Gain resistance to it until your next rest (not bludgeoning/piercing/slashing).'},
+      {lvl:14, name:'Hurl Through Hell', desc:'Once per long rest, when you hit a creature, send it through lower planes until end of your next turn (10d10 psychic dmg, immune if fiend).'},
+    ]
+  },
+  'Evoker': {
+    class:'Wizard',
+    desc:'Focuses on spells that harness raw magical energy — fire, lightning, thunder. Can sculpt area effects to protect allies.',
+    features:[
+      {lvl:2, name:'Evocation Savant', desc:'Gold and time halved to copy evocation spells into spellbook.'},
+      {lvl:2, name:'Sculpt Spells', desc:'When you cast an evocation spell that affects other creatures you can see, choose a number equal to 1 + spell level. Those creatures automatically succeed the save and take no damage.'},
+      {lvl:6, name:'Potent Cantrip', desc:'When a creature succeeds a save against your cantrip, it still takes half damage.'},
+      {lvl:10, name:'Empowered Evocation', desc:'Add INT mod to one damage roll of any wizard evocation spell.'},
+      {lvl:14, name:'Overchannel', desc:'Maximize damage of a 5th-level-or-lower evocation spell (not cantrips). On subsequent uses before long rest, take 2d12 necrotic per spell level.'},
+    ]
+  },
+};
+
+const BACKGROUNDS = [
+  { name:'Acolyte', skills:['Insight','Religion'], feature:'Shelter of the Faithful: you and companions get free stay/food at temples of your faith. Access to religious resources.', equipment:'Holy symbol, prayer book, 5 sticks of incense, vestments, common clothes, 15 gp', personality:['I idolize a particular hero of my faith.','I can find common ground between fiercest enemies.'] },
+  { name:'Criminal', skills:['Deception','Stealth'], feature:'Criminal Contact: reliable contact for passing messages through criminal networks.', equipment:'Crowbar, common clothes (dark), 15 gp', personality:['I always have a plan for when things go wrong.','I am always calm, no matter the situation.'] },
+  { name:'Sage', skills:['Arcana','History'], feature:'Researcher: when you don\'t know information, you know where to find it.', equipment:'Bottle of ink, quill, small knife, letter from colleague, common clothes, 10 gp', personality:['I use polysyllabic words to convey my intelligence.','I\'ve read every book in the world\'s greatest libraries.'] },
+  { name:'Soldier', skills:['Athletics','Intimidation'], feature:'Military Rank: soldiers of your former military recognize your authority, grant deference, access to equipment and fortifications.', equipment:'Insignia of rank, trophy from fallen enemy, deck of cards, common clothes, 10 gp', personality:['I\'m always polite and respectful.','I\'ve lost too many friends and don\'t form attachments.'] },
+];
+
+const SPECIES = [
+  { name:'Human', icon:'👤', desc:'The most common people in the worlds of D&D, defined by their adaptability and ambition.', traits:'Size: Medium. Speed: 30 ft. Extra Skill: Gain proficiency in one skill of choice. Feat: Gain one Origin feat.', asi:'+1 to all ability scores (or +2/+1 to two scores in 2024 rules)' },
+  { name:'Dwarf', icon:'⚒', desc:'Bold and hardy, known for courage in battle and masterful craftsmanship of stone and metal.', traits:'Size: Medium. Speed: 25 ft. (not reduced by heavy armor). Darkvision 60 ft. Dwarven Resilience: adv. on saves vs. poison, resistance to poison dmg. Dwarven Combat Training: prof. with battleaxe, handaxe, throwing hammer, warhammer. Tool Proficiency: 1 artisan tool. Stonecunning: expertise on History checks about stonework.', asi:'+2 CON' },
+  { name:'Elf', icon:'🌙', desc:'A magical people of otherworldly grace, living in harmony with nature or arcane arts for centuries.', traits:'Size: Medium. Speed: 30 ft. Darkvision 60 ft. Keen Senses: proficiency in Perception. Fey Ancestry: adv. vs. charmed, immune to magical sleep. Trance: rest in 4 hrs. (2 hrs. of trance = 8 hrs. of sleep).', asi:'+2 DEX; High Elf: +1 INT, one wizard cantrip, one extra language; Wood Elf: +1 WIS, mask of wild, 35 ft. speed' },
+  { name:'Gnome', icon:'🔬', desc:'Small and inventive, gnomes take delight in life—whether through magic, gadgets, or humor.', traits:'Size: Small. Speed: 25 ft. Darkvision 60 ft. Gnome Cunning: adv. on all INT/WIS/CHA saves vs. magic.', asi:'+2 INT; Forest Gnome: +1 DEX; Rock Gnome: +1 CON' },
+  { name:'Goliath', icon:'🗻', desc:'Towering wanderers who dwell in the highest mountain reaches, always seeking the next challenge.', traits:'Size: Medium. Speed: 35 ft. Giant Ancestry: choose one: Cloud (Misty Step), Frost (Armor of Agathys), Hill (Cure Wounds), Stone (Thunderwave), Storm (Fog Cloud). Large Form (18th). Powerful Build: count as one size larger for carrying capacity.', asi:'+2 STR, +1 CON' },
+  { name:'Halfling', icon:'🌼', desc:'Small and resourceful, halflings are cheerful wanderers with surprising luck.', traits:'Size: Small. Speed: 25 ft. Lucky: when you roll 1 on d20, reroll (must use new roll). Brave: adv. on saves vs. frightened. Halfling Nimbleness: move through space of any creature larger than you.', asi:'+2 DEX; Lightfoot: +1 CHA, can hide behind creatures larger than you; Stout: +1 CON, adv. vs. poison, resistance to poison dmg' },
+  { name:'Orc', icon:'💪', desc:'Powerful warriors with a complex history, often misjudged but resilient and capable.', traits:'Size: Medium. Speed: 30 ft. Darkvision 60 ft. Adrenaline Rush: bonus action dash, regain temp HP = proficiency bonus. Powerful Build: count as one size larger for carrying capacity. Relentless Endurance: when reduced to 0 HP (not instant death), drop to 1 HP instead (once per long rest).', asi:'+2 STR, +1 CON' },
+  { name:'Tiefling', icon:'😈', desc:'Descended from fiends, bearing supernatural power and often facing prejudice from mortal society.', traits:'Size: Medium. Speed: 30 ft. Darkvision 60 ft. Hellish Resistance: resistance to fire damage. Infernal Legacy: Thaumaturgy cantrip; at 3rd level, Hellish Rebuke 2/day; at 5th level, Darkness 1/day.', asi:'+1 INT, +2 CHA' },
+  { name:'Dragonborn', icon:'🐲', desc:'Proud dragon-descended humanoids who have strong ties to draconic magic and tradition.', traits:'Size: Medium. Speed: 30 ft. Draconic Ancestry: choose a dragon type and associated damage type. Breath Weapon: action, exhale energy (15-ft. cone or 30-ft. line). Damage Resistance: resistance to your draconic damage type. Languages: Common and Draconic.', asi:'+2 STR, +1 CHA' },
+];
+
+const SKILLS_LIST = [
+  {name:'Acrobatics',    ability:'DEX'},
+  {name:'Animal Handling', ability:'WIS'},
+  {name:'Arcana',        ability:'INT'},
+  {name:'Athletics',     ability:'STR'},
+  {name:'Deception',     ability:'CHA'},
+  {name:'History',       ability:'INT'},
+  {name:'Insight',       ability:'WIS'},
+  {name:'Intimidation',  ability:'CHA'},
+  {name:'Investigation', ability:'INT'},
+  {name:'Medicine',      ability:'WIS'},
+  {name:'Nature',        ability:'INT'},
+  {name:'Perception',    ability:'WIS'},
+  {name:'Performance',   ability:'CHA'},
+  {name:'Persuasion',    ability:'CHA'},
+  {name:'Religion',      ability:'INT'},
+  {name:'Sleight of Hand', ability:'DEX'},
+  {name:'Stealth',       ability:'DEX'},
+  {name:'Survival',      ability:'WIS'},
+];
+
+const ABILITY_NAMES = ['STR','DEX','CON','INT','WIS','CHA'];
+const ABILITY_FULL  = {STR:'Strength',DEX:'Dexterity',CON:'Constitution',INT:'Intelligence',WIS:'Wisdom',CHA:'Charisma'};
+
+const CONDITIONS = ['Blinded','Charmed','Deafened','Exhausted','Frightened','Grappled','Incapacitated','Invisible','Paralyzed','Petrified','Poisoned','Prone','Restrained','Stunned','Unconscious'];
+
+const STANDARD_ARRAY = [15,14,13,12,10,8];
+
+// =====================================================================
+// STORAGE
+// =====================================================================
+function saveData(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+function loadData(key) { try { const d = localStorage.getItem(key); return d ? JSON.parse(d) : null; } catch(e) { return null; } }
+
+let characters   = loadData('dnd5e_chars')    || [];
+let activeCharId = loadData('dnd5e_activeChar') || null;
+
+function saveAll() { saveData('dnd5e_chars', characters); saveData('dnd5e_activeChar', activeCharId); }
+function getChar(id) { return characters.find(c => c.id === id) || null; }
+function getActive() { return activeCharId ? getChar(activeCharId) : null; }
+function setActive(id) { activeCharId = id; saveData('dnd5e_activeChar', id); }
+function withChar(fn) { const c = getActive(); if(!c) return; fn(c); saveAll(); renderTracker(); }
+
+function newId() { return 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+
+function createBlankChar() {
+  return {
+    id: newId(),
+    name: '',
+    player: '',
+    race: '',
+    class: '',
+    subclass: '',
+    background: '',
+    alignment: '',
+    level: 1,
+    xp: 0,
+    abilities: { STR:10, DEX:10, CON:10, INT:10, WIS:10, CHA:10 },
+    savingThrowProfs: [],
+    skillProfs: [],
+    skillExpertise: [],
+    hp: { max:8, current:8, temp:0 },
+    ac: 10,
+    speed: 30,
+    initiative: 0,
+    proficiencyBonus: 2,
+    inspiration: false,
+    deathSaves: { successes:0, failures:0 },
+    spellSlots: { 1:{max:0,used:0}, 2:{max:0,used:0}, 3:{max:0,used:0}, 4:{max:0,used:0}, 5:{max:0,used:0}, 6:{max:0,used:0}, 7:{max:0,used:0}, 8:{max:0,used:0}, 9:{max:0,used:0} },
+    features: [],
+    equipment: [],
+    currency: { cp:0, sp:0, ep:0, gp:0, pp:0 },
+    conditions: [],
+    notes: '',
+    backstory: '',
+    personality: '',
+    ideals: '',
+    bonds: '',
+    flaws: '',
+    createdAt: Date.now(),
+  };
+}
+
+function abilityMod(score) { return Math.floor((score - 10) / 2); }
+function modStr(score)     { const m = abilityMod(score); return (m >= 0 ? '+' : '') + m; }
+function profBonus(level)  { return 2 + Math.floor((level - 1) / 4); }
+
+// =====================================================================
+// VIEWS
+// =====================================================================
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  const map = ['characters','builder','tracker','dice'];
+  const idx = map.indexOf(name);
+  if (idx >= 0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if (name === 'tracker')    renderTracker();
+  if (name === 'characters') renderCharList();
+}
+
+// =====================================================================
+// CHARACTER LIST
+// =====================================================================
+function renderCharList() {
+  const el = document.getElementById('char-list');
+  if (!characters.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">📜</div><p>No characters yet. Forge your legend.</p><button class="btn btn-primary" onclick="newCharacter()">Create Character</button></div>`;
+    return;
+  }
+  el.innerHTML = characters.map(c => {
+    const cls = CLASSES.find(x => x.name === c.class);
+    return `<div class="char-list-item" onclick="openChar('${c.id}')">
+      <div class="char-avatar">${cls ? cls.icon : '⚔'}</div>
+      <div>
+        <div class="char-name">${c.name || 'Unnamed Hero'}</div>
+        <div class="char-meta">${c.race || '—'} ${c.class ? '· ' + c.class : ''} ${c.subclass ? '(' + c.subclass + ')' : ''} · Level ${c.level} · ${c.background || '—'}</div>
+      </div>
+      <div class="char-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-sm" onclick="openChar('${c.id}')">Track</button>
+        <button class="btn btn-sm" onclick="editChar('${c.id}')">Edit</button>
+        <button class="btn btn-sm" onclick="exportChar('${c.id}')">Export</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteChar('${c.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openChar(id) { setActive(id); showView('tracker'); }
+function editChar(id) { setActive(id); initBuilder(id); showView('builder'); }
+
+function deleteChar(id) {
+  if (!confirm('Delete this character? This cannot be undone.')) return;
+  characters = characters.filter(c => c.id !== id);
+  if (activeCharId === id) { activeCharId = null; saveData('dnd5e_activeChar', null); }
+  saveAll(); renderCharList(); toast('Character deleted.');
+}
+
+function exportChar(id) {
+  const c = getChar(id); if (!c) return;
+  const blob = new Blob([JSON.stringify(c, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = (c.name || 'character').replace(/\s+/g,'-').toLowerCase() + '.dnd5e.json';
+  a.click(); URL.revokeObjectURL(url); toast('Character exported!');
+}
+
+function importChar() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const c = JSON.parse(ev.target.result);
+        if (!c.id) c.id = newId();
+        const merged = Object.assign(createBlankChar(), c);
+        characters.push(merged);
+        saveAll(); renderCharList();
+        toast('Imported: ' + (c.name || 'Unknown'));
+      } catch(e) { alert('Invalid file.'); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// =====================================================================
+// BUILDER WIZARD
+// =====================================================================
+const WIZARD_STEPS = [
+  {id:'species',    label:'Species'},
+  {id:'class',      label:'Class'},
+  {id:'subclass',   label:'Subclass'},
+  {id:'background', label:'Background'},
+  {id:'abilities',  label:'Abilities'},
+  {id:'skills',     label:'Skills'},
+  {id:'features',   label:'Features'},
+  {id:'equipment',  label:'Equipment'},
+  {id:'identity',   label:'Identity'},
+  {id:'finalize',   label:'Finalize'},
+];
+
+let wizardChar = null;
+let wizardStep = 0;
+
+function newCharacter()   { initBuilder(null); showView('builder'); }
+
+function initBuilder(charId) {
+  wizardChar = charId ? JSON.parse(JSON.stringify(getChar(charId))) : createBlankChar();
+  wizardStep = 0;
+  renderWizardProgress();
+  renderWizardPages();
+  updateWizardNav();
+}
+
+function renderWizardProgress() {
+  const prog = document.getElementById('wizard-progress');
+  let html = '';
+  WIZARD_STEPS.forEach((s, i) => {
+    if (i > 0) html += `<div class="wizard-connector"></div>`;
+    const cls = i < wizardStep ? 'done' : (i === wizardStep ? 'active' : '');
+    html += `<div class="wizard-step-dot ${cls}" data-label="${s.label}" onclick="jumpStep(${i})">${i < wizardStep ? '✓' : (i + 1)}</div>`;
+  });
+  prog.innerHTML = html;
+}
+
+function renderWizardPages() {
+  const pages = document.getElementById('wizard-pages');
+  pages.innerHTML = WIZARD_STEPS.map((s,i) => `<div class="wizard-page ${i===wizardStep?'active':''}" id="wpage-${i}">${buildPage(s.id)}</div>`).join('');
+}
+
+function jumpStep(i) { if (i > wizardStep) return; wizardStep = i; renderWizardProgress(); renderWizardPages(); updateWizardNav(); }
+
+function buildPage(id) {
+  switch(id) {
+    case 'species':    return buildSpeciesPage();
+    case 'class':      return buildClassPage();
+    case 'subclass':   return buildSubclassPage();
+    case 'background': return buildBackgroundPage();
+    case 'abilities':  return buildAbilitiesPage();
+    case 'skills':     return buildSkillsPage();
+    case 'features':   return buildFeaturesPage();
+    case 'equipment':  return buildEquipmentPage();
+    case 'identity':   return buildIdentityPage();
+    case 'finalize':   return buildFinalizePage();
+    default: return '';
+  }
+}
+
+function buildSpeciesPage() {
+  return `
+    <div class="wizard-step-title">Step 1: Choose Your Species</div>
+    <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:14px;">Your character's species shapes your starting traits and abilities.</p>
+    <div class="sel-grid">
+      ${SPECIES.map(s => `
+        <div class="sel-card ${wizardChar.race===s.name?'selected':''}" onclick="wizardChar.race='${s.name}'; renderWizardPages();">
+          <div class="sel-name">${s.icon} ${s.name}</div>
+          <div class="sel-desc">${s.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${wizardChar.race ? (() => {
+      const sp = SPECIES.find(s=>s.name===wizardChar.race);
+      return `<div class="card" style="margin-top:14px; background:rgba(0,0,0,0.3);">
+        <div class="card-title">${sp.icon} ${sp.name} Traits</div>
+        <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:6px; white-space:pre-line;">${sp.traits}</div>
+        <div style="font-size:0.8rem; color:var(--light-gold); font-style:italic;">Ability Score Improvement: ${sp.asi}</div>
+      </div>`;
+    })() : ''}
+  `;
+}
+
+function buildClassPage() {
+  return `
+    <div class="wizard-step-title">Step 2: Choose Your Class</div>
+    <div class="class-grid">
+      ${CLASSES.map(c => `
+        <div class="class-card ${wizardChar.class===c.name?'selected':''}" onclick="selectClass('${c.name}')">
+          <div class="class-icon">${c.icon}</div>
+          <div class="class-name">${c.name}</div>
+          <div class="class-sub">d${c.hitDie} · ${c.primaryAbility}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${wizardChar.class ? (() => {
+      const cls = CLASSES.find(c=>c.name===wizardChar.class);
+      return `<div class="card" style="margin-top:14px;">
+        <div style="font-family:'Cinzel',serif; font-size:0.9rem; color:var(--light-gold2); margin-bottom:6px;">${cls.icon} ${cls.name} — Hit Die: d${cls.hitDie} · Primary: ${cls.primaryAbility}</div>
+        <div style="color:var(--text-muted);font-size:0.88rem;margin-bottom:8px;">${cls.desc}</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;"><strong style="color:var(--light-gold);">Armor:</strong> ${cls.armorProfs}</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;"><strong style="color:var(--light-gold);">Weapons:</strong> ${cls.weaponProfs}</div>
+        <div style="font-size:0.8rem; color:var(--text-muted);"><strong style="color:var(--light-gold);">Saving Throws:</strong> ${cls.savingThrows.map(s=>ABILITY_FULL[s]).join(', ')}</div>
+      </div>`;
+    })() : ''}
+  `;
+}
+
+function selectClass(name) {
+  const cls = CLASSES.find(c=>c.name===name);
+  wizardChar.class = name;
+  wizardChar.subclass = '';
+  wizardChar.savingThrowProfs = [...cls.savingThrows];
+  // Set base HP
+  wizardChar.hp.max = cls.hitDie + abilityMod(wizardChar.abilities.CON);
+  wizardChar.hp.current = wizardChar.hp.max;
+  wizardChar.proficiencyBonus = profBonus(wizardChar.level);
+  renderWizardPages();
+}
+
+function buildSubclassPage() {
+  const cls = CLASSES.find(c=>c.name===wizardChar.class);
+  if (!cls) return `<p style="color:var(--text-muted)">Please select a class first.</p>`;
+  return `
+    <div class="wizard-step-title">Step 3: Choose Subclass</div>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:14px;">Note: most subclasses are chosen at level 3. You can select one now or decide later.</p>
+    <div class="sel-grid">
+      ${cls.subclasses.map(s => {
+        const sub = SUBCLASSES[s];
+        return `<div class="sel-card ${wizardChar.subclass===s?'selected':''}" onclick="wizardChar.subclass='${s}'; renderWizardPages();">
+          <div class="sel-name">${s}</div>
+          <div class="sel-desc">${sub?.desc||''}</div>
+        </div>`;
+      }).join('')}
+      <div class="sel-card ${wizardChar.subclass===''?'selected':''}" onclick="wizardChar.subclass=''; renderWizardPages();">
+        <div class="sel-name">Decide Later</div>
+        <div class="sel-desc">Choose your subclass when you reach the appropriate level.</div>
+      </div>
+    </div>
+    ${wizardChar.subclass && SUBCLASSES[wizardChar.subclass] ? (() => {
+      const sub = SUBCLASSES[wizardChar.subclass];
+      return `<div class="card" style="margin-top:14px; background:rgba(0,0,0,0.3);">
+        <div class="card-title">${wizardChar.subclass} Features</div>
+        ${sub.features.map(f=>`<div style="margin-bottom:8px;"><span style="font-family:'Cinzel',serif;font-size:0.8rem;color:var(--light-gold2);">${f.name}</span> <span style="font-size:0.65rem;color:var(--text-muted);font-family:'Cinzel',serif;">(Lvl ${f.lvl})</span><div style="font-size:0.82rem;color:var(--text-muted);margin-top:2px;">${f.desc}</div></div>`).join('')}
+      </div>`;
+    })() : ''}
+  `;
+}
+
+function buildBackgroundPage() {
+  return `
+    <div class="wizard-step-title">Step 4: Choose Background</div>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:14px;">Your background provides proficiencies, equipment, and a special feature.</p>
+    <div class="sel-grid">
+      ${BACKGROUNDS.map(b => `
+        <div class="sel-card ${wizardChar.background===b.name?'selected':''}" onclick="wizardChar.background='${b.name}'; renderWizardPages();">
+          <div class="sel-name">${b.name}</div>
+          <div class="sel-desc" style="font-size:0.78rem;">Skills: ${b.skills.join(', ')}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${wizardChar.background ? (() => {
+      const bg = BACKGROUNDS.find(b=>b.name===wizardChar.background);
+      return `<div class="card" style="margin-top:14px; background:rgba(0,0,0,0.3);">
+        <div class="card-title">${bg.name}</div>
+        <div style="font-size:0.82rem; color:var(--light-gold); margin-bottom:6px;"><strong>Feature:</strong> ${bg.feature}</div>
+        <div style="font-size:0.82rem; color:var(--text-muted); margin-bottom:6px;"><strong>Skill Proficiencies:</strong> ${bg.skills.join(', ')}</div>
+        <div style="font-size:0.82rem; color:var(--text-muted);">Equipment: ${bg.equipment}</div>
+      </div>`;
+    })() : ''}
+  `;
+}
+
+function buildAbilitiesPage() {
+  const arr = [...STANDARD_ARRAY];
+  const assigned = {};
+  ABILITY_NAMES.forEach(a => { if(wizardChar.abilities[a] !== 10) assigned[a] = wizardChar.abilities[a]; });
+
+  return `
+    <div class="wizard-step-title">Step 5: Set Ability Scores</div>
+    <div class="info-box gold">Standard Array: 15, 14, 13, 12, 10, 8 — assign one value to each ability. Or enter custom scores (point buy / rolled).</div>
+    <div class="form-row-3" style="margin-bottom:16px;">
+      ${ABILITY_NAMES.map(a => `
+        <div>
+          <label>${ABILITY_FULL[a]}</label>
+          <input type="number" min="1" max="20" value="${wizardChar.abilities[a]}"
+            onchange="wizardChar.abilities['${a}']=Math.min(20,Math.max(1,parseInt(this.value)||10)); recalcDerived(); renderWizardPages();">
+          <div style="text-align:center; font-family:'Cinzel',serif; font-size:0.72rem; color:var(--light-gold2); margin-top:3px;">${modStr(wizardChar.abilities[a])}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="card-title">Quick Assign Standard Array</div>
+    <div class="form-row-3">
+      ${ABILITY_NAMES.map(a => `
+        <div>
+          <label style="font-size:0.6rem;">${a}</label>
+          <select onchange="wizardChar.abilities['${a}']=parseInt(this.value)||10; recalcDerived(); renderWizardPages();">
+            <option value="10">—</option>
+            ${STANDARD_ARRAY.map(v=>`<option value="${v}" ${wizardChar.abilities[a]===v?'selected':''}>${v}</option>`).join('')}
+          </select>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:10px;font-size:0.78rem;color:var(--text-muted);">Remember: add your species' Ability Score Improvement${wizardChar.race?' ('+SPECIES.find(s=>s.name===wizardChar.race)?.asi+')':''}.</div>
+  `;
+}
+
+function recalcDerived() {
+  const cls = CLASSES.find(c=>c.name===wizardChar.class);
+  if (cls) {
+    wizardChar.hp.max = cls.hitDie + abilityMod(wizardChar.abilities.CON) + (wizardChar.level - 1) * (Math.ceil(cls.hitDie/2)+1+abilityMod(wizardChar.abilities.CON));
+    wizardChar.hp.max = Math.max(1, wizardChar.hp.max);
+    wizardChar.hp.current = Math.min(wizardChar.hp.current, wizardChar.hp.max);
+  }
+  wizardChar.proficiencyBonus = profBonus(wizardChar.level);
+  wizardChar.initiative = abilityMod(wizardChar.abilities.DEX);
+  wizardChar.ac = 10 + abilityMod(wizardChar.abilities.DEX); // base; user adjusts
+}
+
+function buildSkillsPage() {
+  const cls   = CLASSES.find(c=>c.name===wizardChar.class);
+  const bg    = BACKGROUNDS.find(b=>b.name===wizardChar.background);
+  const bgSkills = bg ? bg.skills : [];
+
+  return `
+    <div class="wizard-step-title">Step 6: Skills & Proficiencies</div>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:10px;">Click to toggle skill proficiency. Background grants: <span style="color:var(--light-gold);">${bgSkills.join(', ') || '—'}</span>.</p>
+    <div class="skills-grid">
+      ${SKILLS_LIST.map(sk => {
+        const isProficient = wizardChar.skillProfs.includes(sk.name) || bgSkills.includes(sk.name);
+        const isExpert     = wizardChar.skillExpertise.includes(sk.name);
+        const mod          = abilityMod(wizardChar.abilities[sk.ability]);
+        const bonus        = mod + (isExpert ? wizardChar.proficiencyBonus*2 : isProficient ? wizardChar.proficiencyBonus : 0);
+        return `<div class="skill-row" onclick="toggleSkill('${sk.name}')">
+          <div class="skill-pip ${isExpert?'expert':isProficient?'proficient':''}"></div>
+          <div class="skill-name">${sk.name}</div>
+          <div class="skill-ability">${sk.ability}</div>
+          <div class="skill-bonus">${bonus>=0?'+':''}${bonus}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="margin-top:12px;font-size:0.78rem;color:var(--text-muted);">Gold = expert (double prof.), bronze = proficient, grey = untrained. Background skills auto-added. Click twice for expertise.</div>
+  `;
+}
+
+function toggleSkill(name) {
+  const bg   = BACKGROUNDS.find(b=>b.name===wizardChar.background);
+  const auto = bg ? bg.skills.includes(name) : false;
+  if (auto) return; // background skills can't be toggled off
+  if (wizardChar.skillExpertise.includes(name)) {
+    wizardChar.skillExpertise = wizardChar.skillExpertise.filter(s=>s!==name);
+    wizardChar.skillProfs = wizardChar.skillProfs.filter(s=>s!==name);
+  } else if (wizardChar.skillProfs.includes(name)) {
+    wizardChar.skillExpertise.push(name);
+  } else {
+    wizardChar.skillProfs.push(name);
+  }
+  renderWizardPages();
+}
+
+function buildFeaturesPage() {
+  const cls  = CLASSES.find(c=>c.name===wizardChar.class);
+  const sub  = wizardChar.subclass ? SUBCLASSES[wizardChar.subclass] : null;
+  if (!cls) return `<p style="color:var(--text-muted)">Select a class first.</p>`;
+
+  const lvl = wizardChar.level;
+  const classFeats = cls.features.filter(f => f.lvl <= lvl);
+  const subFeats   = sub ? sub.features.filter(f => f.lvl <= lvl) : [];
+
+  return `
+    <div class="wizard-step-title">Step 7: Class Features</div>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:14px;">These are your class features at level ${lvl}. They're automatically added to your character.</p>
+    <div class="feat-list">
+      ${classFeats.map(f=>`
+        <div class="feat-card">
+          <div class="feat-name">${f.name}</div>
+          <div class="feat-source">${cls.name} · Level ${f.lvl}</div>
+          <div class="feat-desc">${f.desc}</div>
+          <div class="feat-tag tag-${f.tag}">${f.tag}</div>
+        </div>
+      `).join('')}
+      ${subFeats.map(f=>`
+        <div class="feat-card">
+          <div class="feat-name">${f.name}</div>
+          <div class="feat-source">${wizardChar.subclass} · Level ${f.lvl}</div>
+          <div class="feat-desc">${f.desc}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="margin-top:14px;">
+      <div class="card-title">Add Custom Feature / Spell / Ability</div>
+      <div class="form-row">
+        <div><label>Name</label><input type="text" id="feat-name" placeholder="e.g. Fireball, Shield Bash..."></div>
+        <div>
+          <label>Type</label>
+          <select id="feat-tag">
+            <option value="action">Action</option>
+            <option value="bonus">Bonus Action</option>
+            <option value="react">Reaction</option>
+            <option value="spell">Spell</option>
+            <option value="passive">Passive</option>
+          </select>
+        </div>
+      </div>
+      <label>Description</label>
+      <textarea id="feat-desc" style="min-height:60px;" placeholder="Describe what it does..."></textarea>
+      <button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="addWizardFeature()">+ Add Feature</button>
+    </div>
+    ${wizardChar.features.length ? `
+      <div class="card-title" style="margin-top:14px;">Custom Features Added</div>
+      ${wizardChar.features.map((f,i)=>`
+        <div class="feat-card">
+          <div class="feat-name">${f.name}</div>
+          <div class="feat-desc">${f.desc}</div>
+          <div class="feat-tag tag-${f.tag}">${f.tag}</div>
+          <button class="btn btn-sm btn-danger" style="position:absolute;top:9px;right:9px;" onclick="removeWizardFeature(${i})">✕</button>
+        </div>
+      `).join('')}
+    ` : ''}
+  `;
+}
+
+function addWizardFeature() {
+  const name = document.getElementById('feat-name')?.value?.trim();
+  const tag  = document.getElementById('feat-tag')?.value;
+  const desc = document.getElementById('feat-desc')?.value?.trim();
+  if (!name) { toast('Enter a feature name.'); return; }
+  if (!wizardChar.features) wizardChar.features = [];
+  wizardChar.features.push({ name, tag, desc: desc || '' });
+  renderWizardPages();
+}
+
+function removeWizardFeature(idx) { wizardChar.features.splice(idx, 1); renderWizardPages(); }
+
+function buildEquipmentPage() {
+  const cls = CLASSES.find(c=>c.name===wizardChar.class);
+  return `
+    <div class="wizard-step-title">Step 8: Equipment</div>
+    ${cls ? `<div class="info-box">Starting equipment options for <strong>${cls.name}</strong>: ${cls.startingEquipment}</div>` : ''}
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:12px;">Add your starting gear below.</p>
+    ${(wizardChar.equipment||[]).map((item,i)=>`
+      <div class="equip-item">
+        <span class="equip-name">${item.name}</span>
+        <span class="equip-qty" onclick="changeWizardQty(${i},1)">×${item.qty}</span>
+        <button class="btn btn-sm btn-danger" onclick="removeWizardItem(${i})">✕</button>
+      </div>
+    `).join('')}
+    <div class="form-row" style="margin-top:10px;">
+      <div><label>Item Name</label><input type="text" id="new-item-name" placeholder="e.g. Longsword, Rope 50ft..."></div>
+      <div><label>Qty</label><input type="number" id="new-item-qty" value="1" min="1" max="99" style="text-align:center;"></div>
+    </div>
+    <button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="addWizardItem()">+ Add Item</button>
+    <div style="margin-top:14px;">
+      <div class="card-title">Starting Gold</div>
+      <div class="currency-row">
+        <div class="currency-item"><div class="c-label">CP</div><input type="number" value="${wizardChar.currency?.cp||0}" onchange="wizardChar.currency.cp=parseInt(this.value)||0;"></div>
+        <div class="currency-item"><div class="c-label">SP</div><input type="number" value="${wizardChar.currency?.sp||0}" onchange="wizardChar.currency.sp=parseInt(this.value)||0;"></div>
+        <div class="currency-item"><div class="c-label">EP</div><input type="number" value="${wizardChar.currency?.ep||0}" onchange="wizardChar.currency.ep=parseInt(this.value)||0;"></div>
+        <div class="currency-item"><div class="c-label">GP</div><input type="number" value="${wizardChar.currency?.gp||0}" onchange="wizardChar.currency.gp=parseInt(this.value)||0;"></div>
+        <div class="currency-item"><div class="c-label">PP</div><input type="number" value="${wizardChar.currency?.pp||0}" onchange="wizardChar.currency.pp=parseInt(this.value)||0;"></div>
+      </div>
+    </div>
+  `;
+}
+
+function addWizardItem() {
+  const name = document.getElementById('new-item-name')?.value?.trim();
+  const qty  = parseInt(document.getElementById('new-item-qty')?.value)||1;
+  if (!name) { toast('Enter an item name.'); return; }
+  if (!wizardChar.equipment) wizardChar.equipment = [];
+  wizardChar.equipment.push({ name, qty, notes:'' });
+  renderWizardPages();
+}
+
+function removeWizardItem(i) { wizardChar.equipment.splice(i,1); renderWizardPages(); }
+function changeWizardQty(i,d) { wizardChar.equipment[i].qty = Math.max(1,(wizardChar.equipment[i].qty||1)+d); renderWizardPages(); }
+
+function buildIdentityPage() {
+  return `
+    <div class="wizard-step-title">Step 9: Identity & Backstory</div>
+    <div class="form-row">
+      <div><label>Character Name</label><input type="text" placeholder="Your name..." value="${wizardChar.name||''}" onchange="wizardChar.name=this.value"></div>
+      <div><label>Player Name</label><input type="text" placeholder="Your name (player)..." value="${wizardChar.player||''}" onchange="wizardChar.player=this.value"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Alignment</label>
+        <select onchange="wizardChar.alignment=this.value">
+          ${['Lawful Good','Neutral Good','Chaotic Good','Lawful Neutral','True Neutral','Chaotic Neutral','Lawful Evil','Neutral Evil','Chaotic Evil'].map(a=>`<option value="${a}" ${wizardChar.alignment===a?'selected':''}>${a}</option>`).join('')}
+        </select>
+      </div>
+      <div><label>Level</label><input type="number" min="1" max="20" value="${wizardChar.level||1}" onchange="wizardChar.level=parseInt(this.value)||1; recalcDerived();"></div>
+    </div>
+    <label>Personality Traits</label>
+    <textarea placeholder="How do you behave? Any quirks or habits?" onchange="wizardChar.personality=this.value">${wizardChar.personality||''}</textarea>
+    <label>Ideals</label>
+    <textarea placeholder="What do you believe in? What drives you?" onchange="wizardChar.ideals=this.value" style="min-height:60px;">${wizardChar.ideals||''}</textarea>
+    <div class="form-row">
+      <div><label>Bonds</label><textarea placeholder="What ties you to the world?" onchange="wizardChar.bonds=this.value" style="min-height:60px;">${wizardChar.bonds||''}</textarea></div>
+      <div><label>Flaws</label><textarea placeholder="Your vices or weaknesses..." onchange="wizardChar.flaws=this.value" style="min-height:60px;">${wizardChar.flaws||''}</textarea></div>
+    </div>
+    <label>Backstory</label>
+    <textarea placeholder="Who are you and what brought you to adventure?" onchange="wizardChar.backstory=this.value">${wizardChar.backstory||''}</textarea>
+  `;
+}
+
+function buildFinalizePage() {
+  const cls = CLASSES.find(c=>c.name===wizardChar.class);
+  const sp  = SPECIES.find(s=>s.name===wizardChar.race);
+  const bg  = BACKGROUNDS.find(b=>b.name===wizardChar.background);
+  recalcDerived();
+  return `
+    <div class="wizard-step-title">Step 10: Finalize</div>
+    <div class="ability-grid" style="margin-bottom:14px;">
+      ${ABILITY_NAMES.map(a=>{
+        const mod = abilityMod(wizardChar.abilities[a]);
+        return `<div class="ability-box">
+          <div class="ability-name">${a}</div>
+          <div class="ability-score">${wizardChar.abilities[a]}</div>
+          <div class="ability-mod ${mod>0?'positive':mod<0?'negative':''}">${modStr(wizardChar.abilities[a])}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div class="card" style="padding:12px;margin:0;"><div style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--text-muted);">NAME</div><div style="color:var(--light-gold2);font-family:'Cinzel',serif;">${wizardChar.name||'—'}</div></div>
+      <div class="card" style="padding:12px;margin:0;"><div style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--text-muted);">SPECIES</div><div style="color:var(--text-primary);">${wizardChar.race||'—'} ${sp?sp.icon:''}</div></div>
+      <div class="card" style="padding:12px;margin:0;"><div style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--text-muted);">CLASS</div><div style="color:var(--text-primary);">${wizardChar.class||'—'} ${cls?cls.icon:''} ${wizardChar.subclass?'/ '+wizardChar.subclass:''}</div></div>
+      <div class="card" style="padding:12px;margin:0;"><div style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--text-muted);">BACKGROUND</div><div style="color:var(--text-primary);">${wizardChar.background||'—'}</div></div>
+      <div class="card" style="padding:12px;margin:0;"><div style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--text-muted);">HP</div><div style="color:var(--light-gold2);font-family:'Cinzel',serif;font-size:1.4rem;">${wizardChar.hp.max}</div></div>
+      <div class="card" style="padding:12px;margin:0;"><div style="font-family:'Cinzel',serif;font-size:0.6rem;color:var(--text-muted);">PROF. BONUS</div><div style="color:var(--light-gold2);font-family:'Cinzel',serif;font-size:1.4rem;">+${wizardChar.proficiencyBonus}</div></div>
+    </div>
+    <div style="padding:12px;background:rgba(234,207,139,0.07);border:1px solid rgba(234,207,139,0.25);border-radius:6px;font-family:'Cinzel',serif;font-size:0.78rem;color:var(--light-gold);margin-bottom:14px;">
+      ⚔ Ready to begin your adventure? Click "Save Character" below.
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="saveBuiltChar()">⚔ Save Character ⚔</button>
+  `;
+}
+
+function updateWizardNav() {
+  const prev = document.getElementById('btn-prev');
+  const next = document.getElementById('btn-next');
+  prev.style.visibility = wizardStep === 0 ? 'hidden' : 'visible';
+  const isLast = wizardStep === WIZARD_STEPS.length - 1;
+  next.textContent = isLast ? 'Save →' : 'Next →';
+  next.onclick = isLast ? saveBuiltChar : wizardNext;
+}
+
+function wizardNext() {
+  if (wizardStep < WIZARD_STEPS.length - 1) {
+    syncWizardInputs();
+    wizardStep++;
+    renderWizardProgress(); renderWizardPages(); updateWizardNav();
+  }
+}
+
+function wizardPrev() {
+  if (wizardStep > 0) {
+    syncWizardInputs();
+    wizardStep--;
+    renderWizardProgress(); renderWizardPages(); updateWizardNav();
+  }
+}
+
+function syncWizardInputs() {
+  // sync any remaining textarea values
+  const fields = ['backstory','personality','ideals','bonds','flaws','notes'];
+  fields.forEach(f => {
+    const el = document.querySelector(`textarea[onchange*="${f}"]`);
+    if (el) wizardChar[f] = el.value;
+  });
+}
+
+function saveBuiltChar() {
+  syncWizardInputs();
+  if (!wizardChar.name) { toast('Please give your character a name!'); return; }
+  if (!wizardChar.class) { toast('Please choose a class!'); return; }
+
+  // Add background skill proficiencies
+  const bg = BACKGROUNDS.find(b=>b.name===wizardChar.background);
+  if (bg) {
+    bg.skills.forEach(sk => { if (!wizardChar.skillProfs.includes(sk)) wizardChar.skillProfs.push(sk); });
+  }
+  // Apply class saving throw proficiencies
+  const cls = CLASSES.find(c=>c.name===wizardChar.class);
+  if (cls) wizardChar.savingThrowProfs = [...cls.savingThrows];
+
+  recalcDerived();
+
+  // Add default gear if empty
+  if (!wizardChar.equipment.length) {
+    ['Torches (10)','50 ft. Rope','Backpack','Rations (5 days)','Waterskin'].forEach(n => {
+      wizardChar.equipment.push({ name:n, qty:1, notes:'' });
+    });
+  }
+
+  const existing = characters.findIndex(c=>c.id===wizardChar.id);
+  if (existing >= 0) { characters[existing] = wizardChar; toast('Character updated!'); }
+  else { characters.push(wizardChar); toast('Character saved: ' + wizardChar.name); }
+  saveAll(); setActive(wizardChar.id); showView('tracker');
+}
+
+// =====================================================================
+// TRACKER
+// =====================================================================
+function renderTracker() {
+  const char = getActive();
+  const tc   = document.getElementById('tracker-content');
+  if (!char) {
+    tc.innerHTML = `<div class="empty-state"><div class="big-icon">⚔</div><p>No character selected.</p><button class="btn btn-primary" onclick="showView('characters')">Select Character</button></div>`;
+    return;
+  }
+
+  const cls  = CLASSES.find(c=>c.name===char.class);
+  const pb   = profBonus(char.level);
+  const mods = {};
+  ABILITY_NAMES.forEach(a => { mods[a] = abilityMod(char.abilities[a]); });
+
+  function skillBonus(sk) {
+    const ability = SKILLS_LIST.find(s=>s.name===sk)?.ability || 'STR';
+    const isExpert = (char.skillExpertise||[]).includes(sk);
+    const isProf   = (char.skillProfs||[]).includes(sk);
+    return mods[ability] + (isExpert ? pb*2 : isProf ? pb : 0);
+  }
+
+  function saveBonus(a) {
+    return mods[a] + ((char.savingThrowProfs||[]).includes(a) ? pb : 0);
+  }
+
+  tc.innerHTML = `
+    <!-- CHARACTER HEADER -->
+    <div class="card" style="border-color:rgba(227,8,18,0.3);">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div class="char-avatar" style="width:52px;height:52px;font-size:1.6rem;">${cls?cls.icon:'⚔'}</div>
+        <div style="flex:1;">
+          <div style="font-family:'Cinzel',serif;font-size:1.15rem;color:var(--light-gold2);">${char.name}</div>
+          <div style="color:var(--text-muted);font-size:0.82rem;margin-top:2px;">${char.race||'—'} ${char.class?'· '+char.class:''} ${char.subclass?'('+char.subclass+')':''} · Level ${char.level} · ${char.background||'—'} · ${char.alignment||'—'}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm" onclick="editChar('${char.id}')">Edit</button>
+          <button class="btn btn-sm" onclick="exportChar('${char.id}')">Export</button>
+          <button class="btn btn-sm" onclick="showLevelUp('${char.id}')">Level Up</button>
+        </div>
+      </div>
+      <!-- Inspiration -->
+      <div style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+        <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;">Inspiration</div>
+        <div class="inspiration-gem ${char.inspiration?'lit':''}" onclick="toggleInspiration('${char.id}')" title="Toggle Inspiration">✦</div>
+        <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;margin-left:12px;">Prof. Bonus</div>
+        <div style="font-family:'Cinzel',serif;font-size:1.1rem;color:var(--light-gold2);">+${pb}</div>
+        <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.14em;color:var(--text-muted);text-transform:uppercase;margin-left:12px;">XP</div>
+        <input type="number" value="${char.xp||0}" style="width:80px;text-align:center;font-size:0.9rem;" onchange="updateXP('${char.id}',this.value)">
+      </div>
+    </div>
+
+    <!-- CORE STATS ROW -->
+    <div class="stat-bubbles" style="margin-bottom:14px;">
+      <div class="stat-bubble"><div class="sb-label">AC</div><div class="sb-val"><input type="number" value="${char.ac||10}" style="background:transparent;border:none;color:var(--light-gold2);font-family:'Cinzel',serif;font-size:1.5rem;width:56px;text-align:center;padding:0;" onchange="updateField('${char.id}','ac',parseInt(this.value)||10)"></div></div>
+      <div class="stat-bubble"><div class="sb-label">Initiative</div><div class="sb-val" style="font-size:1.3rem;">${mods.DEX>=0?'+':''}${mods.DEX}</div></div>
+      <div class="stat-bubble"><div class="sb-label">Speed</div><div class="sb-val"><input type="number" value="${char.speed||30}" style="background:transparent;border:none;color:var(--light-gold2);font-family:'Cinzel',serif;font-size:1.4rem;width:60px;text-align:center;padding:0;" onchange="updateField('${char.id}','speed',parseInt(this.value)||30)"></div></div>
+      <div class="stat-bubble"><div class="sb-label">Hit Dice</div><div class="sb-val" style="font-size:1.1rem;">${char.level}d${cls?cls.hitDie:8}</div></div>
+      <div class="stat-bubble red-stat"><div class="sb-label">Passive Perc.</div><div class="sb-val" style="font-size:1.3rem;">${10+skillBonus('Perception')}</div></div>
+    </div>
+
+    <!-- ABILITY SCORES + HP grid -->
+    <div class="tracker-grid">
+      <div class="card" style="margin:0;">
+        <div class="card-title">Abilities & Saves</div>
+        <div class="ability-grid">
+          ${ABILITY_NAMES.map(a=>{
+            const mod = mods[a];
+            const saveProf = (char.savingThrowProfs||[]).includes(a);
+            return `<div class="ability-box ${saveProf?'saving-throw':''}">
+              <div class="ability-name">${a}${saveProf?' ⬟':''}</div>
+              <div class="ability-score">${char.abilities[a]}</div>
+              <div class="ability-mod ${mod>0?'positive':mod<0?'negative':''}">${modStr(char.abilities[a])}</div>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="margin-top:10px;">
+          <div class="card-title" style="margin-bottom:6px;">Saving Throws</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            ${ABILITY_NAMES.map(a=>{
+              const b = saveBonus(a);
+              const prof = (char.savingThrowProfs||[]).includes(a);
+              return `<div style="font-family:'Cinzel',serif;font-size:0.68rem;padding:3px 8px;border-radius:4px;background:${prof?'rgba(234,207,139,0.1)':'rgba(20,24,29,0.5)'};border:1px solid ${prof?'rgba(234,207,139,0.35)':'rgba(234,207,139,0.1)'};color:${prof?'var(--light-gold2)':'var(--text-muted)'};">${a} ${b>=0?'+':''}${b}</div>`;
+            }).join('')}
           </div>
         </div>
       </div>
-    </section>
-  </main>
 
-  <footer>
-    dnd5e-character-forge · Single-file offline-friendly character builder & tracker (SRD-based fields, no rules text)
-  </footer>
+      <div class="card" style="margin:0;">
+        <div class="card-title">Hit Points</div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+          <div style="text-align:center;">
+            <div style="font-family:'Cinzel',serif;font-size:0.55rem;color:var(--text-muted);letter-spacing:0.1em;">CURRENT</div>
+            <input type="number" value="${char.hp.current}" min="0" max="${char.hp.max}" style="font-family:'Cinzel',serif;font-size:1.8rem;color:${char.hp.current>0?'var(--light-gold2)':'#ff4444'};background:transparent;border:none;width:70px;text-align:center;padding:0;" onchange="updateHP('${char.id}','current',parseInt(this.value))">
+          </div>
+          <div style="font-family:'Cinzel',serif;font-size:1.2rem;color:var(--text-muted);">/</div>
+          <div style="text-align:center;">
+            <div style="font-family:'Cinzel',serif;font-size:0.55rem;color:var(--text-muted);letter-spacing:0.1em;">MAX</div>
+            <input type="number" value="${char.hp.max}" min="1" style="font-family:'Cinzel',serif;font-size:1.8rem;color:var(--light-gold2);background:transparent;border:none;width:70px;text-align:center;padding:0;" onchange="updateHP('${char.id}','max',parseInt(this.value))">
+          </div>
+          <div style="text-align:center;">
+            <div style="font-family:'Cinzel',serif;font-size:0.55rem;color:rgba(80,160,240,0.9);letter-spacing:0.1em;">TEMP HP</div>
+            <input type="number" value="${char.hp.temp||0}" min="0" style="font-family:'Cinzel',serif;font-size:1.4rem;color:rgba(130,190,255,0.9);background:transparent;border:none;width:60px;text-align:center;padding:0;" onchange="updateHP('${char.id}','temp',parseInt(this.value)||0)">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-sm btn-red" onclick="adjustHP('${char.id}',-1)">−1 HP</button>
+          <button class="btn btn-sm btn-red" onclick="adjustHP('${char.id}',-5)">−5 HP</button>
+          <button class="btn btn-sm" onclick="adjustHP('${char.id}',1)">+1 HP</button>
+          <button class="btn btn-sm" onclick="adjustHP('${char.id}',5)">+5 HP</button>
+          <button class="btn btn-sm" onclick="healFull('${char.id}')">Full Heal</button>
+        </div>
+        ${char.hp.current <= 0 ? `
+        <div style="margin-top:12px;">
+          <div class="card-title" style="color:#ff6060;">Death Saves</div>
+          <div class="death-saves">
+            <div class="ds-group">
+              <div class="ds-label">Successes</div>
+              ${[0,1,2].map(i=>`<div class="ds-pip ${i<(char.deathSaves?.successes||0)?'success':''}" onclick="updateDeathSave('${char.id}','successes',${i})"></div>`).join('')}
+            </div>
+            <div class="ds-group">
+              <div class="ds-label">Failures</div>
+              ${[0,1,2].map(i=>`<div class="ds-pip ${i<(char.deathSaves?.failures||0)?'fail':''}" onclick="updateDeathSave('${char.id}','failures',${i})"></div>`).join('')}
+            </div>
+          </div>
+          <div style="margin-top:8px;">
+            <button class="btn btn-sm" onclick="resetDeathSaves('${char.id}')">Reset Death Saves</button>
+            <button class="btn btn-sm" onclick="stabilize('${char.id}')">Stabilize</button>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+    </div>
 
-  <script>
-    // --- Core character model ---
-    let character = {
-      meta: {
-        name: "",
-        class: "",
-        level: 1,
-        background: "",
-        race: "",
-        alignment: ""
-      },
-      abilities: {
-        STR: 10,
-        DEX: 10,
-        CON: 10,
-        INT: 10,
-        WIS: 10,
-        CHA: 10
-      },
-      hp: {
-        max: 10,
-        current: 10,
-        hitDice: ""
-      },
-      ac: 10,
-      speed: "",
-      proficiencyBonus: 2,
-      skills: "",
-      features: "",
-      equipment: "",
-      spells: {
-        ability: "",
-        saveDC: "",
-        attackBonus: "",
-        cantrips: "",
-        spells: ""
-      },
-      notes: ""
-    };
+    <!-- SKILLS -->
+    <div class="card">
+      <div class="card-title">Skills</div>
+      <div class="skills-grid">
+        ${SKILLS_LIST.map(sk=>{
+          const isExpert = (char.skillExpertise||[]).includes(sk.name);
+          const isProf   = (char.skillProfs||[]).includes(sk.name);
+          const bonus    = skillBonus(sk.name);
+          return `<div class="skill-row">
+            <div class="skill-pip ${isExpert?'expert':isProf?'proficient':''}"></div>
+            <div class="skill-name">${sk.name}</div>
+            <div class="skill-ability">${sk.ability}</div>
+            <div class="skill-bonus">${bonus>=0?'+':''}${bonus}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
 
-    const STORAGE_KEY = "dnd5e-character-forge";
+    <!-- SPELL SLOTS (if caster) -->
+    ${(cls?.spellcasting || cls?.spellcastingPact) ? `
+    <div class="card">
+      <div class="card-title">Spell Slots</div>
+      <div class="spell-slots-grid">
+        ${[1,2,3,4,5,6,7,8,9].map(lvl=>{
+          const slot = char.spellSlots?.[lvl] || {max:0,used:0};
+          if (slot.max === 0 && lvl > 5) return '';
+          return `<div class="spell-slot-box">
+            <div class="ssl-level">Level ${lvl}</div>
+            <div style="display:flex;align-items:center;gap:4px;justify-content:center;margin-bottom:4px;">
+              <input type="number" min="0" max="20" value="${slot.max}" style="width:36px;text-align:center;font-size:0.85rem;padding:2px 0;" onchange="updateSpellSlot('${char.id}',${lvl},'max',parseInt(this.value)||0)">
+              <span style="font-size:0.6rem;color:var(--text-muted);">max</span>
+            </div>
+            <div class="ssl-pips">
+              ${Array.from({length:Math.max(slot.max,0)},(_,i)=>`<div class="ssl-pip ${i<slot.used?'used':'avail'}" onclick="toggleSlot('${char.id}',${lvl},${i})"></div>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn btn-sm" onclick="resetSlots('${char.id}')">Long Rest — Reset All Slots</button>
+      </div>
+    </div>
+    ` : ''}
 
-    function abilityMod(score) {
-      const s = parseInt(score || 10, 10);
-      const mod = Math.floor((s - 10) / 2);
-      return (mod >= 0 ? "+" : "") + mod;
-    }
+    <!-- CONDITIONS -->
+    <div class="card">
+      <div class="card-title">Conditions</div>
+      <div class="condition-list" id="condition-list">
+        ${(char.conditions||[]).map(cond=>`<div class="condition-badge" onclick="removeCondition('${char.id}','${cond}')" title="Click to remove">${cond} ✕</div>`).join('')}
+        ${!(char.conditions||[]).length ? `<span style="color:var(--text-muted);font-size:0.85rem;">None active</span>` : ''}
+      </div>
+      <div style="margin-top:10px;">
+        <select id="add-condition-select" style="width:auto;display:inline-block;margin-right:8px;">
+          ${CONDITIONS.map(c=>`<option value="${c}">${c}</option>`).join('')}
+        </select>
+        <button class="btn btn-sm" onclick="addCondition('${char.id}')">+ Add Condition</button>
+        ${(char.conditions||[]).length ? `<button class="btn btn-sm" style="margin-left:6px;" onclick="clearConditions('${char.id}')">Clear All</button>` : ''}
+      </div>
+    </div>
 
-    // --- Tabs ---
-    const tabButtons = document.querySelectorAll(".tab-button");
-    const builderPanel = document.getElementById("builder-panel");
-    const trackerPanel = document.getElementById("tracker-panel");
+    <!-- FEATURES / ABILITIES -->
+    <div class="card">
+      <div class="card-title">Class Features & Abilities</div>
+      <div class="feat-list">
+        ${(() => {
+          const lvl = char.level;
+          const classFeats  = cls ? cls.features.filter(f=>f.lvl<=lvl) : [];
+          const sub         = char.subclass ? SUBCLASSES[char.subclass] : null;
+          const subFeats    = sub ? sub.features.filter(f=>f.lvl<=lvl) : [];
+          const customFeats = char.features || [];
+          const all = [...classFeats.map(f=>({...f,source:char.class})), ...subFeats.map(f=>({...f,source:char.subclass})), ...customFeats.map(f=>({...f,source:'Custom'}))];
+          if (!all.length) return `<div style="color:var(--text-muted);font-size:0.88rem;">No features yet — select a class to see features.</div>`;
+          return all.map(f=>`<div class="feat-card">
+            <div class="feat-name">${f.name}</div>
+            <div class="feat-source">${f.source}${f.lvl?' · Level '+f.lvl:''}</div>
+            <div class="feat-desc">${f.desc}</div>
+            ${f.tag?`<div class="feat-tag tag-${f.tag}">${f.tag}</div>`:''}
+          </div>`).join('');
+        })()}
+      </div>
+      <button class="btn btn-sm" style="margin-top:10px;" onclick="showAddFeature('${char.id}')">+ Add Feature / Spell</button>
+    </div>
 
-    tabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        tabButtons.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        const tab = btn.dataset.tab;
-        if (tab === "builder") {
-          builderPanel.classList.remove("hidden");
-          trackerPanel.classList.add("hidden");
-        } else {
-          builderPanel.classList.add("hidden");
-          trackerPanel.classList.remove("hidden");
-          syncTrackerFromModel();
-        }
-      });
-    });
+    <!-- EQUIPMENT -->
+    <div class="card">
+      <div class="card-title">Equipment & Inventory</div>
+      <div id="equip-list">
+        ${(char.equipment||[]).map((item,i)=>`
+          <div class="equip-item">
+            <span class="equip-name">${item.name}</span>
+            <span class="equip-qty" onclick="changeEquipQty('${char.id}',${i},1)">×${item.qty}</span>
+            <button class="btn btn-sm btn-danger" onclick="removeEquipItem('${char.id}',${i})">✕</button>
+          </div>
+        `).join('')}
+        ${!(char.equipment||[]).length?`<div style="color:var(--text-muted);font-size:0.85rem;">No items. Add below.</div>`:''}
+      </div>
+      <div style="margin-top:10px;">
+        <div class="form-row">
+          <input type="text" id="new-equip-name" placeholder="Item name..." style="flex:1;">
+          <input type="number" id="new-equip-qty" value="1" min="1" max="999" style="width:70px;text-align:center;">
+        </div>
+        <button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="addEquipItem('${char.id}')">+ Add Item</button>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="card-title">Currency</div>
+        <div class="currency-row">
+          ${['cp','sp','ep','gp','pp'].map(c=>`
+            <div class="currency-item">
+              <div class="c-label">${c.toUpperCase()}</div>
+              <input type="number" value="${char.currency?.[c]||0}" onchange="updateCurrency('${char.id}','${c}',parseInt(this.value)||0)">
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
 
-    // --- Builder stepper ---
-    const steps = document.querySelectorAll(".builder-step");
-    const stepPills = document.querySelectorAll(".step-pill");
-    let currentStep = 0;
+    <!-- NOTES -->
+    <div class="card">
+      <div class="card-title">Notes & Backstory</div>
+      <label>Session Notes</label>
+      <textarea placeholder="Notes, reminders, plot hooks..." onchange="updateField('${char.id}','notes',this.value)">${char.notes||''}</textarea>
+      <label style="margin-top:10px;">Backstory</label>
+      <textarea placeholder="Your character's history..." onchange="updateField('${char.id}','backstory',this.value)">${char.backstory||''}</textarea>
+    </div>
+  `;
+}
 
-    function showStep(idx) {
-      currentStep = idx;
-      steps.forEach(s => s.classList.remove("active"));
-      stepPills.forEach(p => p.classList.remove("active"));
-      const step = document.querySelector('.builder-step[data-step="' + idx + '"]');
-      const pill = document.querySelector('.step-pill[data-step="' + idx + '"]');
-      if (step) step.classList.add("active");
-      if (pill) pill.classList.add("active");
-    }
+// =====================================================================
+// TRACKER HELPERS
+// =====================================================================
+function updateHP(id, field, val) {
+  const c = getChar(id); if(!c) return;
+  c.hp[field] = Math.max(0, isNaN(val)?c.hp[field]:val);
+  saveAll();
+}
+function adjustHP(id, delta) {
+  withChar(c => {
+    const newHP = Math.min(c.hp.max, Math.max(0, c.hp.current + delta));
+    c.hp.current = newHP;
+  });
+}
+function healFull(id) {
+  withChar(c => { c.hp.current = c.hp.max; c.hp.temp = 0; c.deathSaves = {successes:0,failures:0}; });
+  toast('Fully healed!');
+}
+function toggleInspiration(id) { withChar(c => { c.inspiration = !c.inspiration; }); }
+function updateXP(id, val) { withChar(c => { c.xp = parseInt(val)||0; }); }
+function updateField(id, field, val) { const c=getChar(id);if(!c)return; c[field]=val; saveAll(); }
+function updateCurrency(id, coin, val) { withChar(c => { if(!c.currency)c.currency={}; c.currency[coin]=val; }); }
 
-    document.getElementById("builder-next-0").onclick = () => showStep(1);
-    document.getElementById("builder-next-1").onclick = () => showStep(2);
-    document.getElementById("builder-next-2").onclick = () => showStep(3);
-    document.getElementById("builder-back-1").onclick = () => showStep(0);
-    document.getElementById("builder-back-2").onclick = () => showStep(1);
-    document.getElementById("builder-back-3").onclick = () => showStep(2);
+function updateDeathSave(id, type, val) {
+  withChar(c => {
+    if (!c.deathSaves) c.deathSaves = {successes:0,failures:0};
+    c.deathSaves[type] = val + 1;
+    if (c.deathSaves.failures >= 3) toast('⚠ Three failures — character is dead!');
+    if (c.deathSaves.successes >= 3) { stabilize(id); }
+  });
+}
+function resetDeathSaves(id) { withChar(c => { c.deathSaves = {successes:0,failures:0}; }); }
+function stabilize(id) {
+  withChar(c => { c.deathSaves = {successes:0,failures:0}; c.hp.current = 1; });
+  toast('Character stabilized at 1 HP.');
+}
 
-    // --- Builder -> model ---
-    function updateModelFromBuilder() {
-      character.meta.name = document.getElementById("b-name").value.trim();
-      character.meta.level = parseInt(document.getElementById("b-level").value || "1", 10);
-      character.meta.class = document.getElementById("b-class").value.trim();
-      character.meta.race = document.getElementById("b-race").value.trim();
-      character.meta.background = document.getElementById("b-background").value.trim();
-      character.meta.alignment = document.getElementById("b-alignment").value.trim();
+function updateSpellSlot(id, level, field, val) {
+  withChar(c => { if(!c.spellSlots) c.spellSlots={}; if(!c.spellSlots[level]) c.spellSlots[level]={max:0,used:0}; c.spellSlots[level][field]=Math.max(0,val); });
+}
+function toggleSlot(id, level, idx) {
+  withChar(c => {
+    if(!c.spellSlots?.[level]) return;
+    const slot = c.spellSlots[level];
+    if (idx < slot.used) slot.used = idx;
+    else slot.used = Math.min(slot.max, idx + 1);
+  });
+}
+function resetSlots(id) { withChar(c => { Object.values(c.spellSlots||{}).forEach(s=>s.used=0); }); toast('Spell slots restored.'); }
 
-      character.abilities.STR = parseInt(document.getElementById("b-str").value || "10", 10);
-      character.abilities.DEX = parseInt(document.getElementById("b-dex").value || "10", 10);
-      character.abilities.CON = parseInt(document.getElementById("b-con").value || "10", 10);
-      character.abilities.INT = parseInt(document.getElementById("b-int").value || "10", 10);
-      character.abilities.WIS = parseInt(document.getElementById("b-wis").value || "10", 10);
-      character.abilities.CHA = parseInt(document.getElementById("b-cha").value || "10", 10);
+function addCondition(id) {
+  const sel = document.getElementById('add-condition-select');
+  if (!sel) return;
+  withChar(c => { if(!c.conditions) c.conditions=[]; if(!c.conditions.includes(sel.value)) c.conditions.push(sel.value); });
+}
+function removeCondition(id, cond) { withChar(c => { c.conditions = (c.conditions||[]).filter(x=>x!==cond); }); }
+function clearConditions(id) { withChar(c => { c.conditions = []; }); }
 
-      character.proficiencyBonus = parseInt(document.getElementById("b-prof-bonus").value || "2", 10);
-      character.ac = parseInt(document.getElementById("b-ac").value || "10", 10);
-      character.hp.max = parseInt(document.getElementById("b-hp-max").value || "10", 10);
-      character.hp.current = parseInt(document.getElementById("b-hp-current").value || "10", 10);
-      character.hp.hitDice = document.getElementById("b-hit-dice").value.trim();
-      character.speed = document.getElementById("b-speed").value.trim();
+function changeEquipQty(id, idx, delta) {
+  withChar(c => { c.equipment[idx].qty = Math.max(1,(c.equipment[idx].qty||1)+delta); });
+}
+function removeEquipItem(id, idx) { withChar(c => { c.equipment.splice(idx,1); }); }
+function addEquipItem(id) {
+  const name = document.getElementById('new-equip-name')?.value?.trim();
+  const qty  = parseInt(document.getElementById('new-equip-qty')?.value)||1;
+  if (!name) { toast('Enter an item name.'); return; }
+  withChar(c => { c.equipment.push({name,qty,notes:''}); });
+  document.getElementById('new-equip-name').value = '';
+  document.getElementById('new-equip-qty').value  = '1';
+}
 
-      character.skills = document.getElementById("b-skills").value.trim();
-      character.features = document.getElementById("b-features").value.trim();
-      character.equipment = document.getElementById("b-equipment").value.trim();
+function showAddFeature(id) {
+  showModal(`
+    <h3>Add Feature / Ability / Spell</h3>
+    <label>Name</label>
+    <input type="text" id="modal-feat-name" placeholder="e.g. Fireball, Shield of Faith...">
+    <label>Type</label>
+    <select id="modal-feat-tag">
+      <option value="action">Action</option>
+      <option value="bonus">Bonus Action</option>
+      <option value="react">Reaction</option>
+      <option value="spell">Spell</option>
+      <option value="passive">Passive</option>
+    </select>
+    <label>Description</label>
+    <textarea id="modal-feat-desc" style="min-height:80px;" placeholder="What does it do?"></textarea>
+    <div class="btn-row" style="margin-top:10px;">
+      <button class="btn btn-primary" onclick="confirmAddFeature('${id}')">Add Feature</button>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+}
 
-      character.spells.ability = document.getElementById("b-spell-ability").value;
-      character.spells.saveDC = document.getElementById("b-spell-save-dc").value.trim();
-      character.spells.cantrips = document.getElementById("b-cantrips").value.trim();
-      character.spells.spells = document.getElementById("b-spells").value.trim();
-      character.notes = document.getElementById("b-notes").value.trim();
-    }
+function confirmAddFeature(id) {
+  const name = document.getElementById('modal-feat-name')?.value?.trim();
+  const tag  = document.getElementById('modal-feat-tag')?.value;
+  const desc = document.getElementById('modal-feat-desc')?.value?.trim();
+  if (!name) { toast('Enter a name.'); return; }
+  withChar(c => { if(!c.features)c.features=[]; c.features.push({name,tag,desc:desc||''}); });
+  closeModal(); toast('Feature added: ' + name);
+}
 
-    document.getElementById("builder-finish").onclick = () => {
-      updateModelFromBuilder();
-      saveToLocalStorage();
-      syncTrackerFromModel();
-      // Switch to tracker tab
-      tabButtons.forEach(b => {
-        if (b.dataset.tab === "tracker") b.click();
-      });
-    };
+function showLevelUp(id) {
+  const c = getChar(id); if(!c) return;
+  const cls = CLASSES.find(x=>x.name===c.class);
+  showModal(`
+    <h3>Level Up</h3>
+    <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:14px;">Current Level: <strong style="color:var(--light-gold2);">${c.level}</strong></p>
+    <div class="info-box">At each level: gain HP (1 hit die + CON mod), spells/slots increase, new features unlock at their levels.</div>
+    ${cls ? `<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">Hit Die: d${cls.hitDie}. Average HP gain: ${Math.ceil(cls.hitDie/2)+1} + CON mod.</div>` : ''}
+    <div style="margin-bottom:12px;">
+      <label>HP Gained (roll or take average)</label>
+      <input type="number" id="hp-gain" value="${cls?Math.ceil(cls.hitDie/2)+1+abilityMod(c.abilities.CON):5}" min="1" max="${cls?cls.hitDie+10:20}">
+    </div>
+    <button class="btn btn-primary" onclick="doLevelUp('${id}')">Level Up to ${c.level+1}</button>
+  `);
+}
 
-    // --- Model -> tracker ---
-    function syncTrackerFromModel() {
-      document.getElementById("t-name").value = character.meta.name;
-      document.getElementById("t-level").value = character.meta.level;
-      document.getElementById("t-class").value = character.meta.class;
-      document.getElementById("t-race").value = character.meta.race;
-      document.getElementById("t-background").value = character.meta.background;
-      document.getElementById("t-alignment").value = character.meta.alignment;
+function doLevelUp(id) {
+  const c = getChar(id); if(!c) return;
+  const gain = parseInt(document.getElementById('hp-gain')?.value)||5;
+  c.level++;
+  c.hp.max += gain;
+  c.hp.current += gain;
+  c.proficiencyBonus = profBonus(c.level);
+  saveAll(); closeModal(); renderTracker();
+  toast(`Leveled up to ${c.level}! Remember to update features and spell slots.`);
+}
 
-      document.getElementById("t-str").value = character.abilities.STR;
-      document.getElementById("t-dex").value = character.abilities.DEX;
-      document.getElementById("t-con").value = character.abilities.CON;
-      document.getElementById("t-int").value = character.abilities.INT;
-      document.getElementById("t-wis").value = character.abilities.WIS;
-      document.getElementById("t-cha").value = character.abilities.CHA;
+// =====================================================================
+// DICE ROLLER
+// =====================================================================
+let rollHistory = [];
 
-      document.getElementById("t-ac").value = character.ac;
-      document.getElementById("t-speed").value = character.speed;
-      document.getElementById("t-prof-bonus").value = character.proficiencyBonus;
-      document.getElementById("t-hp-max").value = character.hp.max;
-      document.getElementById("t-hp-current").value = character.hp.current;
-      document.getElementById("t-hit-dice").value = character.hp.hitDice;
+function pushHistory(label, result) {
+  rollHistory.unshift({ label, result, time: new Date().toLocaleTimeString() });
+  if (rollHistory.length > 20) rollHistory.pop();
+  const el = document.getElementById('roll-history');
+  if (el) el.innerHTML = rollHistory.map(r=>`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(234,207,139,0.08);">
+    <span>${r.label}</span><span style="color:var(--light-gold2);">${r.result}</span><span style="color:rgba(154,171,170,0.4);">${r.time}</span>
+  </div>`).join('');
+}
 
-      document.getElementById("t-skills").value = character.skills;
-      document.getElementById("t-features").value = character.features;
-      document.getElementById("t-equipment").value = character.equipment;
+function rollDie(sides) {
+  const roll = Math.floor(Math.random()*sides)+1;
+  const isCrit = sides===20 && roll===20;
+  const isFumble = sides===20 && roll===1;
+  const el = document.getElementById('dice-result');
+  el.innerHTML = `
+    <div class="result-num ${isCrit?'crit':isFumble?'fumble':''}">${roll}</div>
+    <div class="result-label">d${sides}${isCrit?' — CRITICAL HIT!':isFumble?' — FUMBLE!':''}</div>
+  `;
+  pushHistory(`d${sides}`, roll);
+}
 
-      document.getElementById("t-spell-ability").value = character.spells.ability || "";
-      document.getElementById("t-spell-save-dc").value = character.spells.saveDC || "";
-      document.getElementById("t-spell-attack").value = character.spells.attackBonus || "";
-      document.getElementById("t-cantrips").value = character.spells.cantrips || "";
-      document.getElementById("t-spells").value = character.spells.spells || "";
-      document.getElementById("t-notes").value = character.notes || "";
+function rollAdvDisadv(adv) {
+  const a = Math.floor(Math.random()*20)+1;
+  const b = Math.floor(Math.random()*20)+1;
+  const result = adv ? Math.max(a,b) : Math.min(a,b);
+  const isCrit = result===20; const isFumble = result===1;
+  document.getElementById('dice-result').innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">${adv?'Advantage':'Disadvantage'}: [${a}] [${b}]</div>
+    <div class="result-num ${isCrit?'crit':isFumble?'fumble':''}">${result}</div>
+    <div class="result-label">${adv?'Take higher':'Take lower'}${isCrit?' — CRITICAL!':isFumble?' — FUMBLE!':''}</div>
+  `;
+  pushHistory(`d20 ${adv?'Adv':'Dis'}`, result);
+}
 
-      updateAllAbilityMods();
-    }
+function rollDamage() {
+  const char = getActive();
+  if (!char) { toast('Select a character first.'); return; }
+  // Roll 1d8+STR as generic melee example
+  const strMod = abilityMod(char.abilities.STR);
+  const dmg    = Math.floor(Math.random()*8)+1;
+  const total  = Math.max(1, dmg + strMod);
+  document.getElementById('dice-result').innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">Melee Damage (1d8${strMod>=0?'+':''}${strMod})</div>
+    <div class="result-num">${total}</div>
+    <div class="result-label">[${dmg}] ${strMod>=0?'+':''}${strMod} = ${total} damage</div>
+  `;
+  pushHistory('Dmg 1d8', total);
+}
 
-    // --- Tracker -> model ---
-    function updateModelFromTracker() {
-      character.meta.name = document.getElementById("t-name").value.trim();
-      character.meta.level = parseInt(document.getElementById("t-level").value || "1", 10);
-      character.meta.class = document.getElementById("t-class").value.trim();
-      character.meta.race = document.getElementById("t-race").value.trim();
-      character.meta.background = document.getElementById("t-background").value.trim();
-      character.meta.alignment = document.getElementById("t-alignment").value.trim();
+function rollInitiative() {
+  const char = getActive();
+  const dexMod = char ? abilityMod(char.abilities.DEX) : 0;
+  const roll   = Math.floor(Math.random()*20)+1;
+  const total  = roll + dexMod;
+  document.getElementById('dice-result').innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">Initiative (d20${dexMod>=0?'+':''}${dexMod})</div>
+    <div class="result-num">${total}</div>
+    <div class="result-label">[${roll}] ${dexMod>=0?'+':''}${dexMod} = ${total}</div>
+  `;
+  pushHistory('Initiative', total);
+}
 
-      character.abilities.STR = parseInt(document.getElementById("t-str").value || "10", 10);
-      character.abilities.DEX = parseInt(document.getElementById("t-dex").value || "10", 10);
-      character.abilities.CON = parseInt(document.getElementById("t-con").value || "10", 10);
-      character.abilities.INT = parseInt(document.getElementById("t-int").value || "10", 10);
-      character.abilities.WIS = parseInt(document.getElementById("t-wis").value || "10", 10);
-      character.abilities.CHA = parseInt(document.getElementById("t-cha").value || "10", 10);
+function rollSave() {
+  const roll = Math.floor(Math.random()*20)+1;
+  document.getElementById('dice-result').innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">Saving Throw (d20)</div>
+    <div class="result-num ${roll>=15?'crit':roll<=4?'fumble':''}">${roll}</div>
+    <div class="result-label">${roll>=15?'Success likely!':roll<=4?'Failure likely!':''}</div>
+  `;
+  pushHistory('Save', roll);
+}
 
-      character.ac = parseInt(document.getElementById("t-ac").value || "10", 10);
-      character.speed = document.getElementById("t-speed").value.trim();
-      character.proficiencyBonus = parseInt(document.getElementById("t-prof-bonus").value || "2", 10);
-      character.hp.max = parseInt(document.getElementById("t-hp-max").value || "10", 10);
-      character.hp.current = parseInt(document.getElementById("t-hp-current").value || "10", 10);
-      character.hp.hitDice = document.getElementById("t-hit-dice").value.trim();
+function rollCustom() {
+  const count  = Math.min(20, parseInt(document.getElementById('roll-count')?.value)||1);
+  const sides  = parseInt(document.getElementById('roll-sides')?.value)||20;
+  const mod    = parseInt(document.getElementById('roll-mod')?.value)||0;
+  const rolls  = Array.from({length:count}, ()=>Math.floor(Math.random()*sides)+1);
+  const sum    = rolls.reduce((a,b)=>a+b,0) + mod;
+  document.getElementById('dice-result').innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">${count}d${sides}${mod!==0?(mod>0?'+':'')+mod:''}</div>
+    <div class="result-num">${sum}</div>
+    <div class="result-label">[${rolls.join(', ')}]${mod!==0?' '+(mod>0?'+':'')+mod+' = '+sum:''}</div>
+  `;
+  pushHistory(`${count}d${sides}${mod?''+mod:''}`, sum);
+}
 
-      character.skills = document.getElementById("t-skills").value.trim();
-      character.features = document.getElementById("t-features").value.trim();
-      character.equipment = document.getElementById("t-equipment").value.trim();
+function rollAbilityCheck() {
+  const char = getActive();
+  const ab   = document.getElementById('check-ability')?.value || 'STR';
+  const prof = parseInt(document.getElementById('check-prof')?.value)||0;
+  const mod  = char ? abilityMod(char.abilities[ab]) : 0;
+  const pb   = char ? profBonus(char.level) : 2;
+  const total_mod = mod + (prof===2 ? pb*2 : prof===1 ? pb : 0);
+  const roll  = Math.floor(Math.random()*20)+1;
+  const total = roll + total_mod;
+  document.getElementById('dice-result').innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">${ABILITY_FULL[ab]} Check (d20${total_mod>=0?'+':''}${total_mod})</div>
+    <div class="result-num ${roll===20?'crit':roll===1?'fumble':''}">${total}</div>
+    <div class="result-label">[${roll}] ${total_mod>=0?'+':''}${total_mod} = ${total}</div>
+  `;
+  pushHistory(`${ab} Check`, total);
+}
 
-      character.spells.ability = document.getElementById("t-spell-ability").value;
-      character.spells.saveDC = document.getElementById("t-spell-save-dc").value.trim();
-      character.spells.attackBonus = document.getElementById("t-spell-attack").value.trim();
-      character.spells.cantrips = document.getElementById("t-cantrips").value.trim();
-      character.spells.spells = document.getElementById("t-spells").value.trim();
-      character.notes = document.getElementById("t-notes").value.trim();
-    }
+// =====================================================================
+// MODAL
+// =====================================================================
+function showModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+}
 
-    document.getElementById("tracker-save").onclick = () => {
-      updateModelFromTracker();
-      saveToLocalStorage();
-      alert("Character saved to local storage.");
-    };
+// =====================================================================
+// TOAST
+// =====================================================================
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove('show'), 2600);
+}
 
-    document.getElementById("tracker-sync-builder").onclick = () => {
-      updateModelFromTracker();
-      syncBuilderFromModel();
-      tabButtons.forEach(b => {
-        if (b.dataset.tab === "builder") b.click();
-      });
-    };
-
-    function syncBuilderFromModel() {
-      document.getElementById("b-name").value = character.meta.name;
-      document.getElementById("b-level").value = character.meta.level;
-      document.getElementById("b-class").value = character.meta.class;
-      document.getElementById("b-race").value = character.meta.race;
-      document.getElementById("b-background").value = character.meta.background;
-      document.getElementById("b-alignment").value = character.meta.alignment;
-
-      document.getElementById("b-str").value = character.abilities.STR;
-      document.getElementById("b-dex").value = character.abilities.DEX;
-      document.getElementById("b-con").value = character.abilities.CON;
-      document.getElementById("b-int").value = character.abilities.INT;
-      document.getElementById("b-wis").value = character.abilities.WIS;
-      document.getElementById("b-cha").value = character.abilities.CHA;
-
-      document.getElementById("b-prof-bonus").value = character.proficiencyBonus;
-      document.getElementById("b-ac").value = character.ac;
-      document.getElementById("b-hp-max").value = character.hp.max;
-      document.getElementById("b-hp-current").value = character.hp.current;
-      document.getElementById("b-hit-dice").value = character.hp.hitDice;
-      document.getElementById("b-speed").value = character.speed;
-
-      document.getElementById("b-skills").value = character.skills;
-      document.getElementById("b-features").value = character.features;
-      document.getElementById("b-equipment").value = character.equipment;
-
-      document.getElementById("b-spell-ability").value = character.spells.ability || "";
-      document.getElementById("b-spell-save-dc").value = character.spells.saveDC || "";
-      document.getElementById("b-cantrips").value = character.spells.cantrips || "";
-      document.getElementById("b-spells").value = character.spells.spells || "";
-      document.getElementById("b-notes").value = character.notes || "";
-    }
-
-    // --- Ability mod live updates ---
-    const abilityIds = ["str", "dex", "con", "int", "wis", "cha"];
-    abilityIds.forEach(id => {
-      const input = document.getElementById("t-" + id);
-      input.addEventListener("input", () => {
-        document.getElementById("t-" + id + "-mod").textContent = abilityMod(input.value);
-      });
-    });
-
-    function updateAllAbilityMods() {
-      abilityIds.forEach(id => {
-        const input = document.getElementById("t-" + id);
-        document.getElementById("t-" + id + "-mod").textContent = abilityMod(input.value);
-      });
-    }
-
-    // --- Local storage ---
-    function saveToLocalStorage() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(character));
-      } catch (e) {
-        console.warn("Could not save to localStorage", e);
-      }
-    }
-
-    function loadFromLocalStorage() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const data = JSON.parse(raw);
-        if (data && typeof data === "object") {
-          character = Object.assign(character, data);
-          // Deep-ish merge for nested objects
-          character.meta = Object.assign({}, character.meta, data.meta || {});
-          character.abilities = Object.assign({}, character.abilities, data.abilities || {});
-          character.hp = Object.assign({}, character.hp, data.hp || {});
-          character.spells = Object.assign({}, character.spells, data.spells || {});
-        }
-      } catch (e) {
-        console.warn("Could not load from localStorage", e);
-      }
-    }
-
-    // --- Export / Import ---
-    document.getElementById("btn-export").onclick = () => {
-      updateModelFromBuilder();
-      const blob = new Blob([JSON.stringify(character, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const safeName = character.meta.name || "dnd5e-character";
-      a.href = url;
-      a.download = safeName.replace(/[^a-z0-9_\-]+/gi, "_") + ".json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    };
-
-    document.getElementById("file-import").addEventListener("change", (ev) => {
-      const file = ev.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(reader.result);
-          if (data && typeof data === "object") {
-            character = Object.assign(character, data);
-            character.meta = Object.assign({}, character.meta, data.meta || {});
-            character.abilities = Object.assign({}, character.abilities, data.abilities || {});
-            character.hp = Object.assign({}, character.hp, data.hp || {});
-            character.spells = Object.assign({}, character.spells, data.spells || {});
-            syncBuilderFromModel();
-            syncTrackerFromModel();
-            alert("Character imported.");
-          }
-        } catch (e) {
-          alert("Could not parse JSON file.");
-        }
-      };
-      reader.readAsText(file);
-      ev.target.value = "";
-    });
-
-    // --- Inline service worker (optional, for hosted use) ---
-    if ("serviceWorker" in navigator) {
-      const swCode = `
-        const CACHE_NAME = "dnd5e-character-forge-v1";
-        self.addEventListener("install", event => {
-          event.waitUntil(self.skipWaiting());
-        });
-        self.addEventListener("activate", event => {
-          event.waitUntil(self.clients.claim());
-        });
-        self.addEventListener("fetch", event => {
-          event.respondWith(
-            caches.open(CACHE_NAME).then(cache =>
-              cache.match(event.request).then(resp => {
-                const fetchPromise = fetch(event.request).then(networkResp => {
-                  try { cache.put(event.request, networkResp.clone()); } catch (e) {}
-                  return networkResp;
-                }).catch(() => resp || Promise.reject());
-                return resp || fetchPromise;
-              })
-            )
-          );
-        });
-      `;
-      const blob = new Blob([swCode], { type: "text/javascript" });
-      const swUrl = URL.createObjectURL(blob);
-      navigator.serviceWorker.register(swUrl).catch(() => {});
-    }
-
-    // --- Init ---
-    loadFromLocalStorage();
-    syncBuilderFromModel();
-    syncTrackerFromModel();
-  </script>
+// =====================================================================
+// INIT
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderCharList();
+  document.getElementById('btn-prev').addEventListener('click', wizardPrev);
+});
+document.addEventListener('keydown', e => {
+  if (document.getElementById('modal-overlay').classList.contains('open') && e.key==='Escape') {
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+});
+</script>
 </body>
 </html>
