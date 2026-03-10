@@ -26,7 +26,7 @@
     --text-gold: #e8c84a;
     --border: rgba(232,200,74,0.2);
     --border-bright: rgba(232,200,74,0.55);
-    --shadow: 0 8px 40px rgba(0,0,0,0.6);
+    --shadow: 0 8px 40px rgba(118, 80, 80, 0.6);
     --glow-gold: 0 0 20px rgba(201,168,76,0.3);
     --glow-hope: 0 0 20px rgba(46,207,212,0.4);
     --glow-fear: 0 0 20px rgba(192,64,64,0.4);
@@ -76,6 +76,16 @@
     bottom: -2px; left: 10%; right: 10%;
     height: 2px;
     background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+  }
+  .app-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.4rem, 5vw, 2.2rem);
+    font-weight: 700;
+    color: var(--text-gold);
+    text-shadow: 0 0 20px rgba(201,168,76,0.3), 0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+    animation: fade-down 0.6s ease both;
   }
   .header-logo-row {
     display: flex;
@@ -631,18 +641,9 @@
       <img src="ref/logo.png" alt="Hamster RPG Logo" class="header-logo-img" onerror="this.style.display='none'">
       <div class="header-emoji">🗡️💜</div>
     </div>
-    <div class="header-divider"></div>
-    <div class="subtitle">Character Forge &amp; Battle Tracker</div>
-  </header>
-    <!-- ===== HEADER ===== -->
-  <header class="app-header">
-    <div class="header-logo-row">
-      <img src="ref/logo.png" alt="Hamster RPG Logo" class="header-logo-img" onerror="this.style.display='none'">
-      <div class="header-dragon">🐉</div>
-    </div>
     <div class="app-title">Daggerheart Character Forge</div>
     <div class="header-divider"></div>
-    <div class="subtitle">Fifth Edition · System Reference Document 5.2.1</div>
+    <div class="subtitle">Darrington Press · <a href="https://www.daggerheart.com/srd/" target="_blank" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#e8c84a;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#6b5ce7'" onmouseout="this.style.color='#9b9bc4'">System Reference Document</a></div>
   </header>
 
   <nav class="nav-tabs">
