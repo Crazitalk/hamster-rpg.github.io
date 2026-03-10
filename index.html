@@ -33,7 +33,33 @@
     --glow-gold:    0 0 20px rgba(35,206,107,0.3);
     --glow-hope:    0 0 20px rgba(24,168,158,0.4);
     --transition:   all 0.25s cubic-bezier(0.4,0,0.2,1);
-    --radius:       12px;
+    /* Daggerheart */
+    --dh-purple: #1d153cff;
+    --dh-blue: #395da7ff;
+    --dh-cyan: #3dcad9ff;
+    --dh-gold: #e6c74cff;
+    /* Dungeons and Dragons */
+    --dd-black: #14181dff;
+    --dd-gold: #eacf8bff;
+    --dd-red: #e30812ff;
+    /* Pathfinder */
+    --pf-red: #410607ff;
+    --pf-blue: #2f6a98ff;
+    --pf-gold: #eac48dff;
+    /* Index Card RPG */
+    --ic-black: #232b2eff;
+    --ic-gray: #c6c4c4ff;
+    --ic-red: #d01c29ff;
+    --ic-gold: #d89b30ff;
+    /* Savage Worlds Adventure Edition */
+    --sw-blue: #162333ff;
+    --sw-brown: #816a36ff;
+    --sw-gold: #f0dd9aff;
+    --sw-red: #e20a00ff;
+    /* Candella Obscura */
+    --co-teal: #1b503cff;
+    --co-ebony: #646040ff;
+    --co-gold: #c9b764ff;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -381,6 +407,12 @@
   .badge-purple { color: #9d90f0;             border-color: rgba(81,26,145,0.5);  background: rgba(81,26,145,0.1);  }
   .badge-red    { color: var(--accent-fear);  border-color: rgba(224,68,68,0.4);   background: rgba(224,68,68,0.08);   }
   .badge-muted  { color: var(--text-muted);   border-color: rgba(168,180,212,0.3); background: rgba(168,180,212,0.05); }
+  .badge-sw   { color: var(--sw-brown);  border-color: var(--sw-red);  background: var(--sw-blue);  }
+  .badge-co   { color: var(--co-gold);  border-color: var(--co-ebony);  background: var(--co-teal);  }
+  .badge-dh { color: var(--dh-gold);  border-color: var(--dh-cyan);  background: var(--dh-purple);  }
+  .badge-dd    { color: var(--dd-gold);  border-color: var(--dd-red);  background: var(--dd-black);  }
+  .badge-ic  { color: var(--ic-red);  border-color: var(--ic-gold);  background: var(--ic-black);  }
+  .badge-pf  { color: var(--pf-blue);  border-color: var(--pf-gold);  background: var(--pf-red);  }
 
   .tool-name {
     font-family: 'Cinzel', serif;
@@ -729,7 +761,7 @@
         <!-- Daggerheart Character Forge -->
         <a href="daggerheart-character-forge.html" class="tool-card">
           <div class="tool-icon">⚔️</div>
-          <span class="tool-badge badge-gold">Daggerheart</span>
+          <span class="tool-badge badge-dh">Daggerheart</span>
           <div class="tool-name">Character Forge</div>
           <div class="tool-desc">
             Build and manage Daggerheart characters with a full step-by-step wizard,
@@ -741,7 +773,7 @@
         <!-- D&D 5e Character Forge -->
         <a href="dnd5e-character-forge.html" class="tool-card">
           <div class="tool-icon">⚔️</div>
-          <span class="tool-badge badge-gold">Dungeons & Dragons 5e</span>
+          <span class="tool-badge badge-dd">Dungeons & Dragons 5e</span>
           <div class="tool-name">Character Forge</div>
           <div class="tool-desc">
             Build and manage D&D 5e characters with a full step-by-step wizard,
