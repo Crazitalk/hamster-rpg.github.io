@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d0221">
+<meta name="description" content="Session Scribe — Lightweight session notes organiser for tabletop RPGs.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Session Scribe — Studio 347</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="ref/favicon.png">
+<style>
+  /* ══════════════════════════════════════════════
+     STUDIO 347 — SESSION SCRIBE
+     Palette: Studio347.scss
+  ══════════════════════════════════════════════ */
+  :root {
+    /* ── Studio347 Palette ── */
+    --s347-midnight-violet: #0d0221;
+    --s347-deep-twilight:   #0f084b;
+    --s347-dark-slate-grey: #0b5351;
+    --s347-emerald:         #23ce6b;
+    --s347-indigo-velvet:   #511a91;
+    --s347-ghost-white:     #f6f8ff;
+
+    /* ── Semantic Tokens ── */
+    --bg-deep:       var(--s347-midnight-violet);
+    --bg-card:       #140a3a;
+    --bg-card2:      #1a0f52;
+    --bg-card3:      #0d0730;
+    --accent-gold:   var(--s347-emerald);
+    --accent-gold2:  #39e87e;
+    --accent-hope:   var(--s347-emerald);
+    --accent-fear:   #e04444;
+    --accent-teal:   var(--s347-dark-slate-grey);
+    --accent-purple: var(--s347-indigo-velvet);
+    --text-primary:  var(--s347-ghost-white);
+    --text-muted:    #a8b4d4;
+    --text-gold:     var(--s347-emerald);
+    --border:        rgba(35,206,107,0.2);
+    --border-bright: rgba(35,206,107,0.55);
+    --shadow:        0 8px 40px rgba(0,0,0,0.6);
+    --glow-gold:     0 0 20px rgba(35,206,107,0.3);
+    --glow-hope:     0 0 20px rgba(11,83,81,0.4);
+    --transition:    all 0.25s cubic-bezier(0.4,0,0.2,1);
+    --radius:        8px;
+
+    /* ── System Badge Colours ── */
+    --dh-purple: #1d153c; --dh-blue: #395da7; --dh-cyan: #3dcad9; --dh-gold: #e6c74c;
+    --dd-black:  #14181d; --dd-gold:  #eacf8b; --dd-red:  #e30812;
+    --pf-red:    #410607; --pf-blue:  #2f6a98; --pf-gold: #eac48d;
+    --ic-black:  #232b2e; --ic-gray:  #c6c4c4; --ic-red:  #d01c29; --ic-gold: #d89b30;
+    --sw-blue:   #162333; --sw-brown: #816a36; --sw-gold: #f0dd9a; --sw-red:  #e20a00;
+    --ag-deep:   #0a1a10; --ag-green: #2a7a3a; --ag-gold: #b8d460;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-deep);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 15%  0%, rgba(81,26,145,0.22) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 60% at 85% 90%, rgba(11,83,81,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(15,8,75,0.45) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  #page { position: relative; z-index: 1; }
+
+  /* ─── BACK BANNER ─── */
+  .back-banner {
+    background: rgba(13,2,33,0.9);
+    padding: 10px 20px;
+    border-bottom: 1px solid rgba(81,26,145,0.4);
+  }
+  .back-banner a {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent-gold); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-banner a:hover { color: var(--accent-purple); }
+
+  /* ─── HEADER ─── */
+  .app-header {
+    text-align: center;
+    padding: clamp(32px,6vw,64px) 20px clamp(24px,4vw,44px);
+    border-bottom: 2px solid rgba(35,206,107,0.25);
+    background: linear-gradient(180deg, rgba(81,26,145,0.18) 0%, transparent 100%);
+    position: relative; overflow: hidden;
+  }
+  .app-header::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(105deg,transparent 0px,transparent 80px,rgba(35,206,107,0.025) 80px,rgba(35,206,107,0.025) 81px);
+    pointer-events: none;
+  }
+  .app-header::after {
+    content: ''; position: absolute; bottom: -2px; left: 8%; right: 8%; height: 2px;
+    background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+  }
+  .logo-wrap { display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .logo-wrap img {
+    height: clamp(56px,10vw,96px); width: auto;
+    filter: drop-shadow(0 0 20px rgba(35,206,107,0.4));
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+
+  .header-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.9rem,6vw,3.8rem); font-weight: 700; color: var(--accent-gold2);
+    text-shadow: 0 0 30px rgba(35,206,107,0.5), 0 0 60px rgba(35,206,107,0.2), 0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 0.04em; line-height: 1.15; margin-bottom: 6px;
+    animation: fade-down 0.7s ease both;
+  }
+  .header-divider {
+    width: 220px; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(24,168,158,0.8), transparent);
+    margin: 10px auto 12px;
+  }
+  .header-subtitle {
+    font-family: 'Cinzel', serif; font-size: clamp(0.6rem,1.8vw,0.78rem);
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-teal);
+    animation: fade-up 0.9s 0.2s ease both;
+  }
+
+  /* ─── NAV TABS ─── */
+  .nav-tabs {
+    display: flex; justify-content: center; gap: 2px; padding: 0 12px;
+    border-bottom: 1px solid rgba(35,206,107,0.12);
+    background: rgba(13,2,33,0.75); flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  }
+  .nav-tab {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted); text-decoration: none;
+    padding: 13px 20px; border: none; border-bottom: 3px solid transparent;
+    transition: var(--transition); white-space: nowrap; position: relative;
+    background: transparent; cursor: pointer;
+  }
+  .nav-tab:hover { color: #fff; border-bottom-color: rgba(35,206,107,0.4); }
+  .nav-tab.active { color: var(--accent-gold2); border-bottom-color: var(--accent-gold); background: rgba(35,206,107,0.05); }
+  .nav-tab.active::before {
+    content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%;
+    height: 2px; background: var(--accent-teal); border-radius: 2px 2px 0 0;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .main { max-width: 1200px; margin: 0 auto; padding: clamp(24px,4vw,48px) clamp(14px,3vw,28px) 80px; }
+
+  .view { display: none; animation: fade-in 0.3s ease both; }
+  .view.active { display: block; }
+
+  /* ─── SECTION HEADING ─── */
+  .section-heading {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--accent-gold); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .section-heading::before, .section-heading::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(35,206,107,0.4));
+  }
+  .section-heading::before { background: linear-gradient(to left, transparent, rgba(35,206,107,0.4)); }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: linear-gradient(160deg, rgba(15,8,75,0.95) 0%, rgba(13,2,33,0.98) 100%);
+    border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 16px; position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), rgba(11,83,81,0.45), transparent);
+    pointer-events: none;
+  }
+  .card-title {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent-gold); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(to right, rgba(35,206,107,0.45), transparent);
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.14em;
+    text-transform: uppercase; padding: 10px 20px;
+    border: 1.5px solid var(--accent-gold); background: transparent;
+    color: var(--accent-gold2); cursor: pointer; border-radius: 4px;
+    transition: var(--transition); text-decoration: none; display: inline-block;
+    position: relative; overflow: hidden;
+  }
+  .btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(35,206,107,0) 0%, rgba(35,206,107,0.08) 100%);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .btn:hover::before { opacity: 1; }
+  .btn:hover { border-color: var(--accent-gold2); box-shadow: 0 0 16px rgba(35,206,107,0.3); color: #fff; }
+  .btn-primary {
+    background: linear-gradient(135deg, #18a858 0%, #23ce6b 50%, #15903e 100%);
+    color: #0d0221; border-color: #23ce6b; font-weight: 700;
+    box-shadow: 0 2px 16px rgba(35,206,107,0.35);
+  }
+  .btn-primary:hover { background: linear-gradient(135deg, #23ce6b 0%, #39e87e 50%, #1eb55e 100%); box-shadow: 0 4px 24px rgba(35,206,107,0.5); color: #0d0221; }
+  .btn-teal { border-color: var(--accent-teal); color: var(--accent-teal); }
+  .btn-teal:hover { background: rgba(11,83,81,0.2); box-shadow: 0 0 16px rgba(11,83,81,0.4); color: #fff; }
+  .btn-danger { border-color: #e04444; color: #e04444; }
+  .btn-danger:hover { background: rgba(224,68,68,0.12); box-shadow: 0 0 14px rgba(224,68,68,0.3); }
+  .btn-purple { border-color: var(--accent-purple); color: #b080ff; }
+  .btn-purple:hover { background: rgba(81,26,145,0.2); box-shadow: 0 0 14px rgba(81,26,145,0.4); color: #fff; }
+  .btn-sm { padding: 6px 12px; font-size: 0.62rem; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+  /* ─── FORMS ─── */
+  label {
+    display: block; font-family: 'Cinzel', serif; font-size: 0.64rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 4px; margin-top: 14px;
+  }
+  label:first-child { margin-top: 0; }
+  input[type=text], input[type=number], input[type=date], textarea, select {
+    width: 100%; background: rgba(10,6,30,0.8);
+    border: 1px solid rgba(35,206,107,0.2); border-radius: 4px;
+    color: var(--text-primary); font-family: 'Crimson Pro', serif;
+    font-size: 1rem; padding: 8px 12px; transition: var(--transition);
+    outline: none; -webkit-appearance: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 2px rgba(35,206,107,0.12);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+  select option { background: #140a3a; color: var(--text-primary); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  @media(max-width:600px) { .form-row, .form-row-3 { grid-template-columns: 1fr; } }
+
+  /* ─── BADGES ─── */
+  .tool-badge {
+    display: inline-block; font-family: 'Cinzel', serif; font-size: 0.55rem;
+    letter-spacing: 0.15em; text-transform: uppercase; padding: 2px 8px;
+    border-radius: 3px; border: 1px solid; white-space: nowrap;
+  }
+  .badge-gold   { color: var(--accent-gold); border-color: rgba(35,206,107,0.4); background: rgba(35,206,107,0.08); }
+  .badge-teal   { color: #5ecfcb; border-color: rgba(11,83,81,0.5); background: rgba(11,83,81,0.15); }
+  .badge-purple { color: #b080ff; border-color: rgba(81,26,145,0.5); background: rgba(81,26,145,0.12); }
+  .badge-red    { color: #e07070; border-color: rgba(224,68,68,0.4); background: rgba(224,68,68,0.08); }
+  .badge-muted  { color: var(--text-muted); border-color: rgba(168,180,212,0.3); background: rgba(168,180,212,0.05); }
+  .badge-dh   { color: var(--dh-gold); border-color: var(--dh-cyan); background: var(--dh-purple); }
+  .badge-dd   { color: var(--dd-gold); border-color: var(--dd-red); background: var(--dd-black); }
+  .badge-pf   { color: var(--pf-gold); border-color: var(--pf-blue); background: var(--pf-red); }
+  .badge-ic   { color: var(--ic-red); border-color: var(--ic-gold); background: var(--ic-black); }
+  .badge-sw   { color: var(--sw-gold); border-color: var(--sw-red); background: var(--sw-blue); }
+  .badge-ag   { color: var(--ag-gold); border-color: var(--ag-green); background: var(--ag-deep); }
+
+  /* ─── CAMPAIGNS LIST ─── */
+  .campaigns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%,320px),1fr));
+    gap: 16px; margin-bottom: 24px;
+  }
+  .campaign-card {
+    background: linear-gradient(160deg, rgba(15,8,75,0.95) 0%, rgba(13,2,33,0.98) 100%);
+    border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+    padding: 20px 22px; position: relative; overflow: hidden;
+    cursor: pointer; transition: var(--transition);
+  }
+  .campaign-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), rgba(11,83,81,0.45), transparent);
+  }
+  .campaign-card:hover {
+    border-color: rgba(35,206,107,0.45);
+    box-shadow: 0 0 28px rgba(35,206,107,0.18), var(--shadow);
+    transform: translateY(-2px);
+  }
+  .campaign-name {
+    font-family: 'Cinzel', serif; font-size: 1.05rem; color: var(--accent-gold2);
+    margin-bottom: 6px; letter-spacing: 0.05em;
+  }
+  .campaign-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; }
+  .campaign-stats { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .campaign-stat {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+  .campaign-stat span { color: var(--accent-gold); font-size: 0.75rem; }
+
+  /* ─── SESSION LIST ─── */
+  .session-item {
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    border: 1px solid rgba(35,206,107,0.14); border-radius: 6px; margin-bottom: 8px;
+    cursor: pointer; transition: var(--transition);
+    background: linear-gradient(90deg, rgba(15,8,75,0.7) 0%, rgba(13,2,33,0.85) 100%);
+  }
+  .session-item:hover { border-color: rgba(35,206,107,0.4); background: linear-gradient(90deg,rgba(20,12,90,0.9),rgba(20,5,50,0.95)); }
+  .session-num {
+    font-family: 'Cinzel Decorative', serif; font-size: 1.2rem; color: rgba(35,206,107,0.4);
+    min-width: 36px; text-align: center; flex-shrink: 0;
+  }
+  .session-info { flex: 1; min-width: 0; }
+  .session-title { font-family: 'Cinzel', serif; font-size: 0.88rem; color: var(--accent-gold2); letter-spacing: 0.04em; }
+  .session-date { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+  .session-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  /* ─── NPC CARDS ─── */
+  .npc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,260px),1fr)); gap: 12px; }
+  .npc-card {
+    background: rgba(15,8,75,0.6); border: 1px solid rgba(35,206,107,0.14);
+    border-radius: 6px; padding: 14px 16px; transition: var(--transition);
+  }
+  .npc-card:hover { border-color: rgba(35,206,107,0.35); }
+  .npc-name { font-family: 'Cinzel', serif; font-size: 0.88rem; color: var(--accent-gold2); margin-bottom: 4px; }
+  .npc-role { font-size: 0.82rem; color: var(--accent-teal); font-style: italic; margin-bottom: 6px; }
+  .npc-attitude {
+    display: inline-block; font-family: 'Cinzel', serif; font-size: 0.55rem;
+    letter-spacing: 0.1em; padding: 2px 7px; border-radius: 3px; border: 1px solid; margin-bottom: 8px;
+  }
+  .attitude-friendly { color: #5ecb8a; border-color: rgba(35,206,107,0.5); background: rgba(35,206,107,0.1); }
+  .attitude-neutral  { color: var(--text-muted); border-color: rgba(168,180,212,0.3); background: rgba(168,180,212,0.06); }
+  .attitude-hostile  { color: #e07070; border-color: rgba(224,68,68,0.4); background: rgba(224,68,68,0.08); }
+  .attitude-unknown  { color: #b080ff; border-color: rgba(81,26,145,0.4); background: rgba(81,26,145,0.08); }
+  .npc-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+  .npc-card-actions { display: flex; gap: 5px; margin-top: 10px; justify-content: flex-end; }
+
+  /* ─── LOCATION CARDS ─── */
+  .loc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,280px),1fr)); gap: 12px; }
+  .loc-card {
+    background: rgba(11,83,81,0.12); border: 1px solid rgba(11,83,81,0.3);
+    border-radius: 6px; padding: 14px 16px; transition: var(--transition);
+  }
+  .loc-card:hover { border-color: rgba(11,83,81,0.6); }
+  .loc-card::before {
+    content: ''; display: block; height: 2px; margin: -14px -16px 12px;
+    background: linear-gradient(to right, rgba(11,83,81,0.8), rgba(35,206,107,0.3), transparent);
+    border-radius: 6px 6px 0 0;
+  }
+  .loc-name { font-family: 'Cinzel', serif; font-size: 0.88rem; color: #5ecfcb; margin-bottom: 4px; }
+  .loc-type { font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-bottom: 6px; }
+  .loc-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+  .loc-card-actions { display: flex; gap: 5px; margin-top: 10px; justify-content: flex-end; }
+
+  /* ─── PLOT HOOKS ─── */
+  .hook-list { display: flex; flex-direction: column; gap: 8px; }
+  .hook-item {
+    display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px;
+    background: rgba(81,26,145,0.1); border: 1px solid rgba(81,26,145,0.25);
+    border-radius: 6px; transition: var(--transition);
+  }
+  .hook-item:hover { border-color: rgba(81,26,145,0.5); }
+  .hook-status-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 6px;
+  }
+  .hook-status-dot.open    { background: var(--accent-gold); box-shadow: 0 0 8px rgba(35,206,107,0.5); }
+  .hook-status-dot.active  { background: #b080ff; box-shadow: 0 0 8px rgba(81,26,145,0.6); }
+  .hook-status-dot.resolved{ background: var(--text-muted); }
+  .hook-status-dot.dropped { background: #e04444; }
+  .hook-body { flex: 1; min-width: 0; }
+  .hook-title { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--text-primary); margin-bottom: 4px; }
+  .hook-source { font-size: 0.78rem; color: var(--text-muted); font-style: italic; margin-bottom: 4px; }
+  .hook-desc { font-size: 0.88rem; color: var(--text-muted); }
+  .hook-actions { display: flex; gap: 5px; flex-shrink: 0; }
+
+  /* ─── LOOT TABLE ─── */
+  .loot-table { width: 100%; border-collapse: collapse; }
+  .loot-table th {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--accent-gold); padding: 8px 12px;
+    border-bottom: 1px solid rgba(35,206,107,0.25); text-align: left;
+  }
+  .loot-table td {
+    font-size: 0.9rem; color: var(--text-primary); padding: 10px 12px;
+    border-bottom: 1px solid rgba(35,206,107,0.08);
+  }
+  .loot-table tr:last-child td { border-bottom: none; }
+  .loot-table tr:hover td { background: rgba(35,206,107,0.04); }
+  .loot-qty { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--accent-gold); }
+  .loot-value { font-size: 0.82rem; color: var(--text-muted); }
+  .loot-type-tag {
+    font-family: 'Cinzel', serif; font-size: 0.5rem; letter-spacing: 0.1em;
+    padding: 1px 5px; border-radius: 2px;
+  }
+  .loot-type-weapon { border: 1px solid rgba(224,68,68,0.4); color: #e07070; background: rgba(224,68,68,0.06); }
+  .loot-type-armor  { border: 1px solid rgba(11,83,81,0.5); color: #5ecfcb; background: rgba(11,83,81,0.1); }
+  .loot-type-magic  { border: 1px solid rgba(81,26,145,0.5); color: #b080ff; background: rgba(81,26,145,0.1); }
+  .loot-type-coin   { border: 1px solid rgba(35,206,107,0.4); color: var(--accent-gold); background: rgba(35,206,107,0.07); }
+  .loot-type-misc   { border: 1px solid rgba(168,180,212,0.3); color: var(--text-muted); background: rgba(168,180,212,0.05); }
+
+  /* ─── PARTY STATS ─── */
+  .party-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%,240px),1fr)); gap: 12px; }
+  .party-card {
+    background: rgba(15,8,75,0.6); border: 1px solid rgba(35,206,107,0.18);
+    border-radius: 6px; padding: 16px;
+  }
+  .party-name { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--accent-gold2); margin-bottom: 2px; }
+  .party-class { font-size: 0.82rem; color: var(--accent-teal); font-style: italic; margin-bottom: 10px; }
+  .party-stat-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(35,206,107,0.07); }
+  .party-stat-row:last-child { border-bottom: none; }
+  .party-stat-label { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .party-stat-val { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--text-primary); }
+  .party-card-actions { display: flex; gap: 5px; margin-top: 10px; justify-content: flex-end; }
+
+  /* ─── NOTES AREA ─── */
+  .notes-content {
+    font-size: 0.95rem; color: var(--text-primary); line-height: 1.75;
+    white-space: pre-wrap; min-height: 60px;
+  }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state {
+    text-align: center; padding: 48px 20px; color: var(--text-muted);
+  }
+  .empty-state .big-icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.5; }
+  .empty-state p { font-size: 0.95rem; margin-bottom: 18px; max-width: 360px; margin-left: auto; margin-right: auto; }
+
+  /* ─── MODAL ─── */
+  #modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8);
+    z-index: 500; align-items: center; justify-content: center; padding: 20px;
+  }
+  #modal-overlay.open { display: flex; }
+  .modal-box {
+    background: linear-gradient(160deg, rgba(20,10,58,0.99) 0%, rgba(13,2,33,0.99) 100%);
+    border: 1px solid rgba(35,206,107,0.35); border-top: 2px solid var(--accent-gold);
+    border-radius: 10px; padding: 28px; max-width: 560px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+  .modal-title {
+    font-family: 'Cinzel', serif; font-size: 1rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent-gold); margin-bottom: 18px;
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+
+  /* ─── TOAST ─── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: rgba(15,8,75,0.97); border: 1px solid var(--accent-gold);
+    border-radius: 6px; padding: 11px 22px; font-family: 'Cinzel', serif;
+    font-size: 0.7rem; letter-spacing: 0.1em; color: var(--accent-gold2);
+    transition: transform 0.3s ease; z-index: 1000;
+    pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── FOOTER ─── */
+  .app-footer {
+    border-top: 1px solid rgba(35,206,107,0.18); padding: 32px 20px;
+    text-align: center; background: rgba(13,2,33,0.85); position: relative;
+  }
+  .app-footer::before {
+    content: ''; position: absolute; top: -1px; left: 10%; right: 10%; height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+  }
+  .footer-copy { font-size: 0.78rem; color: rgba(168,180,212,0.5); font-style: italic; }
+
+  /* ─── ORNAMENT ─── */
+  .ornament {
+    text-align: center; font-family: 'Cinzel', serif;
+    color: rgba(35,206,107,0.3); font-size: 0.7rem;
+    letter-spacing: 12px; margin: 8px 0 28px; user-select: none;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fade-down { from{opacity:0;transform:translateY(-14px);} to{opacity:1;transform:translateY(0);} }
+  @keyframes fade-up   { from{opacity:0;transform:translateY(12px);}  to{opacity:1;transform:translateY(0);} }
+  @keyframes fade-in   { from{opacity:0;} to{opacity:1;} }
+
+  /* ─── DETAIL PANEL ─── */
+  .detail-back {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-muted); cursor: pointer;
+    background: none; border: none; padding: 0; margin-bottom: 20px;
+    display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;
+  }
+  .detail-back:hover { color: var(--accent-gold); }
+
+  .session-tabs {
+    display: flex; gap: 2px; flex-wrap: wrap;
+    border-bottom: 1px solid rgba(35,206,107,0.15); margin-bottom: 24px;
+  }
+  .session-tab {
+    font-family: 'Cinzel', serif; font-size: 0.65rem; letter-spacing: 0.14em;
+    text-transform: uppercase; padding: 10px 16px; border: none;
+    border-bottom: 3px solid transparent; background: transparent;
+    color: var(--text-muted); cursor: pointer; transition: var(--transition);
+  }
+  .session-tab:hover { color: #fff; border-bottom-color: rgba(35,206,107,0.35); }
+  .session-tab.active { color: var(--accent-gold2); border-bottom-color: var(--accent-gold); background: rgba(35,206,107,0.04); }
+
+  .sub-view { display: none; }
+  .sub-view.active { display: block; animation: fade-in 0.25s ease; }
+
+  /* ─── COLLAPSIBLE SECTIONS ─── */
+  .collapsible-header {
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none; padding: 4px 0;
+  }
+  .collapsible-header .toggle-icon { font-size: 0.7rem; color: var(--text-muted); transition: transform 0.2s; }
+  .collapsible-header.open .toggle-icon { transform: rotate(90deg); }
+  .collapsible-body { display: none; margin-top: 14px; }
+  .collapsible-body.open { display: block; animation: fade-in 0.2s ease; }
+
+  /* ─── WEALTH SUMMARY ─── */
+  .wealth-row {
+    display: flex; gap: 16px; flex-wrap: wrap; padding: 12px 0;
+    border-bottom: 1px solid rgba(35,206,107,0.1);
+  }
+  .wealth-item { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 60px; }
+  .wealth-coin { font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; color: var(--accent-gold2); }
+  .wealth-label { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:680px) {
+    .campaigns-grid { grid-template-columns: 1fr; }
+    .npc-grid, .loc-grid, .party-grid { grid-template-columns: 1fr; }
+    .session-item { flex-wrap: wrap; }
+    .session-actions { width: 100%; justify-content: flex-end; }
+  }
+</style>
+</head>
+<body>
+<div id="page">
+
+  <!-- BACK BANNER -->
+  <div class="back-banner">
+    <a href="index.html">⟵ Studio 347 Home</a>
+  </div>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="logo-wrap">
+      <img src="ref/logo.png" alt="Studio 347 Logo" onerror="this.style.display='none'">
+    </div>
+    <h1 class="header-title">Session Scribe</h1>
+    <div class="header-divider"></div>
+    <p class="header-subtitle">Campaign Notes &amp; Session Organiser</p>
+  </header>
+
+  <!-- NAV TABS -->
+  <nav class="nav-tabs" aria-label="Main navigation">
+    <button class="nav-tab active" onclick="showView('campaigns')">📜 Campaigns</button>
+    <button class="nav-tab" onclick="showView('sessions')">✦ Sessions</button>
+    <button class="nav-tab" onclick="showView('party')">⚔ Party</button>
+    <button class="nav-tab" onclick="showView('loot')">💰 Loot</button>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ══════════ CAMPAIGNS VIEW ══════════ -->
+    <div id="view-campaigns" class="view active">
+      <h2 class="section-heading">Your Campaigns</h2>
+      <div id="campaigns-list"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="openNewCampaign()">✦ New Campaign</button>
+        <button class="btn btn-teal" onclick="exportAll()">⬇ Export All</button>
+        <button class="btn btn-teal" onclick="triggerImport()">⬆ Import</button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importAll(event)">
+      </div>
+    </div>
+
+    <!-- ══════════ SESSIONS VIEW ══════════ -->
+    <div id="view-sessions" class="view">
+      <button class="detail-back" onclick="showView('campaigns')">← All Campaigns</button>
+      <div id="sessions-campaign-header"></div>
+      <h2 class="section-heading" id="sessions-heading">Sessions</h2>
+      <div id="sessions-list"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="openNewSession()">✦ New Session</button>
+      </div>
+    </div>
+
+    <!-- ══════════ SESSION DETAIL ══════════ -->
+    <div id="view-session-detail" class="view">
+      <button class="detail-back" onclick="backToSessions()">← Sessions</button>
+      <div id="session-detail-header"></div>
+
+      <div class="session-tabs" id="session-tabs">
+        <button class="session-tab active" onclick="showSubView('notes')">📝 Notes</button>
+        <button class="session-tab" onclick="showSubView('npcs')">👥 NPCs</button>
+        <button class="session-tab" onclick="showSubView('locations')">🗺 Locations</button>
+        <button class="session-tab" onclick="showSubView('hooks')">🪝 Plot Hooks</button>
+        <button class="session-tab" onclick="showSubView('loot-session')">💎 Loot</button>
+      </div>
+
+      <!-- Notes Sub-View -->
+      <div id="sub-notes" class="sub-view active">
+        <div class="card">
+          <div class="card-title">📝 Session Notes</div>
+          <div id="notes-display" class="notes-content"></div>
+          <div class="btn-row">
+            <button class="btn btn-sm" onclick="editNotes()">✏ Edit Notes</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">✦ Summary</div>
+          <div id="summary-display" class="notes-content" style="color:var(--text-muted);font-style:italic;"></div>
+          <div class="btn-row">
+            <button class="btn btn-sm" onclick="editSummary()">✏ Edit Summary</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NPCs Sub-View -->
+      <div id="sub-npcs" class="sub-view">
+        <div id="npc-list-container"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" onclick="openAddNPC()">+ Add NPC</button>
+        </div>
+      </div>
+
+      <!-- Locations Sub-View -->
+      <div id="sub-locations" class="sub-view">
+        <div id="loc-list-container"></div>
+        <div class="btn-row">
+          <button class="btn btn-teal btn-sm" onclick="openAddLocation()">+ Add Location</button>
+        </div>
+      </div>
+
+      <!-- Plot Hooks Sub-View -->
+      <div id="sub-hooks" class="sub-view">
+        <div id="hook-list-container"></div>
+        <div class="btn-row">
+          <button class="btn btn-purple btn-sm" onclick="openAddHook()">+ Add Hook</button>
+        </div>
+      </div>
+
+      <!-- Loot Session Sub-View -->
+      <div id="sub-loot-session" class="sub-view">
+        <div id="loot-session-container"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm" onclick="openAddLoot('session')">+ Add Item</button>
+          <button class="btn btn-sm" onclick="openAddWealth()">+ Add Coins</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ PARTY VIEW ══════════ -->
+    <div id="view-party" class="view">
+      <h2 class="section-heading">Party Roster</h2>
+      <div id="party-campaign-selector" style="margin-bottom:16px;"></div>
+      <div id="party-list-container"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="openAddPartyMember()">+ Add Member</button>
+      </div>
+    </div>
+
+    <!-- ══════════ LOOT VIEW ══════════ -->
+    <div id="view-loot" class="view">
+      <h2 class="section-heading">Party Loot Ledger</h2>
+      <div id="loot-campaign-selector" style="margin-bottom:16px;"></div>
+      <div id="loot-main-container"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="openAddLoot('main')">+ Add Item</button>
+        <button class="btn btn-sm" onclick="openAddWealth('main')">+ Add Coins</button>
+        <button class="btn btn-danger btn-sm" onclick="clearAllLoot()">⚠ Clear All</button>
+      </div>
+    </div>
+
+    <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <p class="footer-copy">Session Scribe — Studio 347 &nbsp;·&nbsp; All data stored locally in your browser.</p>
+  </footer>
+
+</div><!-- /page -->
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title"></div>
+    <div id="modal-content"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ═══════════════════════════════════════════════════════════════
+   DATA MODEL
+   campaigns: [{id, name, system, gm, description, created, party:[],loot:{items:[],coins:{}}}]
+   sessions:  [{id, campaignId, number, title, date, notes, summary,
+                npcs:[{id,name,role,attitude,description,first_seen}],
+                locations:[{id,name,type,description}],
+                hooks:[{id,title,source,description,status}],
+                loot:{items:[{id,name,qty,type,value,notes}], coins:{gp,sp,cp,pp,ep}}}]
+═══════════════════════════════════════════════════════════════ */
+
+const STORAGE_KEY = 'session_scribe_v1';
+const SYSTEMS = [
+  { id:'agnostic', label:'System Agnostic',       badge:'badge-ag' },
+  { id:'dnd5e',    label:'D&D 5e',                badge:'badge-dd' },
+  { id:'dh',       label:'Daggerheart',            badge:'badge-dh' },
+  { id:'pf2e',     label:'Pathfinder 2e',          badge:'badge-pf' },
+  { id:'icrpg',    label:'Index Card RPG',         badge:'badge-ic' },
+  { id:'sw',       label:'Savage Worlds',          badge:'badge-sw' },
+  { id:'other',    label:'Other',                  badge:'badge-muted' },
+];
+const ATTITUDES   = ['Friendly','Neutral','Hostile','Unknown'];
+const HOOK_STATUS = ['Open','Active','Resolved','Dropped'];
+const LOOT_TYPES  = ['Weapon','Armor','Magic Item','Coin','Misc'];
+
+let state = { campaigns: [], sessions: [] };
+let activeCampaignId = null;
+let activeSessionId  = null;
+let currentView      = 'campaigns';
+let currentSubView   = 'notes';
+let activeLootCtx    = 'session'; // 'session' | 'main'
+let partyFilterId    = null;
+let lootFilterId     = null;
+let editingNPCId     = null;
+let editingLocId     = null;
+let editingHookId    = null;
+let editingLootId    = null;
+let editingPartyId   = null;
+let toastTimer       = null;
+
+/* ─── PERSISTENCE ─── */
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+function load() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    if (d) state = JSON.parse(d);
+  } catch(e) { state = { campaigns: [], sessions: [] }; }
+  if (!state.campaigns) state.campaigns = [];
+  if (!state.sessions)  state.sessions  = [];
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ─── HELPERS ─── */
+function getCampaign(id)   { return state.campaigns.find(c => c.id === id); }
+function getSessions(cid)  { return state.sessions.filter(s => s.campaignId === cid).sort((a,b)=>a.number-b.number); }
+function getSession(id)    { return state.sessions.find(s => s.id === id); }
+function systemBadge(sysId) {
+  const s = SYSTEMS.find(x => x.id === sysId) || SYSTEMS[SYSTEMS.length-1];
+  return `<span class="tool-badge ${s.badge}">${s.label}</span>`;
+}
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+/* ─── VIEWS ─── */
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v)?.classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['campaigns','sessions','party','loot'][i] === v);
+  });
+  if (v === 'campaigns')       renderCampaigns();
+  if (v === 'sessions')        renderSessions();
+  if (v === 'party')           renderPartyView();
+  if (v === 'loot')            renderLootMain();
+  if (v === 'session-detail')  renderSessionDetail();
+}
+function showSubView(sv) {
+  currentSubView = sv;
+  document.querySelectorAll('.sub-view').forEach(el => el.classList.remove('active'));
+  document.getElementById('sub-' + sv)?.classList.add('active');
+  document.querySelectorAll('.session-tab').forEach(t => {
+    t.classList.toggle('active', t.getAttribute('onclick').includes(`'${sv}'`));
+  });
+  if (sv === 'npcs')         renderNPCs();
+  if (sv === 'locations')    renderLocations();
+  if (sv === 'hooks')        renderHooks();
+  if (sv === 'loot-session') renderLootSession();
+  if (sv === 'notes')        renderNotes();
+}
+
+/* ══════════════════════════════════════════
+   CAMPAIGNS
+══════════════════════════════════════════ */
+function renderCampaigns() {
+  const el = document.getElementById('campaigns-list');
+  if (!state.campaigns.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="big-icon">📜</div>
+      <p>No campaigns yet. Start your chronicle by creating your first campaign.</p>
+    </div>`; return;
+  }
+  el.innerHTML = `<div class="campaigns-grid">` +
+    state.campaigns.map(c => {
+      const sessionCount = getSessions(c.id).length;
+      const partyCount   = (c.party||[]).length;
+      return `<div class="campaign-card" onclick="openCampaign('${c.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div>${systemBadge(c.system)}</div>
+          <div style="display:flex;gap:5px;" onclick="event.stopPropagation()">
+            <button class="btn btn-sm" onclick="openEditCampaign('${c.id}')">✏</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteCampaign('${c.id}')">✕</button>
+          </div>
+        </div>
+        <div class="campaign-name">${escHtml(c.name)}</div>
+        <div class="campaign-meta">${c.gm ? 'GM: ' + escHtml(c.gm) : ''}</div>
+        ${c.description ? `<div style="font-size:0.88rem;color:var(--text-muted);margin-bottom:8px;">${escHtml(c.description)}</div>` : ''}
+        <div class="campaign-stats">
+          <div class="campaign-stat">Sessions <span>${sessionCount}</span></div>
+          <div class="campaign-stat">Party <span>${partyCount}</span></div>
+          <div class="campaign-stat" style="color:var(--text-muted);font-size:0.58rem;">${c.created ? new Date(c.created).toLocaleDateString() : ''}</div>
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+}
+
+function openCampaign(id) {
+  activeCampaignId = id;
+  showView('sessions');
+}
+
+function openNewCampaign() {
+  editingPartyId = null;
+  showCampaignModal(null);
+}
+function openEditCampaign(id) {
+  showCampaignModal(getCampaign(id));
+}
+function showCampaignModal(c) {
+  const isEdit = !!c;
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit Campaign' : 'New Campaign';
+  document.getElementById('modal-content').innerHTML = `
+    <label>Campaign Name *</label>
+    <input type="text" id="cm-name" placeholder="The Shattered Realm" value="${escHtml(c?.name||'')}">
+    <label>Game System</label>
+    <select id="cm-system">
+      ${SYSTEMS.map(s=>`<option value="${s.id}" ${(c?.system||'agnostic')===s.id?'selected':''}>${s.label}</option>`).join('')}
+    </select>
+    <label>GM / Narrator</label>
+    <input type="text" id="cm-gm" placeholder="Your name" value="${escHtml(c?.gm||'')}">
+    <label>Description</label>
+    <textarea id="cm-desc" placeholder="A short description of the campaign...">${escHtml(c?.description||'')}</textarea>
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="saveCampaign(${isEdit?`'${c.id}'`:null})">${isEdit?'Save Changes':'Create Campaign'}</button>
+  `;
+  openModal();
+}
+function saveCampaign(existingId) {
+  const name = document.getElementById('cm-name').value.trim();
+  if (!name) { toast('Campaign name is required.'); return; }
+  if (existingId) {
+    const c = getCampaign(existingId);
+    c.name = name; c.system = document.getElementById('cm-system').value;
+    c.gm   = document.getElementById('cm-gm').value.trim();
+    c.description = document.getElementById('cm-desc').value.trim();
+  } else {
+    state.campaigns.push({
+      id: uid(), name, system: document.getElementById('cm-system').value,
+      gm: document.getElementById('cm-gm').value.trim(),
+      description: document.getElementById('cm-desc').value.trim(),
+      created: Date.now(), party: [], loot: { items: [], coins: { gp:0, sp:0, cp:0, pp:0, ep:0 } }
+    });
+  }
+  save(); closeModal(); renderCampaigns();
+  toast(existingId ? 'Campaign updated.' : 'Campaign created!');
+}
+function deleteCampaign(id) {
+  if (!confirm('Delete this campaign and ALL its sessions? This cannot be undone.')) return;
+  state.campaigns  = state.campaigns.filter(c => c.id !== id);
+  state.sessions   = state.sessions.filter(s => s.campaignId !== id);
+  if (activeCampaignId === id) activeCampaignId = null;
+  save(); renderCampaigns();
+  toast('Campaign deleted.');
+}
+
+/* ══════════════════════════════════════════
+   SESSIONS
+══════════════════════════════════════════ */
+function renderSessions() {
+  const c = getCampaign(activeCampaignId);
+  if (!c) { showView('campaigns'); return; }
+
+  // Campaign header
+  document.getElementById('sessions-campaign-header').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      ${systemBadge(c.system)}
+      <span style="font-family:'Cinzel',serif;font-size:1rem;color:var(--accent-gold2);">${escHtml(c.name)}</span>
+      ${c.gm?`<span style="font-size:0.85rem;color:var(--text-muted);">· GM: ${escHtml(c.gm)}</span>`:''}
+    </div>`;
+
+  const sessions = getSessions(c.id);
+  const el = document.getElementById('sessions-list');
+  if (!sessions.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">✦</div><p>No sessions yet. Record your first adventure!</p></div>`;
+    return;
+  }
+  el.innerHTML = sessions.map(s => `
+    <div class="session-item" onclick="openSessionDetail('${s.id}')">
+      <div class="session-num">${s.number}</div>
+      <div class="session-info">
+        <div class="session-title">${escHtml(s.title||'Untitled Session')}</div>
+        <div class="session-date">${s.date ? new Date(s.date+'T12:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : 'No date set'}
+          &nbsp;·&nbsp; ${(s.npcs||[]).length} NPCs &nbsp;·&nbsp; ${(s.locations||[]).length} Locations &nbsp;·&nbsp; ${(s.hooks||[]).filter(h=>h.status==='Open'||h.status==='Active').length} Active Hooks
+        </div>
+      </div>
+      <div class="session-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-sm" onclick="openEditSession('${s.id}')">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteSession('${s.id}')">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function openSessionDetail(id) {
+  activeSessionId = id;
+  showView('session-detail');
+  showSubView('notes');
+}
+function backToSessions() {
+  activeSessionId = null;
+  showView('sessions');
+}
+
+function renderSessionDetail() {
+  const s = getSession(activeSessionId);
+  const c = getCampaign(activeCampaignId);
+  if (!s || !c) { backToSessions(); return; }
+  document.getElementById('session-detail-header').innerHTML = `
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+        ${systemBadge(c.system)}
+        <span style="font-family:'Cinzel',serif;font-size:0.75rem;color:var(--text-muted);letter-spacing:0.12em;text-transform:uppercase;">Session ${s.number}</span>
+      </div>
+      <h2 style="font-family:'Cinzel Decorative',serif;font-size:clamp(1.2rem,4vw,2rem);color:var(--accent-gold2);margin-bottom:4px;">${escHtml(s.title||'Untitled Session')}</h2>
+      ${s.date?`<div style="font-size:0.88rem;color:var(--text-muted);">${new Date(s.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>`:''}
+    </div>`;
+  renderNotes();
+}
+function renderNotes() {
+  const s = getSession(activeSessionId); if (!s) return;
+  document.getElementById('notes-display').textContent   = s.notes   || 'No notes yet. Click Edit Notes to begin.';
+  document.getElementById('summary-display').textContent = s.summary || 'No summary yet.';
+}
+
+function openNewSession() {
+  showSessionModal(null);
+}
+function openEditSession(id) {
+  showSessionModal(getSession(id));
+}
+function showSessionModal(s) {
+  const isEdit = !!s;
+  const c = getCampaign(activeCampaignId);
+  const nextNum = isEdit ? s.number : (getSessions(activeCampaignId).length + 1);
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit Session' : 'New Session';
+  document.getElementById('modal-content').innerHTML = `
+    <div class="form-row">
+      <div>
+        <label>Session #</label>
+        <input type="number" id="sm-num" value="${nextNum}" min="1">
+      </div>
+      <div>
+        <label>Date Played</label>
+        <input type="date" id="sm-date" value="${s?.date||''}">
+      </div>
+    </div>
+    <label>Session Title</label>
+    <input type="text" id="sm-title" placeholder="The Night of Broken Stars" value="${escHtml(s?.title||'')}">
+    <label>Summary (one line)</label>
+    <input type="text" id="sm-summary-short" placeholder="A brief one-line summary..." value="${escHtml(s?.summary||'')}">
+    <label>Full Notes</label>
+    <textarea id="sm-notes" style="min-height:140px;" placeholder="Detailed session notes...">${escHtml(s?.notes||'')}</textarea>
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="saveSession(${isEdit?`'${s.id}'`:null})">${isEdit?'Save Changes':'Create Session'}</button>
+  `;
+  openModal();
+}
+function saveSession(existingId) {
+  const title = document.getElementById('sm-title').value.trim();
+  const num   = parseInt(document.getElementById('sm-num').value) || 1;
+  const date  = document.getElementById('sm-date').value;
+  const notes = document.getElementById('sm-notes').value;
+  const sum   = document.getElementById('sm-summary-short').value.trim();
+  if (existingId) {
+    const s = getSession(existingId);
+    s.title = title; s.number = num; s.date = date; s.notes = notes; s.summary = sum;
+  } else {
+    state.sessions.push({
+      id: uid(), campaignId: activeCampaignId, number: num, title, date, notes,
+      summary: sum, npcs: [], locations: [], hooks: [],
+      loot: { items: [], coins: { gp:0, sp:0, cp:0, pp:0, ep:0 } }
+    });
+  }
+  save(); closeModal(); renderSessions();
+  toast(existingId ? 'Session updated.' : 'Session added!');
+}
+function deleteSession(id) {
+  if (!confirm('Delete this session?')) return;
+  state.sessions = state.sessions.filter(s => s.id !== id);
+  if (activeSessionId === id) activeSessionId = null;
+  save(); renderSessions();
+  toast('Session deleted.');
+}
+
+/* ══════════════════════════════════════════
+   NPCs
+══════════════════════════════════════════ */
+function renderNPCs() {
+  const s = getSession(activeSessionId); if (!s) return;
+  const el = document.getElementById('npc-list-container');
+  if (!s.npcs.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">👥</div><p>No NPCs recorded for this session.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="npc-grid">` +
+    s.npcs.map(n => {
+      const att = n.attitude||'Unknown';
+      const attClass = att.toLowerCase();
+      return `<div class="npc-card">
+        <div class="npc-name">${escHtml(n.name)}</div>
+        <div class="npc-role">${escHtml(n.role||'')}</div>
+        <span class="npc-attitude attitude-${attClass}">${att}</span>
+        <div class="npc-desc">${escHtml(n.description||'')}</div>
+        ${n.first_seen ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">First seen: ${escHtml(n.first_seen)}</div>` : ''}
+        <div class="npc-card-actions">
+          <button class="btn btn-sm" onclick="openEditNPC('${n.id}')">✏</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteNPC('${n.id}')">✕</button>
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+}
+function openAddNPC()      { showNPCModal(null); }
+function openEditNPC(id)   {
+  const s = getSession(activeSessionId);
+  showNPCModal(s?.npcs.find(n=>n.id===id)||null);
+}
+function showNPCModal(n) {
+  const isEdit = !!n;
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit NPC' : 'Add NPC';
+  document.getElementById('modal-content').innerHTML = `
+    <label>Name *</label>
+    <input type="text" id="npc-name" placeholder="Seraphine the Trader" value="${escHtml(n?.name||'')}">
+    <label>Role / Title</label>
+    <input type="text" id="npc-role" placeholder="Merchant, Guard Captain, Villain…" value="${escHtml(n?.role||'')}">
+    <div class="form-row">
+      <div>
+        <label>Attitude</label>
+        <select id="npc-att">
+          ${ATTITUDES.map(a=>`<option value="${a}" ${(n?.attitude||'Unknown')===a?'selected':''}>${a}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label>First Seen</label>
+        <input type="text" id="npc-first" placeholder="Silvergate Tavern" value="${escHtml(n?.first_seen||'')}">
+      </div>
+    </div>
+    <label>Description / Notes</label>
+    <textarea id="npc-desc" placeholder="Appearance, personality, goals…">${escHtml(n?.description||'')}</textarea>
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="saveNPC(${isEdit?`'${n.id}'`:null})">${isEdit?'Save':'Add NPC'}</button>
+  `;
+  openModal();
+}
+function saveNPC(existingId) {
+  const s = getSession(activeSessionId); if (!s) return;
+  const name = document.getElementById('npc-name').value.trim();
+  if (!name) { toast('NPC name is required.'); return; }
+  const data = {
+    name, role: document.getElementById('npc-role').value.trim(),
+    attitude: document.getElementById('npc-att').value,
+    first_seen: document.getElementById('npc-first').value.trim(),
+    description: document.getElementById('npc-desc').value.trim()
+  };
+  if (existingId) {
+    const idx = s.npcs.findIndex(n=>n.id===existingId);
+    s.npcs[idx] = { ...s.npcs[idx], ...data };
+  } else {
+    s.npcs.push({ id: uid(), ...data });
+  }
+  save(); closeModal(); renderNPCs();
+  toast(existingId ? 'NPC updated.' : 'NPC added!');
+}
+function deleteNPC(id) {
+  const s = getSession(activeSessionId); if (!s) return;
+  s.npcs = s.npcs.filter(n => n.id !== id);
+  save(); renderNPCs(); toast('NPC removed.');
+}
+
+/* ══════════════════════════════════════════
+   LOCATIONS
+══════════════════════════════════════════ */
+function renderLocations() {
+  const s = getSession(activeSessionId); if (!s) return;
+  const el = document.getElementById('loc-list-container');
+  if (!s.locations.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">🗺</div><p>No locations recorded for this session.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="loc-grid">` +
+    s.locations.map(l => `<div class="loc-card">
+      <div class="loc-name">${escHtml(l.name)}</div>
+      <div class="loc-type">${escHtml(l.type||'')}</div>
+      <div class="loc-desc">${escHtml(l.description||'')}</div>
+      <div class="loc-card-actions">
+        <button class="btn btn-sm btn-teal" onclick="openEditLocation('${l.id}')">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteLocation('${l.id}')">✕</button>
+      </div>
+    </div>`).join('') + `</div>`;
+}
+function openAddLocation()    { showLocationModal(null); }
+function openEditLocation(id) {
+  const s = getSession(activeSessionId);
+  showLocationModal(s?.locations.find(l=>l.id===id)||null);
+}
+function showLocationModal(l) {
+  const isEdit = !!l;
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit Location' : 'Add Location';
+  document.getElementById('modal-content').innerHTML = `
+    <label>Location Name *</label>
+    <input type="text" id="loc-name" placeholder="The Sunken Vault" value="${escHtml(l?.name||'')}">
+    <label>Type</label>
+    <input type="text" id="loc-type" placeholder="Dungeon, City, Wilderness, Shop…" value="${escHtml(l?.type||'')}">
+    <label>Description</label>
+    <textarea id="loc-desc" placeholder="Notable features, history, hazards…">${escHtml(l?.description||'')}</textarea>
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-teal btn-sm" onclick="saveLocation(${isEdit?`'${l.id}'`:null})">${isEdit?'Save':'Add Location'}</button>
+  `;
+  openModal();
+}
+function saveLocation(existingId) {
+  const s = getSession(activeSessionId); if (!s) return;
+  const name = document.getElementById('loc-name').value.trim();
+  if (!name) { toast('Location name is required.'); return; }
+  const data = { name, type: document.getElementById('loc-type').value.trim(), description: document.getElementById('loc-desc').value.trim() };
+  if (existingId) {
+    const idx = s.locations.findIndex(l=>l.id===existingId);
+    s.locations[idx] = { ...s.locations[idx], ...data };
+  } else {
+    s.locations.push({ id: uid(), ...data });
+  }
+  save(); closeModal(); renderLocations();
+  toast(existingId ? 'Location updated.' : 'Location added!');
+}
+function deleteLocation(id) {
+  const s = getSession(activeSessionId); if (!s) return;
+  s.locations = s.locations.filter(l => l.id !== id);
+  save(); renderLocations(); toast('Location removed.');
+}
+
+/* ══════════════════════════════════════════
+   PLOT HOOKS
+══════════════════════════════════════════ */
+function renderHooks() {
+  const s = getSession(activeSessionId); if (!s) return;
+  const el = document.getElementById('hook-list-container');
+  if (!s.hooks.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">🪝</div><p>No plot hooks recorded for this session.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="hook-list">` +
+    s.hooks.map(h => `<div class="hook-item">
+      <div class="hook-status-dot ${h.status?.toLowerCase()||'open'}"></div>
+      <div class="hook-body">
+        <div class="hook-title">${escHtml(h.title)}</div>
+        ${h.source?`<div class="hook-source">Source: ${escHtml(h.source)}</div>`:''}
+        <div class="hook-desc">${escHtml(h.description||'')}</div>
+        <div style="margin-top:8px;">
+          <span class="tool-badge badge-purple" style="text-transform:capitalize;">${h.status||'Open'}</span>
+        </div>
+      </div>
+      <div class="hook-actions">
+        <button class="btn btn-sm btn-purple" onclick="openEditHook('${h.id}')">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteHook('${h.id}')">✕</button>
+      </div>
+    </div>`).join('') + `</div>`;
+}
+function openAddHook()     { showHookModal(null); }
+function openEditHook(id)  {
+  const s = getSession(activeSessionId);
+  showHookModal(s?.hooks.find(h=>h.id===id)||null);
+}
+function showHookModal(h) {
+  const isEdit = !!h;
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit Plot Hook' : 'Add Plot Hook';
+  document.getElementById('modal-content').innerHTML = `
+    <label>Hook Title *</label>
+    <input type="text" id="hook-title" placeholder="The Missing Merchant's Ledger" value="${escHtml(h?.title||'')}">
+    <div class="form-row">
+      <div>
+        <label>Source / Introduced By</label>
+        <input type="text" id="hook-source" placeholder="NPC, discovered, overheard…" value="${escHtml(h?.source||'')}">
+      </div>
+      <div>
+        <label>Status</label>
+        <select id="hook-status">
+          ${HOOK_STATUS.map(st=>`<option value="${st}" ${(h?.status||'Open')===st?'selected':''}>${st}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <label>Description</label>
+    <textarea id="hook-desc" placeholder="Details, clues, leads…">${escHtml(h?.description||'')}</textarea>
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-purple btn-sm" onclick="saveHook(${isEdit?`'${h.id}'`:null})">${isEdit?'Save':'Add Hook'}</button>
+  `;
+  openModal();
+}
+function saveHook(existingId) {
+  const s = getSession(activeSessionId); if (!s) return;
+  const title = document.getElementById('hook-title').value.trim();
+  if (!title) { toast('Hook title is required.'); return; }
+  const data = { title, source: document.getElementById('hook-source').value.trim(),
+    status: document.getElementById('hook-status').value,
+    description: document.getElementById('hook-desc').value.trim() };
+  if (existingId) {
+    const idx = s.hooks.findIndex(h=>h.id===existingId);
+    s.hooks[idx] = { ...s.hooks[idx], ...data };
+  } else {
+    s.hooks.push({ id: uid(), ...data });
+  }
+  save(); closeModal(); renderHooks();
+  toast(existingId ? 'Hook updated.' : 'Hook added!');
+}
+function deleteHook(id) {
+  const s = getSession(activeSessionId); if (!s) return;
+  s.hooks = s.hooks.filter(h => h.id !== id);
+  save(); renderHooks(); toast('Hook removed.');
+}
+
+/* ══════════════════════════════════════════
+   LOOT (SESSION)
+══════════════════════════════════════════ */
+function renderLootSession() {
+  const s = getSession(activeSessionId); if (!s) return;
+  if (!s.loot) s.loot = { items: [], coins: { gp:0,sp:0,cp:0,pp:0,ep:0 } };
+  const el = document.getElementById('loot-session-container');
+  el.innerHTML = renderLootBlock(s.loot);
+}
+function renderLootBlock(loot) {
+  const coins = loot.coins || {};
+  const coinStr = ['pp','gp','ep','sp','cp'].filter(k=>coins[k]>0).map(k=>`<div class="wealth-item"><div class="wealth-coin">${coins[k]}</div><div class="wealth-label">${k.toUpperCase()}</div></div>`).join('');
+  return `
+    ${coinStr ? `<div class="card" style="margin-bottom:12px;">
+      <div class="card-title">💰 Coins &amp; Wealth</div>
+      <div class="wealth-row">${coinStr}</div>
+    </div>` : ''}
+    <div class="card">
+      <div class="card-title">💎 Items</div>
+      ${!loot.items.length ? `<div style="color:var(--text-muted);font-size:0.9rem;padding:16px 0;">No items recorded.</div>` :
+        `<table class="loot-table"><thead><tr><th>Item</th><th>Type</th><th>Qty</th><th>Value</th><th style="width:70px;"></th></tr></thead><tbody>` +
+        loot.items.map(item => `<tr>
+          <td>${escHtml(item.name)}${item.notes?`<br><span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">${escHtml(item.notes)}</span>`:''}</td>
+          <td><span class="loot-type-tag loot-type-${(item.type||'misc').toLowerCase().replace(/\s+/g,'-').replace('magic-item','magic')}">${item.type||'Misc'}</span></td>
+          <td class="loot-qty">${item.qty||1}</td>
+          <td class="loot-value">${item.value||'—'}</td>
+          <td style="display:flex;gap:4px;padding:8px 12px;">
+            <button class="btn btn-sm" style="padding:3px 7px;" onclick="openEditLootItem('${item.id}','session')">✏</button>
+            <button class="btn btn-sm btn-danger" style="padding:3px 7px;" onclick="deleteLootItem('${item.id}','session')">✕</button>
+          </td>
+        </tr>`).join('') + `</tbody></table>`
+      }
+    </div>`;
+}
+
+function openAddLoot(ctx) {
+  activeLootCtx = ctx;
+  showLootModal(null);
+}
+function openEditLootItem(id, ctx) {
+  activeLootCtx = ctx;
+  const loot = getLootSource(ctx);
+  showLootModal(loot.items.find(x=>x.id===id)||null);
+}
+function getLootSource(ctx) {
+  if (ctx === 'session') {
+    const s = getSession(activeSessionId);
+    if (!s.loot) s.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
+    return s.loot;
+  } else {
+    const c = getCampaign(activeCampaignId);
+    if (!c.loot) c.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
+    return c.loot;
+  }
+}
+function showLootModal(item) {
+  const isEdit = !!item;
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit Loot Item' : 'Add Loot Item';
+  document.getElementById('modal-content').innerHTML = `
+    <label>Item Name *</label>
+    <input type="text" id="li-name" placeholder="+1 Longsword, Potion of Healing…" value="${escHtml(item?.name||'')}">
+    <div class="form-row">
+      <div>
+        <label>Type</label>
+        <select id="li-type">
+          ${LOOT_TYPES.map(t=>`<option value="${t}" ${(item?.type||'Misc')===t?'selected':''}>${t}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label>Quantity</label>
+        <input type="number" id="li-qty" value="${item?.qty||1}" min="1">
+      </div>
+    </div>
+    <label>Value / Price</label>
+    <input type="text" id="li-value" placeholder="250 gp, Priceless, Trade…" value="${escHtml(item?.value||'')}">
+    <label>Notes</label>
+    <input type="text" id="li-notes" placeholder="Attunement required, cursed…" value="${escHtml(item?.notes||'')}">
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="saveLootItem(${isEdit?`'${item.id}'`:null})">${isEdit?'Save':'Add Item'}</button>
+  `;
+  openModal();
+}
+function saveLootItem(existingId) {
+  const loot = getLootSource(activeLootCtx);
+  const name = document.getElementById('li-name').value.trim();
+  if (!name) { toast('Item name is required.'); return; }
+  const data = { name, type: document.getElementById('li-type').value,
+    qty: parseInt(document.getElementById('li-qty').value)||1,
+    value: document.getElementById('li-value').value.trim(),
+    notes: document.getElementById('li-notes').value.trim() };
+  if (existingId) {
+    const idx = loot.items.findIndex(x=>x.id===existingId);
+    loot.items[idx] = { ...loot.items[idx], ...data };
+  } else {
+    loot.items.push({ id: uid(), ...data });
+  }
+  save(); closeModal();
+  if (activeLootCtx === 'session') renderLootSession();
+  else renderLootMain();
+  toast(existingId ? 'Item updated.' : 'Item added!');
+}
+function deleteLootItem(id, ctx) {
+  const loot = getLootSource(ctx);
+  loot.items = loot.items.filter(x => x.id !== id);
+  save();
+  if (ctx === 'session') renderLootSession();
+  else renderLootMain();
+  toast('Item removed.');
+}
+function openAddWealth(ctx) {
+  activeLootCtx = ctx || 'session';
+  const loot = getLootSource(activeLootCtx);
+  const coins = loot.coins || {};
+  document.getElementById('modal-title').textContent = 'Add / Edit Coins';
+  document.getElementById('modal-content').innerHTML = `
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;">Enter current totals for each denomination.</p>
+    <div class="form-row-3">
+      <div><label>PP (Platinum)</label><input type="number" id="coin-pp" value="${coins.pp||0}" min="0"></div>
+      <div><label>GP (Gold)</label><input type="number" id="coin-gp" value="${coins.gp||0}" min="0"></div>
+      <div><label>EP (Electrum)</label><input type="number" id="coin-ep" value="${coins.ep||0}" min="0"></div>
+    </div>
+    <div class="form-row">
+      <div><label>SP (Silver)</label><input type="number" id="coin-sp" value="${coins.sp||0}" min="0"></div>
+      <div><label>CP (Copper)</label><input type="number" id="coin-cp" value="${coins.cp||0}" min="0"></div>
+    </div>
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="saveCoins()">Save Coins</button>
+  `;
+  openModal();
+}
+function saveCoins() {
+  const loot = getLootSource(activeLootCtx);
+  loot.coins = {
+    pp: parseInt(document.getElementById('coin-pp').value)||0,
+    gp: parseInt(document.getElementById('coin-gp').value)||0,
+    ep: parseInt(document.getElementById('coin-ep').value)||0,
+    sp: parseInt(document.getElementById('coin-sp').value)||0,
+    cp: parseInt(document.getElementById('coin-cp').value)||0,
+  };
+  save(); closeModal();
+  if (activeLootCtx === 'session') renderLootSession();
+  else renderLootMain();
+  toast('Coins updated!');
+}
+
+/* ══════════════════════════════════════════
+   LOOT (MAIN / CAMPAIGN LEDGER)
+══════════════════════════════════════════ */
+function renderLootMain() {
+  renderCampaignSelector('loot-campaign-selector', 'loot-filter', () => {
+    lootFilterId = activeCampaignId;
+    renderLootMainContent();
+  });
+  renderLootMainContent();
+}
+function renderLootMainContent() {
+  const c = getCampaign(activeCampaignId);
+  const el = document.getElementById('loot-main-container');
+  if (!c) { el.innerHTML = `<div class="empty-state"><div class="big-icon">💰</div><p>Select a campaign to view its loot ledger.</p></div>`; return; }
+  if (!c.loot) c.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
+  el.innerHTML = renderLootBlock(c.loot);
+}
+function clearAllLoot() {
+  const c = getCampaign(activeCampaignId); if (!c) return;
+  if (!confirm('Clear all loot for this campaign?')) return;
+  c.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
+  save(); renderLootMain(); toast('Loot cleared.');
+}
+
+/* ══════════════════════════════════════════
+   PARTY
+══════════════════════════════════════════ */
+function renderPartyView() {
+  renderCampaignSelector('party-campaign-selector', 'party-filter', () => { renderPartyContent(); });
+  renderPartyContent();
+}
+function renderPartyContent() {
+  const c = getCampaign(activeCampaignId);
+  const el = document.getElementById('party-list-container');
+  if (!c) { el.innerHTML = `<div class="empty-state"><div class="big-icon">⚔</div><p>Select a campaign to manage its party.</p></div>`; return; }
+  if (!c.party) c.party = [];
+  if (!c.party.length) { el.innerHTML = `<div class="empty-state"><div class="big-icon">👥</div><p>No party members yet.</p></div>`; return; }
+  el.innerHTML = `<div class="party-grid">` +
+    c.party.map(p => `<div class="party-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div class="party-name">${escHtml(p.name)}</div>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-sm" style="padding:3px 7px;" onclick="openEditPartyMember('${p.id}')">✏</button>
+          <button class="btn btn-sm btn-danger" style="padding:3px 7px;" onclick="deletePartyMember('${p.id}')">✕</button>
+        </div>
+      </div>
+      <div class="party-class">${escHtml(p.class||'')} ${p.level?`· Level ${p.level}`:''}</div>
+      ${p.player?`<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Player: ${escHtml(p.player)}</div>`:''}
+      ${buildPartyStatRows(p)}
+    </div>`).join('') + `</div>`;
+}
+function buildPartyStatRows(p) {
+  const rows = [];
+  if (p.hp_current || p.hp_max) rows.push(['HP', `${p.hp_current||'?'} / ${p.hp_max||'?'}`]);
+  if (p.ac)             rows.push(['AC', p.ac]);
+  if (p.speed)          rows.push(['Speed', p.speed]);
+  if (p.passive_perc)   rows.push(['Passive Perc', p.passive_perc]);
+  if (p.initiative)     rows.push(['Initiative', p.initiative]);
+  if (p.notes)          rows.push(['Notes', p.notes]);
+  return rows.map(([l,v]) => `<div class="party-stat-row"><span class="party-stat-label">${l}</span><span class="party-stat-val">${escHtml(String(v))}</span></div>`).join('');
+}
+function openAddPartyMember()     { showPartyModal(null); }
+function openEditPartyMember(id)  {
+  const c = getCampaign(activeCampaignId);
+  showPartyModal(c?.party.find(p=>p.id===id)||null);
+}
+function showPartyModal(p) {
+  const isEdit = !!p;
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit Party Member' : 'Add Party Member';
+  document.getElementById('modal-content').innerHTML = `
+    <div class="form-row">
+      <div><label>Character Name *</label><input type="text" id="pm-name" value="${escHtml(p?.name||'')}"></div>
+      <div><label>Player Name</label><input type="text" id="pm-player" value="${escHtml(p?.player||'')}"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Class / Role</label><input type="text" id="pm-class" placeholder="Fighter, Rogue…" value="${escHtml(p?.class||'')}"></div>
+      <div><label>Level / Tier</label><input type="number" id="pm-level" value="${p?.level||1}" min="1"></div>
+    </div>
+    <div class="form-row-3">
+      <div><label>Current HP</label><input type="number" id="pm-hpc" value="${p?.hp_current||''}"></div>
+      <div><label>Max HP</label><input type="number" id="pm-hpm" value="${p?.hp_max||''}"></div>
+      <div><label>Armor Class</label><input type="number" id="pm-ac" value="${p?.ac||''}"></div>
+    </div>
+    <div class="form-row-3">
+      <div><label>Speed</label><input type="text" id="pm-speed" value="${escHtml(p?.speed||'')}" placeholder="30 ft"></div>
+      <div><label>Initiative</label><input type="text" id="pm-init" value="${escHtml(p?.initiative||'')}"></div>
+      <div><label>Passive Perc</label><input type="number" id="pm-pp" value="${p?.passive_perc||''}"></div>
+    </div>
+    <label>Notes</label>
+    <textarea id="pm-notes" placeholder="Conditions, special abilities, languages…">${escHtml(p?.notes||'')}</textarea>
+  `;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="savePartyMember(${isEdit?`'${p.id}'`:null})">${isEdit?'Save':'Add Member'}</button>
+  `;
+  openModal();
+}
+function savePartyMember(existingId) {
+  const c = getCampaign(activeCampaignId); if (!c) return;
+  if (!c.party) c.party = [];
+  const name = document.getElementById('pm-name').value.trim();
+  if (!name) { toast('Character name is required.'); return; }
+  const data = {
+    name, player: document.getElementById('pm-player').value.trim(),
+    class: document.getElementById('pm-class').value.trim(),
+    level: parseInt(document.getElementById('pm-level').value)||1,
+    hp_current: parseInt(document.getElementById('pm-hpc').value)||null,
+    hp_max: parseInt(document.getElementById('pm-hpm').value)||null,
+    ac: parseInt(document.getElementById('pm-ac').value)||null,
+    speed: document.getElementById('pm-speed').value.trim(),
+    initiative: document.getElementById('pm-init').value.trim(),
+    passive_perc: parseInt(document.getElementById('pm-pp').value)||null,
+    notes: document.getElementById('pm-notes').value.trim(),
+  };
+  if (existingId) {
+    const idx = c.party.findIndex(p=>p.id===existingId);
+    c.party[idx] = { ...c.party[idx], ...data };
+  } else {
+    c.party.push({ id: uid(), ...data });
+  }
+  save(); closeModal(); renderPartyContent();
+  toast(existingId ? 'Member updated.' : 'Member added!');
+}
+function deletePartyMember(id) {
+  const c = getCampaign(activeCampaignId); if (!c) return;
+  c.party = c.party.filter(p => p.id !== id);
+  save(); renderPartyContent(); toast('Member removed.');
+}
+
+/* ══════════════════════════════════════════
+   CAMPAIGN SELECTOR (for Party / Loot views)
+══════════════════════════════════════════ */
+function renderCampaignSelector(containerId, selectId, onChange) {
+  const el = document.getElementById(containerId);
+  if (!state.campaigns.length) { el.innerHTML = ''; return; }
+  // Auto-select if only one or if activeCampaignId already set
+  if (!activeCampaignId && state.campaigns.length === 1) activeCampaignId = state.campaigns[0].id;
+  el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <label style="margin:0;white-space:nowrap;">Campaign:</label>
+    <select id="${selectId}" style="flex:1;min-width:200px;max-width:400px;" onchange="activeCampaignId=this.value;(${onChange.toString()})()">
+      <option value="">— Select Campaign —</option>
+      ${state.campaigns.map(c=>`<option value="${c.id}" ${activeCampaignId===c.id?'selected':''}>${escHtml(c.name)} (${SYSTEMS.find(s=>s.id===c.system)?.label||c.system})</option>`).join('')}
+    </select>
+  </div>`;
+}
+
+/* ══════════════════════════════════════════
+   SESSION NOTES EDITING
+══════════════════════════════════════════ */
+function editNotes() {
+  const s = getSession(activeSessionId); if (!s) return;
+  document.getElementById('modal-title').textContent = 'Edit Session Notes';
+  document.getElementById('modal-content').innerHTML = `
+    <textarea id="notes-edit" style="min-height:260px;">${escHtml(s.notes||'')}</textarea>`;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="saveNotes()">Save Notes</button>`;
+  openModal();
+}
+function saveNotes() {
+  const s = getSession(activeSessionId); if (!s) return;
+  s.notes = document.getElementById('notes-edit').value;
+  save(); closeModal(); renderNotes();
+  toast('Notes saved!');
+}
+function editSummary() {
+  const s = getSession(activeSessionId); if (!s) return;
+  document.getElementById('modal-title').textContent = 'Edit Session Summary';
+  document.getElementById('modal-content').innerHTML = `
+    <textarea id="summary-edit" style="min-height:120px;">${escHtml(s.summary||'')}</textarea>`;
+  document.getElementById('modal-actions').innerHTML = `
+    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
+    <button class="btn btn-primary btn-sm" onclick="saveSummary()">Save Summary</button>`;
+  openModal();
+}
+function saveSummary() {
+  const s = getSession(activeSessionId); if (!s) return;
+  s.summary = document.getElementById('summary-edit').value;
+  save(); closeModal(); renderNotes();
+  toast('Summary saved!');
+}
+
+/* ══════════════════════════════════════════
+   EXPORT / IMPORT
+══════════════════════════════════════════ */
+function exportAll() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `session-scribe-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); toast('Exported!');
+}
+function triggerImport() { document.getElementById('import-file').click(); }
+function importAll(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      if (d.campaigns && d.sessions) {
+        if (!confirm(`Import ${d.campaigns.length} campaign(s) and ${d.sessions.length} session(s)? This will merge with existing data.`)) return;
+        // Merge: skip duplicates by id
+        d.campaigns.forEach(c => { if (!getCampaign(c.id)) state.campaigns.push(c); });
+        d.sessions.forEach(s  => { if (!getSession(s.id))   state.sessions.push(s);  });
+        save(); renderCampaigns(); toast('Import successful!');
+      } else { toast('Invalid file format.'); }
+    } catch { toast('Import failed — invalid JSON.'); }
+  };
+  r.readAsText(file);
+  e.target.value = '';
+}
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+function openModal()  { document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+/* ══════════════════════════════════════════
+   KEYBOARD
+══════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  load();
+  showView('campaigns');
+});
+</script>
+</body>
+</html>
