@@ -4,35 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0d0221">
-<meta name="description" content="Hamster RPG — Tools, character builders, and resources for your tabletop adventures.">
+<meta name="description" content="Studio 347 — Tools, character builders, and resources for your tabletop adventures.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Hamster RPG — Tabletop Tools & Resources</title>
+<title>Studio 347 — Tabletop Tools & Resources</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 <!-- Favicon / icon from ref folder -->
 <link rel="icon" type="image/png" href="ref/favicon.png">
 <style>
   :root {
-    --bg-deep:      #0d0221;
+    /* ── Studio347 Palette (Studio347.scss) ── */
+    --s347-midnight-violet: #0d0221;
+    --s347-deep-twilight:   #0f084b;
+    --s347-dark-slate-grey: #0b5351;
+    --s347-emerald:         #23ce6b;
+    --s347-indigo-velvet:   #511a91;
+    --s347-ghost-white:     #f6f8ff;
+
+    /* ── Semantic Tokens ── */
+    --bg-deep:      var(--s347-midnight-violet);
     --bg-card:      #140a3a;
     --bg-card2:     #1a0f52;
     --bg-card3:     #0d0730;
-    --accent-gold:  #23ce6b;
+    --accent-gold:  var(--s347-emerald);
     --accent-gold2: #39e87e;
-    --accent-hope:  #23ce6b;
+    --accent-hope:  var(--s347-emerald);
     --accent-fear:  #e04444;
-    --accent-teal:  #18a89e;
-    --accent-purple:#511a91;
-    --text-primary: #f6f8ff;
+    --accent-teal:  var(--s347-dark-slate-grey);
+    --accent-purple:var(--s347-indigo-velvet);
+    --text-primary: var(--s347-ghost-white);
     --text-muted:   #a8b4d4;
-    --text-gold:    #23ce6b;
+    --text-gold:    var(--s347-emerald);
     --border:       rgba(35,206,107,0.2);
     --border-bright:rgba(35,206,107,0.55);
     --shadow:       0 8px 40px rgba(0,0,0,0.6);
     --glow-gold:    0 0 20px rgba(35,206,107,0.3);
-    --glow-hope:    0 0 20px rgba(24,168,158,0.4);
+    --glow-hope:    0 0 20px rgba(11,83,81,0.4);
     --transition:   all 0.25s cubic-bezier(0.4,0,0.2,1);
+    --radius:       8px;
     /* Daggerheart */
     --dh-purple: #1d153cff;
     --dh-blue: #395da7ff;
@@ -94,7 +104,7 @@
   #page { position: relative; z-index: 1; }
 
   /* ─────────────────── HEADER ─────────────────── */
-  .site-header {
+  .app-header {
     text-align: center;
     padding: clamp(32px, 6vw, 64px) 20px clamp(24px, 4vw, 44px);
     border-bottom: 2px solid rgba(35,206,107,0.25);
@@ -104,7 +114,7 @@
   }
 
   /* Decorative shimmer lines in the header */
-  .site-header::before {
+  .app-header::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -119,7 +129,7 @@
     pointer-events: none;
   }
 
-  .site-header::after {
+  .app-header::after {
     content: '';
     position: absolute;
     bottom: -2px; left: 8%; right: 8%;
@@ -147,7 +157,7 @@
     50%       { transform: translateY(-6px); }
   }
 
-  .site-title {
+  .header-title {
     font-family: 'Cinzel Decorative', serif;
     font-size: clamp(1.9rem, 6vw, 3.8rem);
     font-weight: 700;
@@ -169,7 +179,7 @@
     margin: 10px auto 12px;
   }
 
-  .site-tagline {
+  .header-subtitle {
     font-family: 'Cinzel', serif;
     font-size: clamp(0.6rem, 1.8vw, 0.78rem);
     letter-spacing: 0.3em;
@@ -179,7 +189,7 @@
   }
 
   /* ─────────────────── NAV ─────────────────── */
-  .site-nav {
+  .nav-tabs {
     display: flex;
     justify-content: center;
     gap: 2px;
@@ -194,7 +204,7 @@
     -webkit-backdrop-filter: blur(8px);
   }
 
-  .site-nav a {
+  .nav-tab {
     font-family: 'Cinzel', serif;
     font-size: 0.68rem;
     letter-spacing: 0.15em;
@@ -202,13 +212,16 @@
     color: var(--text-muted);
     text-decoration: none;
     padding: 13px 20px;
+    border: none;
     border-bottom: 3px solid transparent;
     transition: var(--transition);
     white-space: nowrap;
     position: relative;
+    background: transparent;
+    cursor: pointer;
   }
 
-  .site-nav a:hover {
+  .nav-tab:hover {
     color: #fff;
     border-bottom-color: rgba(35,206,107,0.4);
   }
@@ -596,8 +609,10 @@
     color: #fff;
   }
 
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
   /* ─────────────────── FOOTER ─────────────────── */
-  .site-footer {
+  .app-footer {
     border-top: 1px solid rgba(35,206,107,0.18);
     padding: 32px 20px;
     text-align: center;
@@ -605,7 +620,7 @@
     position: relative;
   }
 
-  .site-footer::before {
+  .app-footer::before {
     content: '';
     position: absolute;
     top: -1px; left: 10%; right: 10%;
@@ -715,22 +730,22 @@
 <div id="page">
 
   <!-- ===== HEADER ===== -->
-  <header class="site-header">
+  <header class="app-header">
     <div class="logo-wrap">
       <!-- Replace with your actual logo path, e.g. ref/logo.png or img/logo.png -->
       <img src="ref/logo.png" alt="Hamster RPG Logo" onerror="this.style.display='none'">
     </div>
-    <h1 class="site-title">Hamster RPG</h1>
+    <h1 class="header-title">Studio 347</h1>
     <div class="header-divider"></div>
-    <p class="site-tagline">Tools &amp; Resources for Tabletop Adventurers</p>
+    <p class="header-subtitle">Tools &amp; Resources for Tabletop Adventurers</p>
   </header>
 
   <!-- ===== STICKY NAV ===== -->
-  <nav class="site-nav" aria-label="Site navigation">
-    <a href="#tools">Tools</a>
-    <a href="#updates">Updates</a>
-    <a href="#about">About</a>
-    <a href="https://github.com/Crazitalk/hamster-rpg.github.io" target="_blank" rel="noopener">GitHub</a>
+  <nav class="nav-tabs" aria-label="Site navigation">
+    <a href="#tools" class="nav-tab">Tools</a>
+    <a href="#updates" class="nav-tab">Updates</a>
+    <a href="#about" class="nav-tab">About</a>
+    <a href="https://github.com/Crazitalk/hamster-rpg.github.io" target="_blank" rel="noopener" class="nav-tab">GitHub</a>
   </nav>
 
   <!-- ===== MAIN ===== -->
@@ -854,8 +869,18 @@
       <div class="updates-list">
         <div class="update-item">
           <span class="update-date">2025 · Mar</span>
-          <span class="update-text"><strong>DH Character Forge v1.0</strong> — Full Daggerheart character creation wizard, tracker, and dice roller launched.</span>
+          <span class="update-text"><strong>PF 2e Character Forge v1.0</strong> — Full Pathfinder 2e character creation wizard, tracker, and dice roller launched.</span>
           <span class="tool-badge badge-gold">New</span>
+        </div>
+        <div class="update-item">
+          <span class="update-date">2025 · Mar</span>
+          <span class="update-text"><strong>D&amp;D 5e Character Forge v1.0</strong> — Full Dungeons &amp; Dragons 5e character creation wizard, tracker, and dice roller launched.</span>
+          <span class="tool-badge badge-gold">New</span>
+        </div>
+        <div class="update-item">
+          <span class="update-date">2025 · Mar</span>
+          <span class="update-text"><strong>DH Character Forge v1.0</strong> — Full Daggerheart character creation wizard, tracker, and dice roller launched.</span>
+          <span class="tool-badge badge-gold">Forge</span>
         </div>
         <div class="update-item">
           <span class="update-date">2025 · Mar</span>
@@ -870,10 +895,10 @@
   </main>
 
   <!-- ===== FOOTER ===== -->
-  <footer class="site-footer">
+  <footer class="app-footer">
     <div class="footer-logo-row">
       <img src="ref/logo.png" alt="" aria-hidden="true" onerror="this.style.display='none'">
-      <span class="footer-title">Hamster RPG</span>
+      <span class="footer-title">Studio 347</span>
     </div>
     <nav class="footer-links" aria-label="Footer navigation">
       <a href="#tools">Tools</a>

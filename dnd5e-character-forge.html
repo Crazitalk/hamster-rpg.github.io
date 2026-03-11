@@ -11,20 +11,28 @@
 <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ink-black:    #14181d;
-    --jet-black:    #232b2e;
-    --light-gold:   #eacf8b;
+    /* ── rpg-dnd Palette (rpg-dnd.scss) ── */
+    --dnd-ink-black:    #14181d;
+    --dnd-jet-black:    #232b2e;
+    --dnd-light-gold:   #eacf8b;
+    --dnd-racing-red:   #e30812;
+    --dnd-white:        #ffffff;
+
+    /* ── Semantic Tokens ── */
+    --ink-black:    var(--dnd-ink-black);
+    --jet-black:    var(--dnd-jet-black);
+    --light-gold:   var(--dnd-light-gold);
     --light-gold2:  #f5e4b0;
-    --racing-red:   #e30812;
+    --racing-red:   var(--dnd-racing-red);
     --racing-red2:  #ff1a23;
-    --white:        #ffffff;
+    --white:        var(--dnd-white);
     --parchment:    #f7f0e0;
-    --bg-deep:      var(--ink-black);
+    --bg-deep:      var(--dnd-ink-black);
     --bg-card:      #1c2226;
     --bg-card2:     #252e32;
-    --text-primary: var(--white);
+    --text-primary: var(--dnd-white);
     --text-muted:   #9aabaa;
-    --text-gold:    var(--light-gold);
+    --text-gold:    var(--dnd-light-gold);
     --border:       rgba(234,207,139,0.2);
     --border-bright:rgba(234,207,139,0.55);
     --shadow:       0 8px 40px rgba(0,0,0,0.7);
@@ -106,7 +114,7 @@
     background: linear-gradient(to right, transparent, rgba(234,207,139,0.5), transparent);
     margin: 6px auto 8px;
   }
-  .app-title {
+  .header-title {
     font-family: 'Cinzel', serif;
     font-size: clamp(1.4rem, 5vw, 2.2rem);
     font-weight: 700;
@@ -116,7 +124,7 @@
     margin-bottom: 2px;
     animation: fade-down 0.6s ease both;
   }
-  .app-header .subtitle {
+  .app-header .header-subtitle {
     font-family: 'Cinzel', serif;
     color: var(--text-muted);
     font-size: 0.65rem;
@@ -579,7 +587,7 @@
 <body>
  <!-- ===== Banner ===== -->
 <div style="background:#0d0221;padding:10px 20px;">
-  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Hamster RPG Home</a>
+  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Studio 347 Home</a>
 </div>
 <hr style="border:none;border-top:1px solid #511a91;margin:0;">
 <div id="app">
@@ -587,12 +595,12 @@
   <!-- ===== HEADER ===== -->
   <header class="app-header">
     <div class="header-logo-row">
-      <img src="ref/logo.png" alt="Hamster RPG Logo" class="header-logo-img" onerror="this.style.display='none'">
+      <img src="ref/logo.png" alt="Studio 347 Logo" class="header-logo-img" onerror="this.style.display='none'">
       <div class="header-emoji">🐲</div>
     </div>
-    <div class="app-title">D&amp;D 5e Character Forge</div>
+    <div class="header-title">D&amp;D 5e Character Forge</div>
     <div class="header-divider"></div>
-    <div class="subtitle">Wizards of the Coast · <a href="https://www.dndbeyond.com/srd?srsltid=AfmBOopjlLIPYHaEqZc0qHxAnxzLku7iMyWhIvMJcW-xiV4Rjg2h9YLY" target="_blank">System Reference Document</a></div>
+    <div class="header-subtitle">Wizards of the Coast · <a href="https://www.dndbeyond.com/srd?srsltid=AfmBOopjlLIPYHaEqZc0qHxAnxzLku7iMyWhIvMJcW-xiV4Rjg2h9YLY" target="_blank">System Reference Document</a></div>
   </header>
 
   <!-- ===== NAV ===== -->
@@ -725,7 +733,7 @@
 
   <footer class="app-footer">
     <div style="font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-muted);">
-      Hamster RPG · D&amp;D 5e Character Forge
+      Studio 347 · D&amp;D 5e Character Forge
     </div>
     <div style="font-family:'Cinzel',serif; font-size:0.55rem; letter-spacing:0.18em; color:rgba(154,171,170,0.4); margin-top:6px; text-transform:uppercase;">
       Uses material from the SRD 5.2.1 by Wizards of the Coast LLC · CC-BY-4.0 · Unofficial Companion Tool

@@ -11,27 +11,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-deep: #0f0e2a;
-    --bg-card: #181640;
-    --bg-card2: #1e1c50;
-    --bg-card3: #13122e;
-    --accent-gold: #e8c84a;
-    --accent-gold2: #f5d660;
-    --accent-hope: #2ecfd4;
-    --accent-fear: #e04444;
-    --accent-teal: #2ecfd4;
-    --accent-purple: #6b5ce7;
-    --text-primary: #ffffff;
-    --text-muted: #9b9bc4;
-    --text-gold: #e8c84a;
-    --border: rgba(232,200,74,0.2);
+    /* ── rpg-dgrhrt Palette (rpg-dgrhrt.scss) ── */
+    --dh-dark-amethyst: #1d153c;
+    --dh-tech-blue:     #395da7;
+    --dh-strong-cyan:   #3dcad9;
+    --dh-royal-gold:    #e6c74c;
+    --dh-white:         #ffffff;
+
+    /* ── Semantic Tokens ── */
+    --bg-deep:       var(--dh-dark-amethyst);
+    --bg-card:       #181640;
+    --bg-card2:      #1e1c50;
+    --bg-card3:      #13122e;
+    --accent-gold:   var(--dh-royal-gold);
+    --accent-gold2:  #f5d660;
+    --accent-hope:   var(--dh-strong-cyan);
+    --accent-fear:   #e04444;
+    --accent-teal:   var(--dh-strong-cyan);
+    --accent-purple: var(--dh-tech-blue);
+    --text-primary:  var(--dh-white);
+    --text-muted:    #9b9bc4;
+    --text-gold:     var(--dh-royal-gold);
+    --border:        rgba(232,200,74,0.2);
     --border-bright: rgba(232,200,74,0.55);
-    --shadow: 0 8px 40px rgba(118, 80, 80, 0.6);
-    --glow-gold: 0 0 20px rgba(201,168,76,0.3);
-    --glow-hope: 0 0 20px rgba(46,207,212,0.4);
-    --glow-fear: 0 0 20px rgba(192,64,64,0.4);
-    --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-    --radius: 12px;
+    --shadow:        0 8px 40px rgba(0,0,0,0.6);
+    --glow-gold:     0 0 20px rgba(201,168,76,0.3);
+    --glow-hope:     0 0 20px rgba(46,207,212,0.4);
+    --glow-fear:     0 0 20px rgba(192,64,64,0.4);
+    --transition:    all 0.25s cubic-bezier(0.4,0,0.2,1);
+    --radius:        12px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -77,7 +85,7 @@
     height: 2px;
     background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
   }
-  .app-title {
+  .header-title {
     font-family: 'Cinzel', serif;
     font-size: clamp(1.4rem, 5vw, 2.2rem);
     font-weight: 700;
@@ -106,7 +114,7 @@
     background: linear-gradient(to right, transparent, rgba(46,207,212,0.5), transparent);
     margin: 6px auto 8px;
   }
-  .app-header .subtitle {
+  .app-header .header-subtitle {
     font-family: 'Cinzel', serif;
     color: var(--accent-teal);
     font-size: 0.72rem;
@@ -631,19 +639,19 @@
 <body>
   <!-- ========= Banner ========= -->
 <div style="background:#0d0221;padding:10px 20px;">
-  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Hamster RPG Home</a>
+  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Studio 347 Home</a>
 </div>
 <hr style="border:none;border-top:1px solid #511a91;margin:0;">
 <div id="app">
   <!-- ========= Header ========= -->
   <header class="app-header">
     <div class="header-logo-row">
-      <img src="ref/logo.png" alt="Hamster RPG Logo" class="header-logo-img" onerror="this.style.display='none'">
+      <img src="ref/logo.png" alt="Studio 347 Logo" class="header-logo-img" onerror="this.style.display='none'">
       <div class="header-emoji">🗡️💜</div>
     </div>
-    <div class="app-title">Daggerheart Character Forge</div>
+    <div class="header-title">Daggerheart Character Forge</div>
     <div class="header-divider"></div>
-    <div class="subtitle">Darrington Press · <a href="https://www.daggerheart.com/srd/" target="_blank" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#e8c84a;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#6b5ce7'" onmouseout="this.style.color='#9b9bc4'">System Reference Document</a></div>
+    <div class="header-subtitle">Darrington Press · <a href="https://www.daggerheart.com/srd/" target="_blank" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#e8c84a;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#6b5ce7'" onmouseout="this.style.color='#9b9bc4'">System Reference Document</a></div>
   </header>
 
   <nav class="nav-tabs">
