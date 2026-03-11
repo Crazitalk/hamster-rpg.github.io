@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pathfinder 2e — Character Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:       #000000;
+    --mahogany:    #410607;
+    --mahogany2:   #5c0a0b;
+    --mahogany3:   #2a0405;
+    --ocean:       #2f6a98;
+    --ocean2:      #3d87bf;
+    --ocean3:      #1d4a6e;
+    --apricot:     #eac48d;
+    --apricot2:    #f5d8a8;
+    --apricot3:    #c49a5a;
+    --white:       #ffffff;
+    --bg-deep:     #0e0809;
+    --bg-card:     #1a0c0c;
+    --bg-card2:    #120809;
+    --text-primary:#f0e8d8;
+    --text-muted:  #8a7060;
+    --border:      rgba(234,196,141,0.18);
+    --border-bright: rgba(234,196,141,0.5);
+    --radius:      6px;
+    --transition:  all 0.18s ease;
+    --shadow:      0 8px 32px rgba(0,0,0,0.7);
+    --glow-gold:   0 0 20px rgba(234,196,141,0.25);
+    --glow-ocean:  0 0 20px rgba(47,106,152,0.4);
+    --glow-red:    0 0 20px rgba(65,6,7,0.6);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+    line-height: 1.5;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse 80% 40% at 50% 0%, rgba(65,6,7,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 85% 90%, rgba(47,106,152,0.08) 0%, transparent 50%);
+  }
+
+  #app { max-width: 700px; margin: 0 auto; padding: 0 12px 40px; }
+
+  .app-header {
+    text-align: center; padding: 28px 20px 18px;
+    border-bottom: 1px solid var(--border); position: relative;
+    background: linear-gradient(180deg, rgba(65,6,7,0.25) 0%, transparent 100%);
+  }
+  .app-header::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(to right, transparent, var(--mahogany2), var(--apricot3), var(--mahogany2), transparent);
+  }
+  .app-header::after {
+    content: ''; position: absolute; bottom: -1px; left: 5%; right: 5%; height: 1px;
+    background: linear-gradient(to right, transparent, var(--apricot3), transparent);
+  }
+    .app-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.4rem, 5vw, 2.2rem);
+    font-weight: 700;
+    color: var(--apricot);
+    text-shadow: 0 0 20px rgba(92,10,11,0.6), 0 2px 4px rgba(0,0,0,0.8);
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+    animation: fade-down 0.6s ease both;
+  }
+  .header-title span { color: var(--mahogany2); text-shadow: 0 0 20px rgba(92,10,11,0.6); }
+  .header-sub { font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ocean2); }
+  .header-logo-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .header-logo-img {
+    height: clamp(28px, 5vw, 44px);
+    width: auto;
+    filter: drop-shadow(0 0 12px rgba(92,10,11,0.6));
+  }
+  .header-emoji { font-size: clamp(1.8rem, 5vw, 2.8rem); filter: drop-shadow(0 0 14px rgba(227,8,18,0.5)); animation: breathe 4s ease-in-out infinite; }
+  @keyframes breathe { 0%,100%{filter:drop-shadow(0 0 10px rgba(227,8,18,0.4));} 50%{filter:drop-shadow(0 0 22px rgba(227,8,18,0.7));} }
+  .nav-tabs {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    background: rgba(10,4,4,0.7); border-bottom: 1px solid rgba(234,196,141,0.12); margin-bottom: 22px;
+  }
+  .nav-tab {
+    font-family: 'Cinzel', serif; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 13px 18px; border: none; border-bottom: 3px solid transparent;
+    background: transparent; color: var(--text-muted); cursor: pointer; transition: var(--transition); white-space: nowrap;
+  }
+  .nav-tab:hover { color: var(--apricot2); border-bottom-color: rgba(234,196,141,0.3); }
+  .nav-tab.active { color: var(--apricot); border-bottom-color: var(--apricot3); background: rgba(234,196,141,0.05); }
+
+  .card {
+    background: linear-gradient(160deg, rgba(26,12,12,0.97) 0%, rgba(18,8,9,0.98) 100%);
+    border: 1px solid rgba(234,196,141,0.16); border-radius: var(--radius);
+    padding: 18px; margin-bottom: 14px; position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(234,196,141,0.4), rgba(47,106,152,0.3), transparent);
+    pointer-events: none;
+  }
+  .card-title {
+    font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--apricot3); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, rgba(234,196,141,0.3), transparent); }
+
+  .btn {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 9px 18px; border: 1.5px solid var(--apricot3); background: transparent;
+    color: var(--apricot); cursor: pointer; border-radius: 4px; transition: var(--transition);
+  }
+  .btn:hover { border-color: var(--apricot); box-shadow: var(--glow-gold); color: var(--apricot2); background: rgba(234,196,141,0.05); }
+  .btn.btn-primary {
+    background: linear-gradient(135deg, var(--mahogany) 0%, var(--mahogany2) 60%, #6e0a0b 100%);
+    border-color: var(--apricot3); color: var(--apricot); font-weight: 600;
+    box-shadow: 0 2px 12px rgba(65,6,7,0.5);
+  }
+  .btn.btn-primary:hover { background: linear-gradient(135deg, var(--mahogany2) 0%, #7a0c0d 100%); box-shadow: var(--glow-red); }
+  .btn.btn-ocean { border-color: var(--ocean); color: var(--ocean2); }
+  .btn.btn-ocean:hover { background: rgba(47,106,152,0.12); box-shadow: var(--glow-ocean); }
+  .btn.btn-danger { border-color: #8b2020; color: #d05050; }
+  .btn.btn-danger:hover { background: rgba(139,32,32,0.15); }
+  .btn.btn-sm { padding: 5px 11px; font-size: 0.6rem; }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+  input[type=text], input[type=number], textarea, select {
+    width: 100%; background: rgba(8,4,4,0.7); border: 1px solid rgba(234,196,141,0.2);
+    border-radius: 4px; color: var(--text-primary); font-family: 'Crimson Pro', serif;
+    font-size: 1rem; padding: 7px 11px; transition: var(--transition); outline: none; -webkit-appearance: none;
+  }
+  input[type=text]:focus, input[type=number]:focus, textarea:focus, select:focus {
+    border-color: var(--apricot3); box-shadow: 0 0 0 2px rgba(234,196,141,0.1);
+  }
+  select option { background: #1a0c0c; color: var(--text-primary); }
+  label {
+    display: block; font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; margin-top: 10px;
+  }
+  textarea { resize: vertical; min-height: 70px; }
+
+  .sel-grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .sel-grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
+  @media(max-width:480px) { .sel-grid-3 { grid-template-columns: repeat(2,1fr); } .sel-grid-2 { grid-template-columns: 1fr; } }
+
+  .sel-card {
+    border: 1px solid rgba(234,196,141,0.16); border-radius: 6px; padding: 11px 10px;
+    cursor: pointer; transition: var(--transition); background: rgba(10,4,4,0.6); position: relative; overflow: hidden;
+  }
+  .sel-card:hover { border-color: rgba(234,196,141,0.4); background: rgba(26,12,12,0.8); }
+  .sel-card.selected { border-color: var(--ocean2); background: rgba(47,106,152,0.1); box-shadow: 0 0 14px rgba(47,106,152,0.15); }
+  .sel-card.selected::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(to right, transparent, var(--ocean2), transparent); }
+  .sel-name { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--apricot); margin-bottom: 4px; }
+  .sel-sub  { font-size: 0.72rem; color: var(--ocean2); font-style: italic; margin-bottom: 3px; }
+  .sel-desc { font-size: 0.82rem; color: var(--text-muted); }
+  .sel-tag  { display: inline-block; font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.1em; padding: 1px 6px; border-radius: 3px; margin-right: 3px; margin-bottom: 3px; border: 1px solid rgba(234,196,141,0.3); color: var(--apricot3); }
+  .sel-tag.ocean { border-color: rgba(47,106,152,0.5); color: var(--ocean2); }
+
+  .attr-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  @media(max-width:380px) { .attr-grid { grid-template-columns: repeat(2,1fr); } }
+  .attr-box {
+    background: rgba(8,4,4,0.8); border: 1px solid rgba(234,196,141,0.18);
+    border-radius: 6px; padding: 10px 8px; text-align: center; transition: var(--transition);
+  }
+  .attr-box:hover { border-color: rgba(234,196,141,0.4); }
+  .attr-name  { font-family: 'Cinzel', serif; font-size: 0.54rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .attr-score { font-family: 'Cinzel Decorative', serif; font-size: 1.5rem; color: var(--apricot); line-height: 1.1; }
+  .attr-mod   { font-family: 'Cinzel', serif; font-size: 0.72rem; color: var(--ocean2); }
+
+  .prof-row { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-bottom: 1px solid rgba(234,196,141,0.06); }
+  .prof-row:last-child { border-bottom: none; }
+  .prof-label { flex: 1; font-size: 0.9rem; color: var(--text-primary); }
+  .prof-sub   { font-size: 0.72rem; color: var(--text-muted); }
+  .prof-dots  { display: flex; gap: 4px; }
+  .prof-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid rgba(234,196,141,0.25); background: transparent; cursor: pointer; transition: var(--transition); }
+  .prof-dot.t { background: var(--apricot3); border-color: var(--apricot3); }
+  .prof-dot.e { background: var(--ocean2); border-color: var(--ocean2); }
+  .prof-dot.m { background: #c0803a; border-color: #d09050; }
+  .prof-dot.l { background: var(--mahogany2); border-color: #e04040; box-shadow: 0 0 6px rgba(200,30,30,0.5); }
+  .prof-rank  { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.06em; color: var(--text-muted); min-width: 52px; text-align: right; }
+
+  .bubble-row { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; }
+  .bubble {
+    width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid rgba(234,196,141,0.25);
+    display: flex; align-items: center; justify-content: center; font-size: 0.6rem;
+    cursor: pointer; transition: var(--transition); user-select: none;
+  }
+  .bubble:hover { border-color: rgba(234,196,141,0.6); }
+  .bubble.hp.filled    { background: var(--mahogany2); border-color: #b03030; color: var(--apricot2); }
+  .bubble.hero.filled  { background: linear-gradient(135deg,#c8901a,#e8b030); border-color: #f0c040; color: #0e0809; font-size: 0.55rem; }
+  .bubble.dying.filled { background: #1a0505; border-color: #cc2020; color: #ff6060; }
+
+  .cond-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .cond-badge {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.07em; padding: 3px 9px;
+    border-radius: 3px; border: 1px solid rgba(234,196,141,0.22); color: var(--text-muted);
+    cursor: pointer; transition: var(--transition); background: rgba(10,4,4,0.4);
+  }
+  .cond-badge:hover { border-color: rgba(234,196,141,0.5); color: var(--apricot); }
+  .cond-badge.cond-on  { background: rgba(65,6,7,0.55); border-color: var(--mahogany2); color: var(--apricot2); }
+  .cond-badge.cond-dying{ background: rgba(80,0,0,0.7); border-color: #cc2020; color: #ff8080; }
+  .cond-badge.cond-blue { background: rgba(47,106,152,0.2); border-color: var(--ocean2); color: var(--ocean2); }
+
+  .wizard-progress { display: flex; justify-content: center; flex-wrap: wrap; gap: 3px; margin-bottom: 24px; padding: 10px 0; border-bottom: 1px solid rgba(234,196,141,0.1); }
+  .wdot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(234,196,141,0.2); display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 0.58rem; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+  .wdot.done   { border-color: var(--apricot3); background: rgba(234,196,141,0.1); color: var(--apricot); }
+  .wdot.active { border-color: var(--ocean2); background: rgba(47,106,152,0.15); color: var(--ocean2); box-shadow: 0 0 10px rgba(47,106,152,0.3); }
+  .wcon { width: 16px; height: 2px; background: rgba(234,196,141,0.15); align-self: center; }
+  .wizard-page { display: none; animation: fadeUp 0.25s ease; }
+  .wizard-page.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .wizard-nav { display: flex; justify-content: space-between; margin-top: 18px; }
+  .step-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--apricot); margin-bottom: 4px; }
+  .step-hint  { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; font-style: italic; }
+
+  .char-item {
+    display: flex; align-items: center; gap: 12px; padding: 13px 14px;
+    border: 1px solid rgba(234,196,141,0.15); border-radius: 6px; margin-bottom: 8px;
+    cursor: pointer; transition: var(--transition); background: rgba(10,4,4,0.6);
+  }
+  .char-item:hover { border-color: rgba(234,196,141,0.4); background: rgba(26,12,12,0.8); }
+  .char-item.active-char { border-color: var(--ocean2); background: rgba(47,106,152,0.08); }
+  .char-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(65,6,7,0.5); border: 2px solid rgba(234,196,141,0.25); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .char-name { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--apricot); }
+  .char-meta { font-size: 0.78rem; color: var(--text-muted); }
+
+  .feat-card {
+    background: rgba(8,4,4,0.6); border: 1px solid rgba(234,196,141,0.14);
+    border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; transition: var(--transition);
+  }
+  .feat-card:hover { border-color: rgba(234,196,141,0.3); }
+  .feat-name { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--apricot2); }
+  .feat-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+  .empty-state .big-icon { font-size: 5rem; margin-bottom: 12px; opacity: 0.6; }
+  .empty-state p { font-size: 0.9rem; margin-bottom: 14px; }
+
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: rgba(26,12,12,0.97); border: 1px solid var(--apricot3);
+    border-radius: 6px; padding: 10px 20px; font-family: 'Cinzel', serif;
+    font-size: 0.7rem; letter-spacing: 0.1em; color: var(--apricot);
+    transition: transform 0.3s ease; z-index: 1000; pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  #modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    z-index: 500; align-items: center; justify-content: center; padding: 20px;
+  }
+  #modal-overlay.open { display: flex; }
+  .modal-box {
+    background: linear-gradient(160deg, #1e0e0e 0%, #0e0708 100%);
+    border: 1px solid rgba(234,196,141,0.35); border-top: 2px solid var(--apricot3);
+    border-radius: 8px; padding: 24px; max-width: 460px; width: 100%;
+    max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+  .modal-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--apricot); margin-bottom: 14px; }
+
+  .big-stat { font-family: 'Cinzel Decorative', serif; font-size: 2.2rem; color: var(--apricot); line-height: 1; }
+  .stat-label { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+  .split-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .split-row .card { flex: 1; min-width: 120px; }
+
+  .dice-result { text-align: center; padding: 20px; }
+  .dice-result .roll-num { font-family: 'Cinzel Decorative', serif; font-size: 3rem; color: var(--apricot); text-shadow: 0 0 20px rgba(234,196,141,0.4); }
+  .dice-result .roll-detail { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.1em; color: var(--text-muted); margin-top: 6px; }
+  .dice-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-top: 12px; }
+  @media(max-width:380px) { .dice-grid { grid-template-columns: repeat(3,1fr); } }
+  .die-btn {
+    font-family: 'Cinzel', serif; font-size: 0.75rem; padding: 12px 6px;
+    border: 1px solid rgba(234,196,141,0.25); border-radius: 6px; background: rgba(10,4,4,0.6);
+    color: var(--apricot3); cursor: pointer; transition: var(--transition); text-align: center;
+  }
+  .die-btn:hover { border-color: var(--apricot3); background: rgba(234,196,141,0.07); color: var(--apricot); }
+
+  .inline-note { font-size: 0.82rem; color: var(--ocean2); font-style: italic; margin: 4px 0; }
+  .gold  { color: var(--apricot); }
+  .ocean { color: var(--ocean2); }
+  .muted { color: var(--text-muted); }
+  .red   { color: #e05050; }
+  footer { text-align: center; padding: 18px 0 4px; border-top: 1px solid rgba(234,196,141,0.1); margin-top: 20px; }
+  footer p { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; line-height: 1.8; }
+</style>
+</head>
+<body>
+    <!-- ========= Banner ========= -->
+<div style="background:#0d0221;padding:10px 20px;">
+  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Hamster RPG Home</a>
+</div>
+<hr style="border:none;border-top:1px solid #511a91;margin:0;">
+<div id="app">
+  <!-- ========= Header ========= -->
+  <header class="app-header">
+    <div class="header-logo-row">
+      <img src="ref/logo.png" alt="Hamster RPG Logo" class="header-logo-img" onerror="this.style.display='none'">
+      <div class="header-emoji">⚔</div>
+    </div>
+    <div class="app-title">Pathfinder 2e Character Forge</div>
+    <div class="header-divider"></div>
+    <div class="subtitle">Paizo · <a href="https://2e.aonprd.com" target="_blank" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#e8c84a;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#6b5ce7'" onmouseout="this.style.color='#9b9bc4'">System Reference Document</a></div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('characters')">📜 Characters</button>
+    <button class="nav-tab" onclick="showView('builder')">✦ Builder</button>
+    <button class="nav-tab" onclick="showView('tracker')">🛡 Tracker</button>
+    <button class="nav-tab" onclick="showView('dice')">🎲 Dice</button>
+  </nav>
+  <div id="view-characters"></div>
+  <div id="view-builder" style="display:none"></div>
+  <div id="view-tracker" style="display:none"></div>
+  <div id="view-dice" style="display:none"></div>
+  <footer><p>Pathfinder 2e Character Forge — Unofficial Companion Tool<br>Pathfinder is a trademark of Paizo Inc. · Based on Remaster Player Core (2023) &amp; Player Core 2 (2024)</p></footer>
+</div>
+
+<div id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+<div id="toast">✓</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════════════════
+// GAME DATA
+// ═══════════════════════════════════════════════════════════════════════════
+const ABILITY_SHORT = ['STR','DEX','CON','INT','WIS','CHA'];
+const SKILL_LIST = [
+  {name:'Acrobatics',ability:'DEX'},{name:'Arcana',ability:'INT'},
+  {name:'Athletics',ability:'STR'},{name:'Crafting',ability:'INT'},
+  {name:'Deception',ability:'CHA'},{name:'Diplomacy',ability:'CHA'},
+  {name:'Intimidation',ability:'CHA'},{name:'Lore (Specific)',ability:'INT'},
+  {name:'Medicine',ability:'WIS'},{name:'Nature',ability:'WIS'},
+  {name:'Occultism',ability:'INT'},{name:'Performance',ability:'CHA'},
+  {name:'Religion',ability:'WIS'},{name:'Society',ability:'INT'},
+  {name:'Stealth',ability:'DEX'},{name:'Survival',ability:'WIS'},
+  {name:'Thievery',ability:'DEX'}
+];
+const PROF_LABELS = ['Untrained','Trained','Expert','Master','Legendary'];
+const PROF_BONUS  = [0, 2, 4, 6, 8];
+
+const ANCESTRIES = [
+  { name:'Dwarf',   icon:'⛏', hp:10, size:'Medium', speed:20,  boosts:['CON','WIS'],     flaw:'CHA',
+    desc:'Stoic and industrious people with deep ties to stone, craft, and tradition. Known for endurance and loyalty.',
+    features:['Darkvision — See in darkness and dim light as bright light.',
+              'Ancient-Blooded — +1 circumstance bonus to saves vs. poison; resistance 1 to poison damage.'],
+    langs:['Common','Dwarven'], heritages:['Ancient-Blooded','Death Warden','Elemental Heart','Forge','Rock','Strong-Blooded'] },
+  { name:'Elf',     icon:'🍃', hp:6,  size:'Medium', speed:30,  boosts:['DEX','INT'],     flaw:'CON',
+    desc:'Ancient and graceful, elves carry centuries of memory. Deeply connected to magic and nature.',
+    features:['Low-Light Vision — See in dim light as if bright light.',
+              'Elven Longevity — Gain trained proficiency in one additional skill of your choice.'],
+    langs:['Common','Elven'], heritages:['Ancient','Arctic','Cavern','Desert','Seer','Whisper','Woodland'] },
+  { name:'Gnome',   icon:'🍄', hp:8,  size:'Small',  speed:25,  boosts:['CON','CHA'],     flaw:'STR',
+    desc:'Curious and vivacious, gnomes are tied to the First World. Their eccentricity drives boundless enthusiasm.',
+    features:['Low-Light Vision — See in dim light as if bright light.',
+              'Illusion Sense — +1 circumstance bonus to saves vs. illusions; auto-disbelieve on critical success.'],
+    langs:['Common','Gnomish','Sylvan'], heritages:['Chameleon','Fey-Touched','Sensate','Umbral','Wellspring'] },
+  { name:'Goblin',  icon:'🔥', hp:6,  size:'Small',  speed:25,  boosts:['DEX','CHA'],     flaw:'WIS',
+    desc:'Scrappy, energetic survivors who have carved a new place in Golarion. Fearless in danger, love of fire.',
+    features:['Darkvision — See in darkness and dim light as bright light.',
+              'Goblin Scuttle — Once per round, when an ally moves adjacent, Stride up to half your Speed as a reaction.'],
+    langs:['Common','Goblin'], heritages:['Charhide','Irongut','Razortooth','Snow','Unbreakable'] },
+  { name:'Halfling',icon:'🌿', hp:6,  size:'Small',  speed:25,  boosts:['DEX','WIS'],     flaw:'STR',
+    desc:'Adaptable and cheerful, halflings thrive anywhere. Their luck seems supernatural, their curiosity boundless.',
+    features:['Keen Eyes — +2 circumstance bonus to notice hidden creatures and objects.',
+              'Halfling Luck — Once per day when you fail a skill check or save, reroll and use the second result.'],
+    langs:['Common','Halfling'], heritages:['Gutsy','Hillock','Nomadic','Twilight','Wildwood'] },
+  { name:'Human',   icon:'🌟', hp:8,  size:'Medium', speed:25,  boosts:['Free','Free'],   flaw:null,
+    desc:'Ambitious and adaptable, humans have spread across Golarion. Their diversity grants unmatched versatility.',
+    features:['Skilled — Gain trained proficiency in one additional skill of your choice.',
+              'Bonus Feat — You gain one additional 1st-level general feat at character creation.'],
+    langs:['Common','One additional'], heritages:['Skilled Heritage','Versatile Heritage','Half-Elf','Half-Orc'] },
+  { name:'Leshy',   icon:'🌱', hp:8,  size:'Small',  speed:25,  boosts:['CON','WIS'],     flaw:'INT',
+    desc:'Nature spirits given plant bodies. Joyful immortals who experience mortal life with wide-eyed wonder.',
+    features:['Plant Nourishment — Sustained by sunlight; need no food if exposed to sunlight each day.',
+              'Leshy Lore — Gain trained proficiency in Nature and Survival.'],
+    langs:['Common','Sylvan'], heritages:['Fungus','Gourd','Leaf','Vine'] },
+  { name:'Orc',     icon:'💪', hp:10, size:'Medium', speed:25,  boosts:['STR','Free'],    flaw:null,
+    desc:'Proud and powerful, orcs value strength and direct action. Their martial prowess and honor go hand in hand.',
+    features:['Darkvision — See in darkness and dim light as bright light.',
+              'Orc Ferocity — Once per day when reduced to 0 HP, avoid falling unconscious and remain at 1 HP.'],
+    langs:['Common','Orcish'], heritages:['Badlands','Battle-Ready','Deep','Rainfall','Venomhide'] },
+];
+
+const BACKGROUNDS = [
+  { name:'Acolyte',      b1:'INT', b2:'WIS',  sk1:'Occultism',   sk2:'Religion',     feat:'Student of the Canon',    desc:'You served a deity, learning religious doctrine and the mysteries of faith.' },
+  { name:'Acrobat',      b1:'STR', b2:'DEX',  sk1:'Acrobatics',  sk2:'Thievery',     feat:'Steady Balance',          desc:'You mastered feats of agility through rigorous physical training.' },
+  { name:'Animal Whisperer',b1:'WIS',b2:'CHA',sk1:'Nature',      sk2:'Diplomacy',    feat:'Train Animal',            desc:'You have a natural rapport with animals and can calm even wild beasts.' },
+  { name:'Artisan',      b1:'STR', b2:'INT',  sk1:'Crafting',    sk2:'Society',      feat:'Specialty Crafting',      desc:'You learned a specialized craft under a skilled mentor.' },
+  { name:'Charlatan',    b1:'INT', b2:'CHA',  sk1:'Deception',   sk2:'Society',      feat:'Charming Liar',           desc:'You lived by your wits selling fake cures and running elaborate cons.' },
+  { name:'Criminal',     b1:'DEX', b2:'INT',  sk1:'Stealth',     sk2:'Thievery',     feat:'Experienced Smuggler',    desc:'As an underground operative, you learned to live outside the law.' },
+  { name:'Detective',    b1:'INT', b2:'WIS',  sk1:'Society',     sk2:'Medicine',     feat:'Experienced Investigator',desc:'You pieced together evidence and solved crimes for a government or guild.' },
+  { name:'Emissary',     b1:'INT', b2:'CHA',  sk1:'Society',     sk2:'Diplomacy',    feat:'Multilingual',            desc:'You traveled as a diplomat or spy for your homeland.' },
+  { name:'Farmhand',     b1:'CON', b2:'WIS',  sk1:'Athletics',   sk2:'Nature',       feat:'Assurance (Athletics)',   desc:'Years of hard labor built your strength and connection to the land.' },
+  { name:'Gambler',      b1:'DEX', b2:'CHA',  sk1:'Deception',   sk2:'Society',      feat:'Lie to Me',               desc:'You traveled gambling halls, mastering games of chance and reading people.' },
+  { name:'Guard',        b1:'STR', b2:'CHA',  sk1:'Athletics',   sk2:'Intimidation', feat:'Quick Draw',              desc:'You served as a guard, protecting people and places from harm.' },
+  { name:'Herbalist',    b1:'CON', b2:'WIS',  sk1:'Crafting',    sk2:'Nature',       feat:'Natural Medicine',        desc:'You gathered plants and brewed herbal medicines as a trained healer.' },
+  { name:'Hermit',       b1:'CON', b2:'INT',  sk1:'Nature',      sk2:'Occultism',    feat:'Dubious Knowledge',       desc:'Years of isolation granted you deep insights unknown to civilized folk.' },
+  { name:'Hunter',       b1:'STR', b2:'WIS',  sk1:'Nature',      sk2:'Stealth',      feat:'Monster Hunter',          desc:'You stalked and slew animals and monsters across the wilderness.' },
+  { name:'Merchant',     b1:'INT', b2:'CHA',  sk1:'Crafting',    sk2:'Diplomacy',    feat:'Bargain Hunter',          desc:'You bought and sold goods across many lands as an itinerant trader.' },
+  { name:'Nomad',        b1:'CON', b2:'WIS',  sk1:'Nature',      sk2:'Survival',     feat:'Assurance (Survival)',    desc:'With no permanent home, you developed a knack for surviving anywhere.' },
+  { name:'Prisoner',     b1:'STR', b2:'CON',  sk1:'Stealth',     sk2:'Thievery',     feat:'Experienced Smuggler',    desc:'Time imprisoned—whether just or not—hardened your resolve.' },
+  { name:'Scholar',      b1:'INT', b2:'WIS',  sk1:'Arcana',      sk2:'Occultism',    feat:'Assurance (Arcana)',      desc:'You studied at an academy, gaining theoretical knowledge across fields.' },
+  { name:'Scout',        b1:'STR', b2:'WIS',  sk1:'Nature',      sk2:'Stealth',      feat:'Experienced Tracker',     desc:'You ranged ahead of others into hostile lands, mapping terrain and threats.' },
+  { name:'Street Urchin',b1:'CON', b2:'DEX',  sk1:'Thievery',    sk2:'Society',      feat:'Pickpocket',              desc:'Raised on city streets, you survived by quick wits and quick fingers.' },
+];
+
+const CLASSES = [
+  { name:'Alchemist', icon:'⚗', hp:8,  key:'INT',        trad:null,     sp:null,
+    perc:'T', fort:'E', ref:'E', will:'T', skills:3, baseSkills:['Crafting'],
+    desc:'Master of alchemical arts, creating bombs, elixirs, and other wonders from a daily pool of infused reagents.',
+    cf1:'Infused Reagents — Pool = level + INT mod each day. Use with Quick Alchemy to create free alchemical items.',
+    cf2:'Quick Alchemy — 1 action + 1 reagent batch to craft any known alchemical item on the fly.',
+    subs:['Bomber','Chirurgeon','Mutagenist','Toxicologist'] },
+  { name:'Barbarian', icon:'🪓', hp:12, key:'STR',        trad:null,     sp:null,
+    perc:'E', fort:'E', ref:'T', will:'E', skills:3, baseSkills:['Athletics'],
+    desc:'When rage takes you, you become an engine of destruction, soaking up and dealing tremendous punishment.',
+    cf1:'Rage — 1-minute rage as 1 action: +2 status bonus to damage, 3+level temp HP, once per minute.',
+    cf2:'Instinct — Your subclass grants additional rage benefits and powers tied to your chosen instinct.',
+    subs:['Animal','Dragon','Fury','Giant','Spirit','Superstition'] },
+  { name:'Bard',      icon:'🎭', hp:8,  key:'CHA',        trad:'Occult', sp:'Spontaneous',
+    perc:'E', fort:'T', ref:'T', will:'E', skills:4, baseSkills:['Occultism','Performance'],
+    desc:'Using occult magic and bardic training to influence allies and confound enemies through magnificent performance.',
+    cf1:'Composition Spells — Focus Points fuel composition cantrips/spells that you cast by performing.',
+    cf2:'Muse — Your subclass reflects your source of inspiration, granting bonus spells and unique abilities.',
+    subs:['Enigma','Maestro','Polymath','Warrior'] },
+  { name:'Champion', icon:'⚜',  hp:10, key:'STR or DEX', trad:'Divine', sp:null,
+    perc:'T', fort:'E', ref:'T', will:'E', skills:2, baseSkills:['Religion'],
+    desc:'A divine warrior committed to a deity\'s cause, wielding holy or unholy power to protect and smite.',
+    cf1:'Champion\'s Reaction — Retributive Strike (Holy), Glimpse of Redemption (Redeemer), or Destructive Vengeance (Unholy).',
+    cf2:'Devotion Spells — Focus Points fuel divine spells powered by your faith.',
+    subs:['Holy','Redeemer','Unholy'] },
+  { name:'Cleric',   icon:'✝',  hp:8,  key:'WIS',        trad:'Divine', sp:'Prepared',
+    perc:'T', fort:'T', ref:'T', will:'E', skills:2, baseSkills:['Religion'],
+    desc:'The power of your deity flows through you, empowering spells to heal, smite, and advance divine will.',
+    cf1:'Divine Font — Prepare extra Heal or Harm spells per day equal to 1 + CHA modifier.',
+    cf2:'Doctrine — Choose Warpriest (martial) or Cloistered Cleric (spellcasting) to shape your proficiencies.',
+    subs:['Cloistered Cleric','Warpriest'] },
+  { name:'Druid',    icon:'🌿', hp:8,  key:'WIS',        trad:'Primal', sp:'Prepared',
+    perc:'T', fort:'T', ref:'T', will:'E', skills:2, baseSkills:['Nature'],
+    desc:'Bound to the natural world, you draw magic from the land and can transform into powerful wild shapes.',
+    cf1:'Primal Spellcasting — Prepare primal spells; know all primal cantrips.',
+    cf2:'Druidic Order — Your order grants a focus spell and unique capabilities.',
+    subs:['Animal','Leaf','Stone','Storm','Wild'] },
+  { name:'Fighter',  icon:'⚔',  hp:10, key:'STR or DEX', trad:null,     sp:null,
+    perc:'E', fort:'E', ref:'E', will:'T', skills:3, baseSkills:['Athletics or Acrobatics'],
+    desc:'Undisputed master of weaponry, combining attacks, techniques, and counterattacks into devastating combinations.',
+    cf1:'Reactive Strike — When a creature uses a manipulate/move action within reach or makes a ranged attack, Strike it as a reaction.',
+    cf2:'Fighter Weapon Mastery (Lvl 5) — Achieve mastery with a weapon group for greater proficiency and critical specialization.',
+    subs:['No subclass — feats define your style'] },
+  { name:'Monk',     icon:'☯',  hp:10, key:'STR or DEX', trad:null,     sp:null,
+    perc:'T', fort:'E', ref:'E', will:'E', skills:4, baseSkills:['Athletics'],
+    desc:'Honing body and mind through rigorous training, achieving extraordinary martial arts and ki power.',
+    cf1:'Flurry of Blows — 1 action: make two Strikes with unarmed attacks (multiple attack penalty applies).',
+    cf2:'Ki Spells (Optional) — Some feats grant ki focus spells powered by Focus Points.',
+    subs:['No subclass — feats define your style'] },
+  { name:'Oracle',   icon:'🔮', hp:8,  key:'CHA',        trad:'Varies', sp:'Spontaneous',
+    perc:'T', fort:'T', ref:'T', will:'E', skills:3, baseSkills:['Religion'],
+    desc:'Touched by mysterious divine forces, you wield great power but suffer an escalating curse.',
+    cf1:'Oracle\'s Curse — Each focus spell cast intensifies your curse, inflicting escalating effects but granting power.',
+    cf2:'Revelation Spells — Focus spells tied to your mystery, enhanced by your curse.',
+    subs:['Ancestors','Battle','Bones','Cosmos','Flames','Life','Lore','Stone','Tempest','Ashes'] },
+  { name:'Ranger',   icon:'🏹', hp:10, key:'STR or DEX', trad:null,     sp:null,
+    perc:'E', fort:'E', ref:'E', will:'T', skills:4, baseSkills:['Nature','Survival'],
+    desc:'Expert in wild places: tracking prey, surviving harsh conditions, and striking from advantageous positions.',
+    cf1:'Hunt Prey — 1 action: designate prey. Gain +2 circumstance to Seek them and first attack per round against them.',
+    cf2:'Hunter\'s Edge — Choose Flurry, Precision, or Outwit for unique benefits against your prey.',
+    subs:['Flurry','Outwit','Precision'] },
+  { name:'Rogue',    icon:'🗡', hp:8,  key:'DEX or other',trad:null,    sp:null,
+    perc:'E', fort:'T', ref:'E', will:'E', skills:7, baseSkills:['Stealth','Thievery'],
+    desc:'Stealthy and versatile master of infiltration, surprise attacks, and creative problem solving.',
+    cf1:'Sneak Attack — Strike an off-guard creature to deal extra 1d6 precision damage (scales with level).',
+    cf2:'Rogue\'s Racket — Determines your key ability modifier and grants unique benefits.',
+    subs:['Mastermind','Ruffian','Scoundrel','Thief'] },
+  { name:'Sorcerer', icon:'💫', hp:6,  key:'CHA',        trad:'Varies', sp:'Spontaneous',
+    perc:'T', fort:'T', ref:'T', will:'E', skills:2, baseSkills:['Arcana or Nature or Occultism or Religion'],
+    desc:'Magic flows from within you through a powerful bloodline rather than study or devotion.',
+    cf1:'Bloodline — Determines your magical tradition, bonus spells, and the power of Blood Magic.',
+    cf2:'More Spell Slots — The most spell slots per day of any spellcasting class, offset by a limited repertoire.',
+    subs:['Aberrant','Angelic','Demonic','Diabolic','Draconic','Elemental','Fey','Genie','Hag','Imperial','Nymph','Undead'] },
+  { name:'Witch',    icon:'🧙', hp:6,  key:'INT',        trad:'Varies', sp:'Prepared',
+    perc:'T', fort:'T', ref:'T', will:'E', skills:3, baseSkills:['Arcana or Nature or Occultism or Religion'],
+    desc:'You learned magic from a mysterious patron who teaches through your familiar.',
+    cf1:'Familiar — A magical familiar stores your spells and teaches you new ones each day.',
+    cf2:'Patron — Your patron\'s theme determines your tradition and grants unique hex cantrips and focus spells.',
+    subs:['Curse','Fate','Fervor','Night','Resentment','Vengeful','Wilds'] },
+  { name:'Wizard',   icon:'📖', hp:6,  key:'INT',        trad:'Arcane', sp:'Prepared',
+    perc:'T', fort:'T', ref:'T', will:'E', skills:2, baseSkills:['Arcana'],
+    desc:'Master of arcane arts through rigorous study, preparing spells from any school of magic.',
+    cf1:'Arcane Thesis — Choose a breakthrough: Improved Familiar Attunement, Metamagical Experimentation, Spell Blending, or Staff Nexus.',
+    cf2:'Arcane School — Your school specialization grants bonus spells and a special ability.',
+    subs:['Abjuration','Conjuration','Divination','Enchantment','Evocation','Illusion','Necromancy','Transmutation','Universalist'] },
+];
+
+const CONDITIONS = [
+  'Blinded','Clumsy','Confused','Dazzled','Deafened','Doomed','Drained','Encumbered',
+  'Enfeebled','Fascinated','Fatigued','Fleeing','Frightened','Grabbed','Immobilized',
+  'Off-Guard','Paralyzed','Petrified','Poisoned','Prone','Quickened','Restrained',
+  'Sickened','Slowed','Stunned','Stupefied','Unconscious'
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
+let characters = [];
+let activeCharId = null;
+let currentView = 'characters';
+let wz = null;
+let wzStep = 0;
+const WZ_STEPS = ['Ancestry','Background','Class','Attributes','Skills','Identity','Review'];
+
+try { characters = JSON.parse(localStorage.getItem('pf2e_chars')||'[]'); } catch(e){characters=[];}
+activeCharId = localStorage.getItem('pf2e_active')||null;
+
+function save() { try { localStorage.setItem('pf2e_chars', JSON.stringify(characters)); } catch(e){} }
+function saveActive() { try { localStorage.setItem('pf2e_active', activeCharId); } catch(e){} }
+function getActive() { return characters.find(c=>c.id===activeCharId)||null; }
+function withChar(fn) { const c=getActive(); if(!c)return; fn(c); save(); renderView(currentView); }
+
+function newChar() {
+  return {
+    id: Date.now()+Math.random().toString(36).slice(2,7),
+    name:'', level:1, player:'', pronouns:'', deity:'',
+    ancestry:null, background:null, class:null,
+    attributes:{STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10},
+    skills:{}, hp:{max:0,current:0},
+    ac:14, speed:25, hero:1, dying:0, wounded:0,
+    conditions:[], focus:{max:0,current:0}, notes:'', background_desc:'',
+  };
+}
+function attrMod(score){ return Math.floor(((score||10)-10)/2); }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════════════════════════
+function showView(v) {
+  currentView = v;
+  ['characters','builder','tracker','dice'].forEach(n=>{
+    document.getElementById('view-'+n).style.display = n===v?'':'none';
+  });
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['characters','builder','tracker','dice'][i]===v);
+  });
+  renderView(v);
+}
+function renderView(v) {
+  if (v==='characters') renderChars();
+  else if (v==='builder')   renderBuilder();
+  else if (v==='tracker')   renderTracker();
+  else if (v==='dice')      renderDice();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CHARACTERS VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+function renderChars() {
+  const el = document.getElementById('view-characters');
+  if (!characters.length) {
+    el.innerHTML=`<div class="empty-state">
+      <div class="big-icon">📜</div>
+      <p>No adventurers yet. Your legend awaits.</p>
+      <button class="btn btn-primary" onclick="startNew()">✦ Create Character</button>
+    </div>`; return;
+  }
+  el.innerHTML=`
+    <div class="card">
+      <div class="card-title">⚔ Your Adventurers</div>
+      ${characters.map(c=>{
+        const cl=CLASSES.find(x=>x.name===c.class);
+        return `<div class="char-item ${c.id===activeCharId?'active-char':''}" onclick="selectChar('${c.id}')">
+          <div class="char-avatar">${cl?.icon||'?'}</div>
+          <div style="flex:1; min-width:0;">
+            <div class="char-name">${c.name||'Unnamed'}</div>
+            <div class="char-meta">Lvl ${c.level||1} ${c.ancestry||'?'} ${c.class||'?'} · HP ${c.hp.current||0}/${c.hp.max||0}</div>
+          </div>
+          <div style="display:flex;gap:5px;" onclick="event.stopPropagation()">
+            <button class="btn btn-sm" onclick="editChar('${c.id}')">Edit</button>
+            <button class="btn btn-sm btn-ocean" onclick="exportChar('${c.id}')">⬇</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteChar('${c.id}')">✕</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="startNew()">+ New Character</button>
+      <button class="btn" onclick="importChar()">⬆ Import JSON</button>
+    </div>`;
+}
+function selectChar(id){ activeCharId=id; saveActive(); renderChars(); }
+function deleteChar(id){
+  if(!confirm('Delete this character?'))return;
+  characters=characters.filter(c=>c.id!==id);
+  if(activeCharId===id) activeCharId=characters[0]?.id||null;
+  save(); saveActive(); renderChars();
+}
+function exportChar(id){
+  const c=characters.find(x=>x.id===id);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(c,null,2)],{type:'application/json'}));
+  a.download=`${(c.name||'char').replace(/\s+/g,'_')}.pf2e.json`; a.click();
+  toast('Exported!');
+}
+function importChar(){
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
+  inp.onchange=e=>{
+    const f=e.target.files[0]; if(!f)return;
+    const r=new FileReader(); r.onload=ev=>{
+      try { const c=JSON.parse(ev.target.result); c.id=Date.now()+'x'; characters.push(c); save(); renderChars(); toast('Imported!'); }
+      catch{ toast('Import failed.'); }
+    }; r.readAsText(f);
+  }; inp.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUILDER
+// ═══════════════════════════════════════════════════════════════════════════
+function startNew(){ wz=newChar(); wzStep=0; showView('builder'); }
+function editChar(id){ wz=JSON.parse(JSON.stringify(characters.find(c=>c.id===id))); wzStep=0; showView('builder'); }
+
+function renderBuilder(){
+  const el=document.getElementById('view-builder');
+  if(!wz){ el.innerHTML=`<div class="empty-state"><div class="big-icon">✦</div><p>No build in progress.</p><button class="btn btn-primary" onclick="startNew()">New Character</button></div>`; return; }
+  const dots=WZ_STEPS.map((s,i)=>`
+    <div class="wdot ${i<wzStep?'done':i===wzStep?'active':''}" onclick="goStep(${i})" title="${s}">${i+1}</div>
+    ${i<WZ_STEPS.length-1?'<div class="wcon"></div>':''}`).join('');
+  el.innerHTML=`<div class="wizard-progress">${dots}</div><div id="wz-content"></div>`;
+  renderWzStep();
+}
+function goStep(i){ if(i<=wzStep){ wzStep=i; renderWzStep(); } }
+function canAdvance(){
+  if(wzStep===0) return !!wz.ancestry;
+  if(wzStep===1) return !!wz.background;
+  if(wzStep===2) return !!wz.class;
+  return true;
+}
+function renderWzStep(){
+  const el=document.getElementById('wz-content'); if(!el)return;
+  const fns=[pgAncestry,pgBackground,pgClass,pgAttributes,pgSkills,pgIdentity,pgReview];
+  el.innerHTML=fns[wzStep]();
+}
+function wzNext(){ if(canAdvance()){ wzStep=Math.min(WZ_STEPS.length-1,wzStep+1); renderBuilder(); } else toast('Complete this step first.'); }
+function wzPrev(){ wzStep=Math.max(0,wzStep-1); renderBuilder(); }
+
+// ── Page 1: Ancestry ──────────────────────────────────────────────────
+function pgAncestry(){
+  const detail = wz.ancestry ? (()=>{
+    const a=ANCESTRIES.find(x=>x.name===wz.ancestry);
+    return `<div class="card" style="margin-top:12px;">
+      <div class="card-title">${a.icon} ${a.name}</div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">${a.desc}</p>
+      ${a.features.map(f=>`<div class="feat-card"><div class="feat-name">${f.split('—')[0].trim()}</div><div class="feat-desc">${f.split('—').slice(1).join('—').trim()}</div></div>`).join('')}
+      <div style="margin-top:8px; font-size:0.8rem;">
+        <span class="muted">Languages:</span> <span class="gold">${a.langs.join(', ')}</span> &nbsp;
+        <span class="muted">Heritages:</span> <span class="ocean">${a.heritages.join(', ')}</span>
+      </div>
+    </div>`;
+  })() : '';
+  return `<div class="wizard-page active">
+    <div class="step-title">Step 1: Ancestry</div>
+    <div class="step-hint">Ancestry sets your base HP, size, Speed, attribute boosts & flaw, and languages.</div>
+    <div class="sel-grid-3">
+      ${ANCESTRIES.map(a=>`
+        <div class="sel-card ${wz.ancestry===a.name?'selected':''}" onclick="pickAncestry('${a.name}')">
+          <div style="font-size:1.4rem;margin-bottom:3px;">${a.icon}</div>
+          <div class="sel-name">${a.name}</div>
+          <div class="sel-sub">${a.hp} HP · Spd ${a.speed} · ${a.size}</div>
+          <div style="margin-top:3px;">
+            ${a.boosts.map(b=>`<span class="sel-tag">${b}↑</span>`).join('')}
+            ${a.flaw?`<span class="sel-tag" style="border-color:rgba(200,60,60,0.4);color:#e06060;">${a.flaw}↓</span>`:''}
+          </div>
+        </div>`).join('')}
+    </div>
+    ${detail}
+    <div class="wizard-nav">
+      <span></span>
+      <button class="btn btn-primary" onclick="wzNext()" ${!wz.ancestry?'disabled':''}>Next: Background →</button>
+    </div>
+  </div>`;
+}
+function pickAncestry(name){
+  wz.ancestry=name;
+  const a=ANCESTRIES.find(x=>x.name===name);
+  wz.speed=a.speed;
+  recalcHP(); renderWzStep();
+}
+
+// ── Page 2: Background ────────────────────────────────────────────────
+function pgBackground(){
+  const detail = wz.background ? (()=>{
+    const b=BACKGROUNDS.find(x=>x.name===wz.background);
+    return `<div class="card" style="margin-top:12px;">
+      <div class="card-title">📜 ${b.name}</div>
+      <p style="font-size:0.88rem; margin-bottom:8px;">${b.desc}</p>
+      <div class="inline-note">+${b.b1}, +${b.b2} · Trained: ${b.sk1} &amp; ${b.sk2} · Feat: ${b.feat}</div>
+    </div>`;
+  })() : '';
+  return `<div class="wizard-page active">
+    <div class="step-title">Step 2: Background</div>
+    <div class="step-hint">Your background grants two attribute boosts, two trained skills, and a skill feat.</div>
+    <div class="sel-grid-2">
+      ${BACKGROUNDS.map(b=>`
+        <div class="sel-card ${wz.background===b.name?'selected':''}" onclick="pickBG('${b.name}')">
+          <div class="sel-name">${b.name}</div>
+          <div class="sel-desc" style="margin-bottom:5px;">${b.desc.substring(0,70)}…</div>
+          <div>
+            <span class="sel-tag">${b.b1}↑</span><span class="sel-tag">${b.b2}↑</span>
+            <span class="sel-tag ocean">${b.sk1}</span><span class="sel-tag ocean">${b.sk2}</span>
+          </div>
+        </div>`).join('')}
+    </div>
+    ${detail}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Ancestry</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${!wz.background?'disabled':''}>Next: Class →</button>
+    </div>
+  </div>`;
+}
+function pickBG(name){ wz.background=name; renderWzStep(); }
+
+// ── Page 3: Class ─────────────────────────────────────────────────────
+function pgClass(){
+  const detail = wz.class ? (()=>{
+    const cl=CLASSES.find(x=>x.name===wz.class);
+    const pmap={'T':'Trained','E':'Expert','M':'Master','L':'Legendary'};
+    return `<div class="card" style="margin-top:12px;">
+      <div class="card-title">${cl.icon} ${cl.name}</div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">${cl.desc}</p>
+      <div class="feat-card"><div class="feat-name">${cl.cf1.split('—')[0].trim()}</div><div class="feat-desc">${cl.cf1.split('—').slice(1).join('—').trim()}</div></div>
+      <div class="feat-card"><div class="feat-name">${cl.cf2.split('—')[0].trim()}</div><div class="feat-desc">${cl.cf2.split('—').slice(1).join('—').trim()}</div></div>
+      <div style="margin-top:8px; font-size:0.78rem; line-height:1.8;">
+        <span class="muted">Saves:</span> <span class="gold">${pmap[cl.fort]} Fort / ${pmap[cl.ref]} Ref / ${pmap[cl.will]} Will</span><br>
+        <span class="muted">Perception:</span> <span class="gold">${pmap[cl.perc]}</span><br>
+        <span class="muted">Base skills:</span> <span class="ocean">${cl.baseSkills.join(', ')}</span><br>
+        <span class="muted">Subclasses:</span> ${cl.subs.join(', ')}
+      </div>
+    </div>`;
+  })() : '';
+  return `<div class="wizard-page active">
+    <div class="step-title">Step 3: Class</div>
+    <div class="step-hint">Your class defines your role, Hit Points, proficiencies, and primary abilities.</div>
+    <div class="sel-grid-3">
+      ${CLASSES.map(cl=>`
+        <div class="sel-card ${wz.class===cl.name?'selected':''}" onclick="pickClass('${cl.name}')">
+          <div style="font-size:1.3rem;margin-bottom:3px;">${cl.icon}</div>
+          <div class="sel-name">${cl.name}</div>
+          <div class="sel-sub">${cl.hp} HP · ${cl.key}</div>
+          ${cl.trad?`<div style="margin-top:3px;"><span class="sel-tag ocean">${cl.trad}</span></div>`:''}
+        </div>`).join('')}
+    </div>
+    ${detail}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Background</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${!wz.class?'disabled':''}>Next: Attributes →</button>
+    </div>
+  </div>`;
+}
+function pickClass(name){ wz.class=name; recalcHP(); renderWzStep(); }
+function recalcHP(){
+  const cl=CLASSES.find(x=>x.name===wz.class); if(!cl)return;
+  const an=ANCESTRIES.find(x=>x.name===wz.ancestry); if(!an)return;
+  wz.hp.max=an.hp+cl.hp+attrMod(wz.attributes.CON);
+  wz.hp.current=wz.hp.max;
+}
+
+// ── Page 4: Attributes ────────────────────────────────────────────────
+function pgAttributes(){
+  const an=ANCESTRIES.find(x=>x.name===wz.ancestry)||{};
+  const bg=BACKGROUNDS.find(x=>x.name===wz.background)||{};
+  const cl=CLASSES.find(x=>x.name===wz.class)||{};
+  return `<div class="wizard-page active">
+    <div class="step-title">Step 4: Attribute Scores</div>
+    <div class="step-hint">Base 10. Each boost gives +2 (or +1 if already 18+). Apply ancestry, background, class, and 4 free boosts to different attributes.</div>
+    <div style="font-size:0.82rem; margin-bottom:10px;">
+      ${an.boosts?`<div class="inline-note">Ancestry: ${an.boosts.map(b=>`+${b}`).join(', ')}${an.flaw?` · −${an.flaw}`:''}</div>`:''}
+      ${bg.b1?`<div class="inline-note">Background: +${bg.b1}, +${bg.b2}</div>`:''}
+      ${cl.key?`<div class="inline-note">Class key: +${cl.key.split(' or ')[0]}</div>`:''}
+      <div class="inline-note">+ 4 free boosts to different attributes</div>
+    </div>
+    <div class="attr-grid">
+      ${ABILITY_SHORT.map(ab=>{
+        const sc=wz.attributes[ab]||10;
+        const md=attrMod(sc);
+        return `<div class="attr-box">
+          <div class="attr-name">${ab}</div>
+          <div class="attr-score">${sc}</div>
+          <div class="attr-mod">${md>=0?'+':''}${md}</div>
+          <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;">
+            <button class="btn btn-sm" style="padding:2px 8px;" onclick="adjAttr('${ab}',-2)">−</button>
+            <button class="btn btn-sm" style="padding:2px 8px;" onclick="adjAttr('${ab}',+2)">+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="btn-row"><button class="btn btn-sm" onclick="resetAttrs()">Reset to 10</button></div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Class</button>
+      <button class="btn btn-primary" onclick="wzNext()">Next: Skills →</button>
+    </div>
+  </div>`;
+}
+function adjAttr(ab,d){ wz.attributes[ab]=Math.max(8,Math.min(20,(wz.attributes[ab]||10)+d)); recalcHP(); renderWzStep(); }
+function resetAttrs(){ ABILITY_SHORT.forEach(a=>{ wz.attributes[a]=10; }); recalcHP(); renderWzStep(); }
+
+// ── Page 5: Skills ────────────────────────────────────────────────────
+function pgSkills(){
+  const cl=CLASSES.find(x=>x.name===wz.class)||{skills:2};
+  const intM=attrMod(wz.attributes.INT||10);
+  const free=cl.skills+Math.max(0,intM);
+  const trained=Object.values(wz.skills||{}).filter(v=>v>=1).length;
+  return `<div class="wizard-page active">
+    <div class="step-title">Step 5: Skills</div>
+    <div class="step-hint">Click dots to set proficiency rank. Class grants ${cl.skills} free trained skills + INT mod (${intM>=0?'+':''}${intM}) = <strong class="gold">${free}</strong> trained skills at 1st level.</div>
+    <div style="margin-bottom:8px; font-size:0.82rem;">Trained: <strong class="${trained>=free?'gold':'red'}">${trained}</strong> / ${free}</div>
+    <div class="card" style="padding:12px 14px;">
+      ${SKILL_LIST.map(sk=>{
+        const rank=(wz.skills||{})[sk.name]||0;
+        const am=attrMod(wz.attributes[sk.ability]||10);
+        const amStr=(am>=0?'+':'')+am;
+        return `<div class="prof-row">
+          <div class="prof-label">${sk.name} <span class="prof-sub">(${sk.ability} ${amStr})</span></div>
+          <div class="prof-dots">
+            ${[1,2,3,4].map(r=>`<div class="prof-dot ${rank>=r?['','t','e','m','l'][r]:''}" onclick="setSkill('${sk.name}',${rank===r?0:r})" title="${PROF_LABELS[r]}"></div>`).join('')}
+          </div>
+          <div class="prof-rank">${PROF_LABELS[rank]}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Attributes</button>
+      <button class="btn btn-primary" onclick="wzNext()">Next: Identity →</button>
+    </div>
+  </div>`;
+}
+function setSkill(name,rank){ if(!wz.skills)wz.skills={}; wz.skills[name]=rank; renderWzStep(); }
+
+// ── Page 6: Identity ──────────────────────────────────────────────────
+function pgIdentity(){
+  return `<div class="wizard-page active">
+    <div class="step-title">Step 6: Identity</div>
+    <div class="step-hint">Give your character life beyond the mechanics.</div>
+    <div class="card">
+      <label>Character Name</label>
+      <input type="text" value="${wz.name||''}" oninput="wz.name=this.value" placeholder="Enter a name…">
+      <label>Player</label>
+      <input type="text" value="${wz.player||''}" oninput="wz.player=this.value">
+      <label>Pronouns</label>
+      <input type="text" value="${wz.pronouns||''}" oninput="wz.pronouns=this.value" placeholder="she/her, he/him, they/them…">
+      <label>Deity / Patron / Philosophy</label>
+      <input type="text" value="${wz.deity||''}" oninput="wz.deity=this.value" placeholder="Sarenrae, Pharasma, Nethys…">
+      <label>Level</label>
+      <input type="number" value="${wz.level||1}" min="1" max="20" style="width:80px;" oninput="wz.level=+this.value||1; recalcHP();">
+      <label>AC</label>
+      <input type="number" value="${wz.ac||14}" min="1" max="50" style="width:80px;" oninput="wz.ac=+this.value||14;">
+      <label>Subclass / Archetype</label>
+      <input type="text" value="${wz.subclass||''}" oninput="wz.subclass=this.value" placeholder="e.g. Thief, Storm Order, Angelic Bloodline…">
+      <label>Backstory</label>
+      <textarea oninput="wz.background_desc=this.value" placeholder="Who are you? What drives your quest?">${wz.background_desc||''}</textarea>
+      <label>Notes / Equipment / Feats</label>
+      <textarea oninput="wz.notes=this.value" placeholder="Feats, equipment, spells, special abilities…">${wz.notes||''}</textarea>
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Skills</button>
+      <button class="btn btn-primary" onclick="wzNext()">Next: Review →</button>
+    </div>
+  </div>`;
+}
+
+// ── Page 7: Review ────────────────────────────────────────────────────
+function pgReview(){
+  const an=ANCESTRIES.find(x=>x.name===wz.ancestry)||{icon:'?',name:'?',speed:25};
+  const bg=BACKGROUNDS.find(x=>x.name===wz.background)||{name:'?'};
+  const cl=CLASSES.find(x=>x.name===wz.class)||{icon:'⚔',name:'?',cf1:'',cf2:''};
+  const trainedSkills=Object.entries(wz.skills||{}).filter(([,v])=>v>=1);
+  return `<div class="wizard-page active">
+    <div class="step-title">Step 7: Review &amp; Save</div>
+    <div class="card">
+      <div class="card-title">Character Summary</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-bottom:12px;">
+        <div style="font-size:2.2rem;">${cl.icon}</div>
+        <div>
+          <div style="font-family:'Cinzel',serif;font-size:1.1rem;color:var(--apricot);">${wz.name||'Unnamed Hero'}</div>
+          <div style="font-size:0.85rem;color:var(--text-muted);">Level ${wz.level} ${an.name} ${cl.name}</div>
+          <div style="font-size:0.8rem;color:var(--ocean2);">${wz.pronouns||''} ${wz.deity?'· '+wz.deity:''}</div>
+        </div>
+      </div>
+      <div class="attr-grid">
+        ${ABILITY_SHORT.map(ab=>{
+          const sc=wz.attributes[ab]||10; const md=attrMod(sc);
+          return `<div class="attr-box"><div class="attr-name">${ab}</div><div class="attr-score">${sc}</div><div class="attr-mod">${md>=0?'+':''}${md}</div></div>`;
+        }).join('')}
+      </div>
+      <div style="margin-top:10px; display:flex; gap:20px; flex-wrap:wrap; font-size:0.85rem;">
+        <div><span class="muted">HP:</span> <strong class="gold">${wz.hp.max}</strong></div>
+        <div><span class="muted">Speed:</span> <strong class="gold">${an.speed} ft</strong></div>
+        <div><span class="muted">Background:</span> <span class="ocean">${bg.name}</span></div>
+      </div>
+      ${trainedSkills.length?`<div style="margin-top:6px;font-size:0.8rem;"><span class="muted">Trained:</span> ${trainedSkills.map(([n])=>n).join(', ')}</div>`:''}
+    </div>
+    <div class="card">
+      <div class="card-title">Class Features</div>
+      <div class="feat-card"><div class="feat-name">${cl.cf1.split('—')[0].trim()}</div><div class="feat-desc">${cl.cf1.split('—').slice(1).join('—').trim()}</div></div>
+      <div class="feat-card"><div class="feat-name">${cl.cf2.split('—')[0].trim()}</div><div class="feat-desc">${cl.cf2.split('—').slice(1).join('—').trim()}</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveWizard()">💾 Save Character</button>
+      <button class="btn" onclick="wzPrev()">← Back</button>
+    </div>
+  </div>`;
+}
+function saveWizard(){
+  if(!wz.name){ toast('Please enter a name first.'); return; }
+  const idx=characters.findIndex(c=>c.id===wz.id);
+  if(idx>=0) characters[idx]=wz; else characters.push(wz);
+  activeCharId=wz.id; save(); saveActive();
+  toast(`${wz.name} saved!`); showView('tracker');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TRACKER
+// ═══════════════════════════════════════════════════════════════════════════
+function renderTracker(){
+  const el=document.getElementById('view-tracker');
+  const c=getActive();
+  if(!c){ el.innerHTML=`<div class="empty-state"><div class="big-icon">🛡</div><p>Select a character first.</p><button class="btn btn-primary" onclick="showView('characters')">← Characters</button></div>`; return; }
+  const cl=CLASSES.find(x=>x.name===c.class)||{icon:'⚔',fort:'T',ref:'T',will:'T',perc:'T'};
+  const an=ANCESTRIES.find(x=>x.name===c.ancestry)||{speed:25};
+  const pmap={'T':1,'E':2,'M':3,'L':4};
+  const dying=c.dying||0; const hero=c.hero||0;
+  // Save bonus calc
+  function sv(rankChar, abilityShort){
+    const rank=pmap[rankChar]||1; const ab=attrMod(c.attributes?.[abilityShort]||10);
+    const bonus=(rank>0?((c.level||1)+PROF_BONUS[rank]):0)+ab;
+    return (bonus>=0?'+':'')+bonus+' ('+['U','T','E','M','L'][rank]+')';
+  }
+  el.innerHTML=`
+    <!-- Header -->
+    <div class="card" style="background:linear-gradient(135deg,rgba(65,6,7,0.35) 0%,rgba(26,12,12,0.95) 100%);">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:1.8rem;">${cl.icon||'⚔'}</div>
+        <div style="flex:1;">
+          <div style="font-family:'Cinzel',serif;font-size:1rem;color:var(--apricot);">${c.name||'Unnamed'}</div>
+          <div style="font-size:0.78rem;color:var(--text-muted);">Level ${c.level||1} ${c.ancestry||''} ${c.class||''} ${c.subclass?'('+c.subclass+')':''}</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm" onclick="editChar('${c.id}')">✏ Edit</button>
+          <button class="btn btn-sm btn-ocean" onclick="showView('characters')">⇐</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px;text-align:center;">
+        ${[['AC',c.ac||14],['Speed',(an.speed||25)+'ft'],['Perc',(()=>{const r=pmap[cl.perc]||1;const b=(r>0?(c.level||1)+PROF_BONUS[r]:0)+attrMod(c.attributes?.WIS||10);return (b>=0?'+':'')+b;})()],['Level',c.level||1]].map(([l,v])=>`<div class="attr-box"><div class="attr-name">${l}</div><div class="attr-score" style="font-size:1.3rem;">${v}</div></div>`).join('')}
+      </div>
+    </div>
+
+    <!-- HP -->
+    <div class="card">
+      <div class="card-title">❤ Hit Points</div>
+      <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap;">
+        <div>
+          <div class="big-stat">${c.hp.current}</div>
+          <div class="stat-label">of ${c.hp.max} max</div>
+        </div>
+        <div style="flex:1;">
+          <div class="bubble-row">
+            ${Array.from({length:Math.min(c.hp.max,24)},(_,i)=>`<div class="bubble hp ${i<c.hp.current?'filled':''}" onclick="setHP(${i+1})"></div>`).join('')}
+            ${c.hp.max>24?`<span class="muted" style="font-size:0.75rem;align-self:center;">+${c.hp.max-24}</span>`:''}
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-sm" style="border-color:#3a8a3a;color:#60c060;" onclick="hpChange(1)">+ Heal</button>
+        <button class="btn btn-sm btn-danger" onclick="hpChange(-1)">− Damage</button>
+        <button class="btn btn-sm" onclick="setHP(c.hp.max)" style="display:none" id="full-heal-btn"></button>
+        <button class="btn btn-sm" onclick="hpSet()">Set HP</button>
+        <button class="btn btn-sm" onclick="setHP(${c.hp.max})">Full Heal</button>
+      </div>
+    </div>
+
+    <!-- Dying / Hero -->
+    <div class="split-row">
+      <div class="card">
+        <div class="card-title">💀 Dying / Wounded</div>
+        <div class="bubble-row">
+          ${[1,2,3,4].map(v=>`<div class="bubble dying ${dying>=v?'filled':''}" onclick="setDying(${dying===v?0:v})">${v-1}</div>`).join('')}
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Dying 4 = death · Wounded: <strong class="gold">${c.wounded||0}</strong></div>
+        <div class="btn-row" style="margin-top:6px;">
+          <button class="btn btn-sm" onclick="setWounded(0)">Clear Wounded</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⭐ Hero Points</div>
+        <div class="bubble-row">
+          ${[1,2,3].map(i=>`<div class="bubble hero ${i<=hero?'filled':''}" onclick="setHero(${i===hero?0:i})">★</div>`).join('')}
+        </div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">1: reroll · 3: recover from Dying</div>
+        <div class="btn-row" style="margin-top:6px;">
+          <button class="btn btn-sm" onclick="setHero(Math.min(3,(${hero})+1))">+</button>
+          <button class="btn btn-sm" onclick="setHero(Math.max(0,(${hero})-1))">−</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attributes -->
+    <div class="card">
+      <div class="card-title">📊 Attributes &amp; Saves</div>
+      <div class="attr-grid" style="margin-bottom:12px;">
+        ${ABILITY_SHORT.map(ab=>{
+          const sc=c.attributes?.[ab]||10; const md=attrMod(sc);
+          return `<div class="attr-box"><div class="attr-name">${ab}</div><div class="attr-score" style="font-size:1.3rem;">${sc}</div><div class="attr-mod">${md>=0?'+':''}${md}</div></div>`;
+        }).join('')}
+      </div>
+      ${[['Fortitude',cl.fort,'CON'],['Reflex',cl.ref,'DEX'],['Will',cl.will,'WIS']].map(([name,r,ab])=>`
+        <div class="prof-row">
+          <div class="prof-label">${name}</div>
+          <div class="prof-dots">${[1,2,3,4].map(i=>`<div class="prof-dot ${pmap[r]>=i?['','t','e','m','l'][i]:''}"></div>`).join('')}</div>
+          <div class="prof-rank">${sv(r,ab)}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- Skills -->
+    <div class="card">
+      <div class="card-title">🎯 Skills</div>
+      ${SKILL_LIST.map(sk=>{
+        const rank=(c.skills||{})[sk.name]||0; if(!rank)return '';
+        const am=attrMod(c.attributes?.[sk.ability]||10);
+        const pb=(c.level||1)+PROF_BONUS[rank]; const tot=am+pb;
+        return `<div class="prof-row">
+          <div class="prof-label">${sk.name} <span class="prof-sub">(${sk.ability})</span></div>
+          <div class="prof-dots">${[1,2,3,4].map(i=>`<div class="prof-dot ${rank>=i?['','t','e','m','l'][i]:''}"></div>`).join('')}</div>
+          <div class="prof-rank">${tot>=0?'+':''}${tot}</div>
+        </div>`;
+      }).filter(Boolean).join('')||'<p class="muted" style="font-size:0.85rem;">No trained skills recorded. Edit character to add them.</p>'}
+    </div>
+
+    <!-- Conditions -->
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+        🩺 Conditions <button class="btn btn-sm" onclick="clearConds()" style="margin-left:auto;">Clear All</button>
+      </div>
+      <div class="cond-wrap">
+        ${CONDITIONS.map(co=>{
+          const on=(c.conditions||[]).includes(co);
+          const cls=on?co==='Prone'||co==='Off-Guard'?'cond-blue':'cond-on':'';
+          return `<span class="cond-badge ${cls}" onclick="toggleCond('${co}')">${on?'◉ ':''}${co}</span>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="card">
+      <div class="card-title">📝 Session Notes</div>
+      <textarea style="min-height:80px;" oninput="saveNotes(this.value)" placeholder="Encounter notes, loot, XP, tactics…">${c.notes||''}</textarea>
+    </div>
+
+    <!-- Rests -->
+    <div class="btn-row">
+      <button class="btn btn-ocean" onclick="shortRest()">⊕ Short Rest</button>
+      <button class="btn btn-primary" onclick="longRest()">☀ Long Rest</button>
+      <button class="btn" onclick="levelUp()">↑ Level Up</button>
+    </div>`;
+}
+
+function setHP(v){ withChar(c=>{ c.hp.current=Math.max(0,Math.min(c.hp.max,v)); }); }
+function hpChange(sign){
+  openModal('HP Change',`
+    <div class="modal-title">${sign>0?'Heal':'Take Damage'}</div>
+    <label>Amount</label>
+    <input type="number" id="hpamt" value="5" min="1" max="999" style="width:100px;">
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn ${sign>0?'btn-ocean':'btn-danger'}" onclick="applyHP(${sign})">Apply</button>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+    </div>`);
+}
+function applyHP(sign){
+  const amt=+document.getElementById('hpamt').value||0;
+  withChar(c=>{ c.hp.current=Math.max(0,Math.min(c.hp.max,(c.hp.current||0)+sign*amt)); });
+  closeModal();
+}
+function hpSet(){
+  const cur=getActive()?.hp.current||0;
+  openModal('Set HP',`
+    <div class="modal-title">Set Current HP</div>
+    <label>HP</label>
+    <input type="number" id="hpset" value="${cur}" min="0">
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn-primary" onclick="doHpSet()">Set</button>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+    </div>`);
+}
+function doHpSet(){ withChar(c=>{ c.hp.current=Math.max(0,Math.min(c.hp.max,+document.getElementById('hpset').value||0)); }); closeModal(); }
+function setDying(v){ withChar(c=>{ const prev=c.dying||0; c.dying=Math.max(0,Math.min(4,v)); if(v===0&&prev>0) c.wounded=(c.wounded||0)+1; }); }
+function setWounded(v){ withChar(c=>{ c.wounded=Math.max(0,v); }); }
+function setHero(v){ withChar(c=>{ c.hero=Math.max(0,Math.min(3,v)); }); }
+function toggleCond(co){ withChar(c=>{ const i=(c.conditions||[]).indexOf(co); if(i>=0) c.conditions.splice(i,1); else { if(!c.conditions)c.conditions=[]; c.conditions.push(co); } }); }
+function clearConds(){ withChar(c=>{ c.conditions=[]; }); toast('Conditions cleared.'); }
+function saveNotes(v){ const c=getActive(); if(!c)return; c.notes=v; save(); }
+
+function shortRest(){ withChar(c=>{ c.focus={max:c.focus?.max||0,current:c.focus?.max||0}; c.hero=Math.min(3,(c.hero||0)+1); }); toast('Short Rest: Focus Points restored, +1 Hero Point.'); }
+function longRest(){ withChar(c=>{ c.hp.current=c.hp.max; c.dying=0; c.focus={max:c.focus?.max||0,current:c.focus?.max||0}; c.hero=1; c.conditions=(c.conditions||[]).filter(x=>x==='Doomed'||x==='Drained'); }); toast('Long Rest: HP restored, conditions cleared, Hero Points reset to 1.'); }
+function levelUp(){
+  withChar(c=>{
+    if((c.level||1)>=20){ toast('Max level reached!'); return; }
+    c.level=(c.level||1)+1;
+    const cl=CLASSES.find(x=>x.name===c.class)||{hp:8};
+    const an=ANCESTRIES.find(x=>x.name===c.ancestry)||{hp:8};
+    c.hp.max+=cl.hp+attrMod(c.attributes?.CON||10);
+    c.hp.current=c.hp.max;
+    toast(`Now Level ${c.level}! HP max increased.`);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DICE ROLLER
+// ═══════════════════════════════════════════════════════════════════════════
+function renderDice(){
+  const el=document.getElementById('view-dice');
+  el.innerHTML=`
+    <div class="card">
+      <div class="card-title">🎲 Dice Roller</div>
+      <div id="dice-result" class="dice-result">
+        <div class="roll-num" style="opacity:0.25;">—</div>
+        <div class="roll-detail">Roll a die to begin</div>
+      </div>
+      <div class="dice-grid">
+        ${[4,6,8,10,12,20,'%'].map(d=>`<div class="die-btn" onclick="rollDie(${d==='%'?'"flat"':d})">${d==='%'?'d%':'d'+d}</div>`).join('')}
+        <div class="die-btn" onclick="rollDie(20,true)">d20 ×2</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🎯 Check / Attack Roll</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+        <div><label>Modifier</label><input type="number" id="r-mod" value="0" style="width:80px;"></div>
+        <div><label>MAP</label>
+          <select id="r-map" style="width:100px;">
+            <option value="0">None</option><option value="-5">−5 (2nd)</option><option value="-10">−10 (3rd)</option>
+          </select>
+        </div>
+        <div><label>Fortune / Misfortune</label>
+          <select id="r-mode" style="width:130px;">
+            <option value="n">Normal</option><option value="f">Fortune (take high)</option><option value="m">Misfortune (take low)</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn btn-primary" onclick="rollCheck()">Roll d20 + Modifier</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Degrees of Success</div>
+      <div style="font-size:0.88rem;line-height:2;">
+        <div><strong class="gold">Critical Success</strong> — Exceed DC by 10+, or natural 20 that succeeds</div>
+        <div><strong class="ocean">Success</strong> — Meet or exceed the DC</div>
+        <div><strong class="muted">Failure</strong> — Miss the DC</div>
+        <div><strong class="red">Critical Failure</strong> — Miss DC by 10+, or natural 1 that fails</div>
+      </div>
+      <div style="margin-top:8px;font-size:0.8rem;color:var(--text-muted);">Natural 20 improves degree by 1 step · Natural 1 worsens degree by 1 step</div>
+    </div>`;
+}
+function rollDie(sides, dual=false){
+  const r1=Math.ceil(Math.random()*(sides==='flat'?100:sides));
+  let txt, val=r1;
+  if(dual){ const r2=Math.ceil(Math.random()*20); txt=`d20: [${r1}, ${r2}]`; val=r1; }
+  else txt=`d${sides==='flat'?'%':sides} = ${r1}`;
+  const el=document.getElementById('dice-result');
+  el.innerHTML=`<div class="roll-num">${val}</div><div class="roll-detail">${txt}</div>`;
+}
+function rollCheck(){
+  const mod=+document.getElementById('r-mod').value||0;
+  const map=+document.getElementById('r-map').value||0;
+  const mode=document.getElementById('r-mode').value;
+  const r1=Math.ceil(Math.random()*20);
+  const r2=Math.ceil(Math.random()*20);
+  const die=mode==='f'?Math.max(r1,r2):mode==='m'?Math.min(r1,r2):r1;
+  const total=die+mod+map;
+  const modeStr=mode!=='n'?` (${mode==='f'?'Fortune':'Misfortune'}: ${r1}&${r2})`:'';
+  const mapStr=map?` ${map} MAP`:'';
+  const nat=die===20?'<span class="gold"> NAT 20!</span>':die===1?'<span class="red"> NAT 1!</span>':'';
+  document.getElementById('dice-result').innerHTML=`
+    <div class="roll-num">${total}</div>
+    <div class="roll-detail">d20(${die})${nat} ${mod>=0?'+':''}${mod}${mapStr}${modeStr}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MODAL & TOAST
+// ═══════════════════════════════════════════════════════════════════════════
+function openModal(title,html){ document.getElementById('modal-box').innerHTML=`<div class="modal-title">${title}</div>${html}`; document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+let _tt;
+function toast(msg){ const e=document.getElementById('toast'); e.textContent=msg; e.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(()=>e.classList.remove('show'),2600); }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════════
+showView('characters');
+</script>
+</body>
+</html>
