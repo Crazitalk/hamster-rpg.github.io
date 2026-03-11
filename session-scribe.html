@@ -535,6 +535,84 @@
     .session-item { flex-wrap: wrap; }
     .session-actions { width: 100%; justify-content: flex-end; }
   }
+
+  /* ─── MARKDOWN RENDERING ─── */
+  .md-render { line-height: 1.75; }
+  .md-render h1 { font-family: 'Cinzel Decorative', serif; font-size: 1.4rem; color: var(--accent-gold2); margin: 18px 0 8px; }
+  .md-render h2 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--accent-gold); letter-spacing: 0.08em; margin: 16px 0 6px; text-transform: uppercase; }
+  .md-render h3 { font-family: 'Cinzel', serif; font-size: 0.9rem; color: #5ecfcb; letter-spacing: 0.06em; margin: 12px 0 4px; }
+  .md-render strong { color: var(--text-primary); font-weight: 700; }
+  .md-render em { color: var(--text-muted); font-style: italic; }
+  .md-render code { font-family: monospace; background: rgba(35,206,107,0.1); border: 1px solid rgba(35,206,107,0.2); border-radius: 3px; padding: 1px 5px; font-size: 0.85em; color: var(--accent-gold); }
+  .md-render blockquote { border-left: 3px solid rgba(35,206,107,0.4); padding: 4px 0 4px 14px; margin: 10px 0; color: var(--text-muted); font-style: italic; }
+  .md-render ul, .md-render ol { padding-left: 22px; margin: 6px 0 10px; }
+  .md-render li { margin-bottom: 3px; }
+  .md-render hr { border: none; border-top: 1px solid rgba(35,206,107,0.2); margin: 14px 0; }
+  .md-render p { margin-bottom: 10px; }
+  .md-render p:last-child { margin-bottom: 0; }
+  .md-render a { color: var(--accent-gold); text-decoration: underline; text-underline-offset: 2px; }
+
+  /* ─── NOTES EDIT MODE ─── */
+  .notes-edit-area {
+    width: 100%; background: rgba(10,6,30,0.8);
+    border: 1px solid rgba(35,206,107,0.35); border-radius: 4px;
+    color: var(--text-primary); font-family: 'Crimson Pro', serif;
+    font-size: 1rem; padding: 12px; transition: var(--transition);
+    outline: none; resize: vertical; min-height: 180px; line-height: 1.7;
+    display: none;
+  }
+  .notes-edit-area.open { display: block; }
+  .notes-edit-hint { font-size: 0.75rem; color: rgba(168,180,212,0.5); margin-top: 4px; font-style: italic; }
+
+  /* ─── DIVIDED COIN TOGGLE ─── */
+  .divided-row {
+    display: flex; align-items: center; gap: 10px; padding: 10px 0;
+    border-top: 1px solid rgba(35,206,107,0.1); margin-top: 10px;
+  }
+  .divided-toggle { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+  .divided-toggle input { opacity: 0; width: 0; height: 0; }
+  .divided-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: rgba(168,180,212,0.15); border: 1px solid rgba(168,180,212,0.25);
+    border-radius: 20px; transition: 0.25s;
+  }
+  .divided-slider::before {
+    content: ''; position: absolute; height: 14px; width: 14px;
+    left: 2px; bottom: 2px; background: var(--text-muted); border-radius: 50%; transition: 0.25s;
+  }
+  .divided-toggle input:checked + .divided-slider { background: rgba(35,206,107,0.2); border-color: rgba(35,206,107,0.5); }
+  .divided-toggle input:checked + .divided-slider::before { transform: translateX(16px); background: var(--accent-gold); }
+  .divided-label { font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+  .divided-label.on { color: var(--accent-gold); }
+  .divided-hint { font-size: 0.78rem; color: rgba(168,180,212,0.45); font-style: italic; }
+
+  /* ─── CAMPAIGN LOOT AGGREGATED ─── */
+  .loot-session-group {
+    border: 1px solid rgba(35,206,107,0.12); border-radius: 6px;
+    overflow: hidden; margin-bottom: 10px;
+  }
+  .loot-session-group-header {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    background: linear-gradient(90deg, rgba(15,8,75,0.8), rgba(13,2,33,0.9));
+    font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent-gold);
+    cursor: pointer; user-select: none;
+  }
+  .loot-session-group-header .session-badge {
+    background: rgba(35,206,107,0.1); border: 1px solid rgba(35,206,107,0.25);
+    border-radius: 3px; padding: 1px 6px; font-size: 0.6rem;
+  }
+  .loot-session-group-body { padding: 0 2px 2px; }
+
+  /* ─── COIN SUM DISPLAY ─── */
+  .coin-sum-row {
+    display: flex; gap: 20px; flex-wrap: wrap; padding: 14px 0;
+  }
+  .coin-sum-item { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .coin-sum-val { font-family: 'Cinzel Decorative', serif; font-size: 1.5rem; color: var(--accent-gold2); line-height: 1; }
+  .coin-sum-label { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
+  .coin-sum-breakdown { font-size: 0.72rem; color: rgba(168,180,212,0.45); margin-top: 1px; }
+
 </style>
 </head>
 <body>
@@ -560,7 +638,7 @@
     <button class="nav-tab active" onclick="showView('campaigns')">📜 Campaigns</button>
     <button class="nav-tab" onclick="showView('sessions')">✦ Sessions</button>
     <button class="nav-tab" onclick="showView('party')">⚔ Party</button>
-    <button class="nav-tab" onclick="showView('loot')">💰 Loot</button>
+    <button class="nav-tab" onclick="showView('loot')">💰 Loot Ledger</button>
   </nav>
 
   <!-- MAIN -->
@@ -606,16 +684,19 @@
       <div id="sub-notes" class="sub-view active">
         <div class="card">
           <div class="card-title">📝 Session Notes</div>
-          <div id="notes-display" class="notes-content"></div>
+          <div id="notes-display" class="notes-content md-render"></div>
+          <textarea id="notes-edit-box" class="notes-edit-area" placeholder="Write your session notes here. Markdown supported: **bold**, *italic*, # Heading, - list…"></textarea>
+          <div style="font-size:0.72rem;color:rgba(168,180,212,0.4);margin-top:4px;font-style:italic;" id="notes-md-hint"></div>
           <div class="btn-row">
-            <button class="btn btn-sm" onclick="editNotes()">✏ Edit Notes</button>
+            <button class="btn btn-sm" id="notes-edit-btn" onclick="toggleNotesEdit()">✏ Edit Notes</button>
           </div>
         </div>
         <div class="card">
           <div class="card-title">✦ Summary</div>
-          <div id="summary-display" class="notes-content" style="color:var(--text-muted);font-style:italic;"></div>
+          <div id="summary-display" class="notes-content md-render" style="color:var(--text-muted);"></div>
+          <textarea id="summary-edit-box" class="notes-edit-area" placeholder="A one-paragraph summary of the session. Markdown supported."></textarea>
           <div class="btn-row">
-            <button class="btn btn-sm" onclick="editSummary()">✏ Edit Summary</button>
+            <button class="btn btn-sm" id="summary-edit-btn" onclick="toggleSummaryEdit()">✏ Edit Summary</button>
           </div>
         </div>
       </div>
@@ -648,8 +729,8 @@
       <div id="sub-loot-session" class="sub-view">
         <div id="loot-session-container"></div>
         <div class="btn-row">
-          <button class="btn btn-primary btn-sm" onclick="openAddLoot('session')">+ Add Item</button>
-          <button class="btn btn-sm" onclick="openAddWealth()">+ Add Coins</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddLoot()">+ Add Item</button>
+          <button class="btn btn-sm" onclick="openEditSessionCoins()">💰 Edit Coins</button>
         </div>
       </div>
     </div>
@@ -664,16 +745,12 @@
       </div>
     </div>
 
-    <!-- ══════════ LOOT VIEW ══════════ -->
+    <!-- ══════════ LOOT VIEW (aggregated from sessions) ══════════ -->
     <div id="view-loot" class="view">
-      <h2 class="section-heading">Party Loot Ledger</h2>
+      <h2 class="section-heading">Campaign Loot Ledger</h2>
+      <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:18px;">All items collected across sessions. Coins marked as <strong style="color:var(--accent-gold);">Divided</strong> in each session are excluded from the total.</p>
       <div id="loot-campaign-selector" style="margin-bottom:16px;"></div>
       <div id="loot-main-container"></div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="openAddLoot('main')">+ Add Item</button>
-        <button class="btn btn-sm" onclick="openAddWealth('main')">+ Add Coins</button>
-        <button class="btn btn-danger btn-sm" onclick="clearAllLoot()">⚠ Clear All</button>
-      </div>
     </div>
 
     <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
@@ -701,24 +778,17 @@
 <script>
 'use strict';
 /* ═══════════════════════════════════════════════════════════════
-   DATA MODEL
-   campaigns: [{id, name, system, gm, description, created, party:[],loot:{items:[],coins:{}}}]
-   sessions:  [{id, campaignId, number, title, date, notes, summary,
-                npcs:[{id,name,role,attitude,description,first_seen}],
-                locations:[{id,name,type,description}],
-                hooks:[{id,title,source,description,status}],
-                loot:{items:[{id,name,qty,type,value,notes}], coins:{gp,sp,cp,pp,ep}}}]
+   DATA MODEL  (unchanged schema)
 ═══════════════════════════════════════════════════════════════ */
-
 const STORAGE_KEY = 'session_scribe_v1';
 const SYSTEMS = [
-  { id:'agnostic', label:'System Agnostic',       badge:'badge-ag' },
-  { id:'dnd5e',    label:'D&D 5e',                badge:'badge-dd' },
-  { id:'dh',       label:'Daggerheart',            badge:'badge-dh' },
-  { id:'pf2e',     label:'Pathfinder 2e',          badge:'badge-pf' },
-  { id:'icrpg',    label:'Index Card RPG',         badge:'badge-ic' },
-  { id:'sw',       label:'Savage Worlds',          badge:'badge-sw' },
-  { id:'other',    label:'Other',                  badge:'badge-muted' },
+  { id:'agnostic', label:'System Agnostic', badge:'badge-ag' },
+  { id:'dnd5e',    label:'D&D 5e',          badge:'badge-dd' },
+  { id:'dh',       label:'Daggerheart',      badge:'badge-dh' },
+  { id:'pf2e',     label:'Pathfinder 2e',    badge:'badge-pf' },
+  { id:'icrpg',    label:'Index Card RPG',   badge:'badge-ic' },
+  { id:'sw',       label:'Savage Worlds',    badge:'badge-sw' },
+  { id:'other',    label:'Other',            badge:'badge-muted' },
 ];
 const ATTITUDES   = ['Friendly','Neutral','Hostile','Unknown'];
 const HOOK_STATUS = ['Open','Active','Resolved','Dropped'];
@@ -729,34 +799,25 @@ let activeCampaignId = null;
 let activeSessionId  = null;
 let currentView      = 'campaigns';
 let currentSubView   = 'notes';
-let activeLootCtx    = 'session'; // 'session' | 'main'
-let partyFilterId    = null;
-let lootFilterId     = null;
-let editingNPCId     = null;
-let editingLocId     = null;
-let editingHookId    = null;
-let editingLootId    = null;
-let editingPartyId   = null;
 let toastTimer       = null;
+// inline notes edit state
+let notesEditing   = false;
+let summaryEditing = false;
 
 /* ─── PERSISTENCE ─── */
-function save() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
-}
+function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {} }
 function load() {
-  try {
-    const d = localStorage.getItem(STORAGE_KEY);
-    if (d) state = JSON.parse(d);
-  } catch(e) { state = { campaigns: [], sessions: [] }; }
+  try { const d = localStorage.getItem(STORAGE_KEY); if (d) state = JSON.parse(d); }
+  catch(e) { state = { campaigns: [], sessions: [] }; }
   if (!state.campaigns) state.campaigns = [];
   if (!state.sessions)  state.sessions  = [];
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
 /* ─── HELPERS ─── */
-function getCampaign(id)   { return state.campaigns.find(c => c.id === id); }
-function getSessions(cid)  { return state.sessions.filter(s => s.campaignId === cid).sort((a,b)=>a.number-b.number); }
-function getSession(id)    { return state.sessions.find(s => s.id === id); }
+function getCampaign(id) { return state.campaigns.find(c => c.id === id); }
+function getSessions(cid){ return state.sessions.filter(s => s.campaignId === cid).sort((a,b)=>a.number-b.number); }
+function getSession(id)  { return state.sessions.find(s => s.id === id); }
 function systemBadge(sysId) {
   const s = SYSTEMS.find(x => x.id === sysId) || SYSTEMS[SYSTEMS.length-1];
   return `<span class="tool-badge ${s.badge}">${s.label}</span>`;
@@ -772,6 +833,89 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
+/* ══════════════════════════════════════════
+   MINIMAL MARKDOWN PARSER
+   Supports: # h1-h3, **bold**, *italic*, `code`,
+   > blockquote, - / * / 1. lists, ---, [link](url), \n paragraphs
+══════════════════════════════════════════ */
+function renderMarkdown(md) {
+  if (!md) return '<span style="opacity:0.4;font-style:italic;">Nothing here yet.</span>';
+  const lines = md.split('\n');
+  let html = '';
+  let inUL = false, inOL = false, inBQ = false;
+
+  function closeLists() {
+    if (inUL) { html += '</ul>'; inUL = false; }
+    if (inOL) { html += '</ol>'; inOL = false; }
+  }
+  function closeBQ() { if (inBQ) { html += '</blockquote>'; inBQ = false; } }
+
+  function inlineFormat(s) {
+    // escape HTML first (already escaped at storage, but handle display)
+    // then apply inline patterns
+    s = s
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/_(.+?)_/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    return s;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // HR
+    if (/^(---|-{3,}|\*{3,})$/.test(line.trim())) {
+      closeLists(); closeBQ();
+      html += '<hr>'; continue;
+    }
+    // Headings
+    const hm = line.match(/^(#{1,3})\s+(.+)/);
+    if (hm) {
+      closeLists(); closeBQ();
+      const lvl = hm[1].length;
+      html += `<h${lvl}>${inlineFormat(hm[2])}</h${lvl}>`;
+      continue;
+    }
+    // Blockquote
+    if (/^>\s?/.test(line)) {
+      closeLists();
+      if (!inBQ) { html += '<blockquote>'; inBQ = true; }
+      html += inlineFormat(line.replace(/^>\s?/, '')) + ' ';
+      continue;
+    } else { closeBQ(); }
+    // Unordered list
+    const ulm = line.match(/^[-*+]\s+(.+)/);
+    if (ulm) {
+      if (inOL) { html += '</ol>'; inOL = false; }
+      if (!inUL) { html += '<ul>'; inUL = true; }
+      html += `<li>${inlineFormat(ulm[1])}</li>`;
+      continue;
+    }
+    // Ordered list
+    const olm = line.match(/^\d+\.\s+(.+)/);
+    if (olm) {
+      if (inUL) { html += '</ul>'; inUL = false; }
+      if (!inOL) { html += '<ol>'; inOL = true; }
+      html += `<li>${inlineFormat(olm[1])}</li>`;
+      continue;
+    }
+    closeLists();
+    // Blank line = paragraph break
+    if (line.trim() === '') {
+      html += '</p><p>';
+      continue;
+    }
+    html += inlineFormat(line) + ' ';
+  }
+  closeLists(); closeBQ();
+  // Wrap in paragraph tags, clean up empties
+  html = '<p>' + html + '</p>';
+  html = html.replace(/<p>\s*<\/p>/g, '').replace(/<p>(<h[1-3]>)/g, '$1').replace(/(<\/h[1-3]>)<\/p>/g,'$1');
+  return html;
+}
+
 /* ─── VIEWS ─── */
 function showView(v) {
   currentView = v;
@@ -780,11 +924,11 @@ function showView(v) {
   document.querySelectorAll('.nav-tab').forEach((t,i) => {
     t.classList.toggle('active', ['campaigns','sessions','party','loot'][i] === v);
   });
-  if (v === 'campaigns')       renderCampaigns();
-  if (v === 'sessions')        renderSessions();
-  if (v === 'party')           renderPartyView();
-  if (v === 'loot')            renderLootMain();
-  if (v === 'session-detail')  renderSessionDetail();
+  if (v === 'campaigns')      renderCampaigns();
+  if (v === 'sessions')       renderSessions();
+  if (v === 'party')          renderPartyView();
+  if (v === 'loot')           renderLootLedger();
+  if (v === 'session-detail') renderSessionDetail();
 }
 function showSubView(sv) {
   currentSubView = sv;
@@ -797,7 +941,7 @@ function showSubView(sv) {
   if (sv === 'locations')    renderLocations();
   if (sv === 'hooks')        renderHooks();
   if (sv === 'loot-session') renderLootSession();
-  if (sv === 'notes')        renderNotes();
+  if (sv === 'notes')        { notesEditing = false; summaryEditing = false; renderNotes(); }
 }
 
 /* ══════════════════════════════════════════
@@ -806,10 +950,8 @@ function showSubView(sv) {
 function renderCampaigns() {
   const el = document.getElementById('campaigns-list');
   if (!state.campaigns.length) {
-    el.innerHTML = `<div class="empty-state">
-      <div class="big-icon">📜</div>
-      <p>No campaigns yet. Start your chronicle by creating your first campaign.</p>
-    </div>`; return;
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">📜</div><p>No campaigns yet. Start your chronicle by creating your first campaign.</p></div>`;
+    return;
   }
   el.innerHTML = `<div class="campaigns-grid">` +
     state.campaigns.map(c => {
@@ -834,19 +976,9 @@ function renderCampaigns() {
       </div>`;
     }).join('') + `</div>`;
 }
-
-function openCampaign(id) {
-  activeCampaignId = id;
-  showView('sessions');
-}
-
-function openNewCampaign() {
-  editingPartyId = null;
-  showCampaignModal(null);
-}
-function openEditCampaign(id) {
-  showCampaignModal(getCampaign(id));
-}
+function openCampaign(id) { activeCampaignId = id; showView('sessions'); }
+function openNewCampaign() { showCampaignModal(null); }
+function openEditCampaign(id) { showCampaignModal(getCampaign(id)); }
 function showCampaignModal(c) {
   const isEdit = !!c;
   document.getElementById('modal-title').textContent = isEdit ? 'Edit Campaign' : 'New Campaign';
@@ -877,23 +1009,20 @@ function saveCampaign(existingId) {
     c.gm   = document.getElementById('cm-gm').value.trim();
     c.description = document.getElementById('cm-desc').value.trim();
   } else {
-    state.campaigns.push({
-      id: uid(), name, system: document.getElementById('cm-system').value,
+    state.campaigns.push({ id: uid(), name, system: document.getElementById('cm-system').value,
       gm: document.getElementById('cm-gm').value.trim(),
       description: document.getElementById('cm-desc').value.trim(),
-      created: Date.now(), party: [], loot: { items: [], coins: { gp:0, sp:0, cp:0, pp:0, ep:0 } }
-    });
+      created: Date.now(), party: [] });
   }
   save(); closeModal(); renderCampaigns();
   toast(existingId ? 'Campaign updated.' : 'Campaign created!');
 }
 function deleteCampaign(id) {
   if (!confirm('Delete this campaign and ALL its sessions? This cannot be undone.')) return;
-  state.campaigns  = state.campaigns.filter(c => c.id !== id);
-  state.sessions   = state.sessions.filter(s => s.campaignId !== id);
+  state.campaigns = state.campaigns.filter(c => c.id !== id);
+  state.sessions  = state.sessions.filter(s => s.campaignId !== id);
   if (activeCampaignId === id) activeCampaignId = null;
-  save(); renderCampaigns();
-  toast('Campaign deleted.');
+  save(); renderCampaigns(); toast('Campaign deleted.');
 }
 
 /* ══════════════════════════════════════════
@@ -902,15 +1031,12 @@ function deleteCampaign(id) {
 function renderSessions() {
   const c = getCampaign(activeCampaignId);
   if (!c) { showView('campaigns'); return; }
-
-  // Campaign header
   document.getElementById('sessions-campaign-header').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
       ${systemBadge(c.system)}
       <span style="font-family:'Cinzel',serif;font-size:1rem;color:var(--accent-gold2);">${escHtml(c.name)}</span>
       ${c.gm?`<span style="font-size:0.85rem;color:var(--text-muted);">· GM: ${escHtml(c.gm)}</span>`:''}
     </div>`;
-
   const sessions = getSessions(c.id);
   const el = document.getElementById('sessions-list');
   if (!sessions.length) {
@@ -932,17 +1058,8 @@ function renderSessions() {
       </div>
     </div>`).join('');
 }
-
-function openSessionDetail(id) {
-  activeSessionId = id;
-  showView('session-detail');
-  showSubView('notes');
-}
-function backToSessions() {
-  activeSessionId = null;
-  showView('sessions');
-}
-
+function openSessionDetail(id) { activeSessionId = id; notesEditing = false; summaryEditing = false; showView('session-detail'); showSubView('notes'); }
+function backToSessions() { activeSessionId = null; showView('sessions'); }
 function renderSessionDetail() {
   const s = getSession(activeSessionId);
   const c = getCampaign(activeCampaignId);
@@ -958,33 +1075,16 @@ function renderSessionDetail() {
     </div>`;
   renderNotes();
 }
-function renderNotes() {
-  const s = getSession(activeSessionId); if (!s) return;
-  document.getElementById('notes-display').textContent   = s.notes   || 'No notes yet. Click Edit Notes to begin.';
-  document.getElementById('summary-display').textContent = s.summary || 'No summary yet.';
-}
-
-function openNewSession() {
-  showSessionModal(null);
-}
-function openEditSession(id) {
-  showSessionModal(getSession(id));
-}
+function openNewSession()    { showSessionModal(null); }
+function openEditSession(id) { showSessionModal(getSession(id)); }
 function showSessionModal(s) {
   const isEdit = !!s;
-  const c = getCampaign(activeCampaignId);
   const nextNum = isEdit ? s.number : (getSessions(activeCampaignId).length + 1);
   document.getElementById('modal-title').textContent = isEdit ? 'Edit Session' : 'New Session';
   document.getElementById('modal-content').innerHTML = `
     <div class="form-row">
-      <div>
-        <label>Session #</label>
-        <input type="number" id="sm-num" value="${nextNum}" min="1">
-      </div>
-      <div>
-        <label>Date Played</label>
-        <input type="date" id="sm-date" value="${s?.date||''}">
-      </div>
+      <div><label>Session #</label><input type="number" id="sm-num" value="${nextNum}" min="1"></div>
+      <div><label>Date Played</label><input type="date" id="sm-date" value="${s?.date||''}"></div>
     </div>
     <label>Session Title</label>
     <input type="text" id="sm-title" placeholder="The Night of Broken Stars" value="${escHtml(s?.title||'')}">
@@ -1009,11 +1109,9 @@ function saveSession(existingId) {
     const s = getSession(existingId);
     s.title = title; s.number = num; s.date = date; s.notes = notes; s.summary = sum;
   } else {
-    state.sessions.push({
-      id: uid(), campaignId: activeCampaignId, number: num, title, date, notes,
-      summary: sum, npcs: [], locations: [], hooks: [],
-      loot: { items: [], coins: { gp:0, sp:0, cp:0, pp:0, ep:0 } }
-    });
+    state.sessions.push({ id: uid(), campaignId: activeCampaignId, number: num, title, date,
+      notes, summary: sum, npcs: [], locations: [], hooks: [],
+      loot: { items: [], coins: { gp:0, sp:0, cp:0, pp:0, ep:0 }, divided: false } });
   }
   save(); closeModal(); renderSessions();
   toast(existingId ? 'Session updated.' : 'Session added!');
@@ -1022,9 +1120,67 @@ function deleteSession(id) {
   if (!confirm('Delete this session?')) return;
   state.sessions = state.sessions.filter(s => s.id !== id);
   if (activeSessionId === id) activeSessionId = null;
-  save(); renderSessions();
-  toast('Session deleted.');
+  save(); renderSessions(); toast('Session deleted.');
 }
+
+/* ══════════════════════════════════════════
+   NOTES — INLINE MARKDOWN EDITING
+══════════════════════════════════════════ */
+function renderNotes() {
+  const s = getSession(activeSessionId); if (!s) return;
+
+  // ── Full Notes ──
+  const nd = document.getElementById('notes-display');
+  const nb = document.getElementById('notes-edit-box');
+  if (nd) nd.innerHTML = renderMarkdown(s.notes || '');
+  if (nb) {
+    nb.value = s.notes || '';
+    nb.className = 'notes-edit-area' + (notesEditing ? ' open' : '');
+  }
+  const neBtn = document.getElementById('notes-edit-btn');
+  if (neBtn) neBtn.textContent = notesEditing ? '✓ Done' : '✏ Edit Notes';
+  if (nd) nd.style.display = notesEditing ? 'none' : '';
+  const hint = document.getElementById('notes-md-hint');
+  if (hint) hint.textContent = notesEditing ? 'Tip: **bold**, *italic*, # Heading, - list item, > blockquote, `code`' : '';
+
+  // ── Summary ──
+  const sd = document.getElementById('summary-display');
+  const sb = document.getElementById('summary-edit-box');
+  if (sd) sd.innerHTML = renderMarkdown(s.summary || '');
+  if (sb) {
+    sb.value = s.summary || '';
+    sb.className = 'notes-edit-area' + (summaryEditing ? ' open' : '');
+  }
+  const seBtn = document.getElementById('summary-edit-btn');
+  if (seBtn) seBtn.textContent = summaryEditing ? '✓ Done' : '✏ Edit Summary';
+  if (sd) sd.style.display = summaryEditing ? 'none' : '';
+}
+
+function toggleNotesEdit() {
+  const s = getSession(activeSessionId); if (!s) return;
+  if (notesEditing) {
+    // save on done
+    const nb = document.getElementById('notes-edit-box');
+    s.notes = nb ? nb.value : s.notes;
+    save(); toast('Notes saved!');
+  }
+  notesEditing = !notesEditing;
+  renderNotes();
+}
+function toggleSummaryEdit() {
+  const s = getSession(activeSessionId); if (!s) return;
+  if (summaryEditing) {
+    const sb = document.getElementById('summary-edit-box');
+    s.summary = sb ? sb.value : s.summary;
+    save(); toast('Summary saved!');
+  }
+  summaryEditing = !summaryEditing;
+  renderNotes();
+}
+
+// Called from HTML buttons — need to wire up after DOM renders
+// The notes card is static HTML, so we update the button onclick via renderNotes()
+// But actually the buttons are in the static HTML, so we use data attributes:
 
 /* ══════════════════════════════════════════
    NPCs
@@ -1039,11 +1195,10 @@ function renderNPCs() {
   el.innerHTML = `<div class="npc-grid">` +
     s.npcs.map(n => {
       const att = n.attitude||'Unknown';
-      const attClass = att.toLowerCase();
       return `<div class="npc-card">
         <div class="npc-name">${escHtml(n.name)}</div>
         <div class="npc-role">${escHtml(n.role||'')}</div>
-        <span class="npc-attitude attitude-${attClass}">${att}</span>
+        <span class="npc-attitude attitude-${att.toLowerCase()}">${att}</span>
         <div class="npc-desc">${escHtml(n.description||'')}</div>
         ${n.first_seen ? `<div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">First seen: ${escHtml(n.first_seen)}</div>` : ''}
         <div class="npc-card-actions">
@@ -1053,62 +1208,43 @@ function renderNPCs() {
       </div>`;
     }).join('') + `</div>`;
 }
-function openAddNPC()      { showNPCModal(null); }
-function openEditNPC(id)   {
-  const s = getSession(activeSessionId);
-  showNPCModal(s?.npcs.find(n=>n.id===id)||null);
-}
+function openAddNPC()     { showNPCModal(null); }
+function openEditNPC(id)  { const s = getSession(activeSessionId); showNPCModal(s?.npcs.find(n=>n.id===id)||null); }
 function showNPCModal(n) {
   const isEdit = !!n;
   document.getElementById('modal-title').textContent = isEdit ? 'Edit NPC' : 'Add NPC';
   document.getElementById('modal-content').innerHTML = `
-    <label>Name *</label>
-    <input type="text" id="npc-name" placeholder="Seraphine the Trader" value="${escHtml(n?.name||'')}">
-    <label>Role / Title</label>
-    <input type="text" id="npc-role" placeholder="Merchant, Guard Captain, Villain…" value="${escHtml(n?.role||'')}">
+    <label>Name *</label><input type="text" id="npc-name" placeholder="Seraphine the Trader" value="${escHtml(n?.name||'')}">
+    <label>Role / Title</label><input type="text" id="npc-role" placeholder="Merchant, Guard Captain…" value="${escHtml(n?.role||'')}">
     <div class="form-row">
-      <div>
-        <label>Attitude</label>
-        <select id="npc-att">
-          ${ATTITUDES.map(a=>`<option value="${a}" ${(n?.attitude||'Unknown')===a?'selected':''}>${a}</option>`).join('')}
-        </select>
+      <div><label>Attitude</label>
+        <select id="npc-att">${ATTITUDES.map(a=>`<option value="${a}" ${(n?.attitude||'Unknown')===a?'selected':''}>${a}</option>`).join('')}</select>
       </div>
-      <div>
-        <label>First Seen</label>
-        <input type="text" id="npc-first" placeholder="Silvergate Tavern" value="${escHtml(n?.first_seen||'')}">
-      </div>
+      <div><label>First Seen</label><input type="text" id="npc-first" placeholder="Silvergate Tavern" value="${escHtml(n?.first_seen||'')}"></div>
     </div>
     <label>Description / Notes</label>
-    <textarea id="npc-desc" placeholder="Appearance, personality, goals…">${escHtml(n?.description||'')}</textarea>
-  `;
+    <textarea id="npc-desc" placeholder="Appearance, personality, goals…">${escHtml(n?.description||'')}</textarea>`;
   document.getElementById('modal-actions').innerHTML = `
     <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary btn-sm" onclick="saveNPC(${isEdit?`'${n.id}'`:null})">${isEdit?'Save':'Add NPC'}</button>
-  `;
+    <button class="btn btn-primary btn-sm" onclick="saveNPC(${isEdit?`'${n.id}'`:null})">${isEdit?'Save':'Add NPC'}</button>`;
   openModal();
 }
 function saveNPC(existingId) {
   const s = getSession(activeSessionId); if (!s) return;
   const name = document.getElementById('npc-name').value.trim();
   if (!name) { toast('NPC name is required.'); return; }
-  const data = {
-    name, role: document.getElementById('npc-role').value.trim(),
+  const data = { name, role: document.getElementById('npc-role').value.trim(),
     attitude: document.getElementById('npc-att').value,
     first_seen: document.getElementById('npc-first').value.trim(),
-    description: document.getElementById('npc-desc').value.trim()
-  };
-  if (existingId) {
-    const idx = s.npcs.findIndex(n=>n.id===existingId);
-    s.npcs[idx] = { ...s.npcs[idx], ...data };
-  } else {
-    s.npcs.push({ id: uid(), ...data });
-  }
+    description: document.getElementById('npc-desc').value.trim() };
+  if (existingId) { const idx = s.npcs.findIndex(n=>n.id===existingId); s.npcs[idx] = {...s.npcs[idx],...data}; }
+  else s.npcs.push({ id: uid(), ...data });
   save(); closeModal(); renderNPCs();
   toast(existingId ? 'NPC updated.' : 'NPC added!');
 }
 function deleteNPC(id) {
   const s = getSession(activeSessionId); if (!s) return;
-  s.npcs = s.npcs.filter(n => n.id !== id);
+  s.npcs = s.npcs.filter(n=>n.id!==id);
   save(); renderNPCs(); toast('NPC removed.');
 }
 
@@ -1134,25 +1270,17 @@ function renderLocations() {
     </div>`).join('') + `</div>`;
 }
 function openAddLocation()    { showLocationModal(null); }
-function openEditLocation(id) {
-  const s = getSession(activeSessionId);
-  showLocationModal(s?.locations.find(l=>l.id===id)||null);
-}
+function openEditLocation(id) { const s = getSession(activeSessionId); showLocationModal(s?.locations.find(l=>l.id===id)||null); }
 function showLocationModal(l) {
   const isEdit = !!l;
   document.getElementById('modal-title').textContent = isEdit ? 'Edit Location' : 'Add Location';
   document.getElementById('modal-content').innerHTML = `
-    <label>Location Name *</label>
-    <input type="text" id="loc-name" placeholder="The Sunken Vault" value="${escHtml(l?.name||'')}">
-    <label>Type</label>
-    <input type="text" id="loc-type" placeholder="Dungeon, City, Wilderness, Shop…" value="${escHtml(l?.type||'')}">
-    <label>Description</label>
-    <textarea id="loc-desc" placeholder="Notable features, history, hazards…">${escHtml(l?.description||'')}</textarea>
-  `;
+    <label>Location Name *</label><input type="text" id="loc-name" placeholder="The Sunken Vault" value="${escHtml(l?.name||'')}">
+    <label>Type</label><input type="text" id="loc-type" placeholder="Dungeon, City, Wilderness, Shop…" value="${escHtml(l?.type||'')}">
+    <label>Description</label><textarea id="loc-desc" placeholder="Notable features, history, hazards…">${escHtml(l?.description||'')}</textarea>`;
   document.getElementById('modal-actions').innerHTML = `
     <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-teal btn-sm" onclick="saveLocation(${isEdit?`'${l.id}'`:null})">${isEdit?'Save':'Add Location'}</button>
-  `;
+    <button class="btn btn-teal btn-sm" onclick="saveLocation(${isEdit?`'${l.id}'`:null})">${isEdit?'Save':'Add Location'}</button>`;
   openModal();
 }
 function saveLocation(existingId) {
@@ -1160,18 +1288,14 @@ function saveLocation(existingId) {
   const name = document.getElementById('loc-name').value.trim();
   if (!name) { toast('Location name is required.'); return; }
   const data = { name, type: document.getElementById('loc-type').value.trim(), description: document.getElementById('loc-desc').value.trim() };
-  if (existingId) {
-    const idx = s.locations.findIndex(l=>l.id===existingId);
-    s.locations[idx] = { ...s.locations[idx], ...data };
-  } else {
-    s.locations.push({ id: uid(), ...data });
-  }
+  if (existingId) { const idx = s.locations.findIndex(l=>l.id===existingId); s.locations[idx]={...s.locations[idx],...data}; }
+  else s.locations.push({ id: uid(), ...data });
   save(); closeModal(); renderLocations();
   toast(existingId ? 'Location updated.' : 'Location added!');
 }
 function deleteLocation(id) {
   const s = getSession(activeSessionId); if (!s) return;
-  s.locations = s.locations.filter(l => l.id !== id);
+  s.locations = s.locations.filter(l=>l.id!==id);
   save(); renderLocations(); toast('Location removed.');
 }
 
@@ -1192,9 +1316,7 @@ function renderHooks() {
         <div class="hook-title">${escHtml(h.title)}</div>
         ${h.source?`<div class="hook-source">Source: ${escHtml(h.source)}</div>`:''}
         <div class="hook-desc">${escHtml(h.description||'')}</div>
-        <div style="margin-top:8px;">
-          <span class="tool-badge badge-purple" style="text-transform:capitalize;">${h.status||'Open'}</span>
-        </div>
+        <div style="margin-top:8px;"><span class="tool-badge badge-purple" style="text-transform:capitalize;">${h.status||'Open'}</span></div>
       </div>
       <div class="hook-actions">
         <button class="btn btn-sm btn-purple" onclick="openEditHook('${h.id}')">✏</button>
@@ -1202,36 +1324,23 @@ function renderHooks() {
       </div>
     </div>`).join('') + `</div>`;
 }
-function openAddHook()     { showHookModal(null); }
-function openEditHook(id)  {
-  const s = getSession(activeSessionId);
-  showHookModal(s?.hooks.find(h=>h.id===id)||null);
-}
+function openAddHook()    { showHookModal(null); }
+function openEditHook(id) { const s = getSession(activeSessionId); showHookModal(s?.hooks.find(h=>h.id===id)||null); }
 function showHookModal(h) {
   const isEdit = !!h;
   document.getElementById('modal-title').textContent = isEdit ? 'Edit Plot Hook' : 'Add Plot Hook';
   document.getElementById('modal-content').innerHTML = `
-    <label>Hook Title *</label>
-    <input type="text" id="hook-title" placeholder="The Missing Merchant's Ledger" value="${escHtml(h?.title||'')}">
+    <label>Hook Title *</label><input type="text" id="hook-title" placeholder="The Missing Merchant's Ledger" value="${escHtml(h?.title||'')}">
     <div class="form-row">
-      <div>
-        <label>Source / Introduced By</label>
-        <input type="text" id="hook-source" placeholder="NPC, discovered, overheard…" value="${escHtml(h?.source||'')}">
-      </div>
-      <div>
-        <label>Status</label>
-        <select id="hook-status">
-          ${HOOK_STATUS.map(st=>`<option value="${st}" ${(h?.status||'Open')===st?'selected':''}>${st}</option>`).join('')}
-        </select>
+      <div><label>Source / Introduced By</label><input type="text" id="hook-source" placeholder="NPC, discovered, overheard…" value="${escHtml(h?.source||'')}"></div>
+      <div><label>Status</label>
+        <select id="hook-status">${HOOK_STATUS.map(st=>`<option value="${st}" ${(h?.status||'Open')===st?'selected':''}>${st}</option>`).join('')}</select>
       </div>
     </div>
-    <label>Description</label>
-    <textarea id="hook-desc" placeholder="Details, clues, leads…">${escHtml(h?.description||'')}</textarea>
-  `;
+    <label>Description</label><textarea id="hook-desc" placeholder="Details, clues, leads…">${escHtml(h?.description||'')}</textarea>`;
   document.getElementById('modal-actions').innerHTML = `
     <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-purple btn-sm" onclick="saveHook(${isEdit?`'${h.id}'`:null})">${isEdit?'Save':'Add Hook'}</button>
-  `;
+    <button class="btn btn-purple btn-sm" onclick="saveHook(${isEdit?`'${h.id}'`:null})">${isEdit?'Save':'Add Hook'}</button>`;
   openModal();
 }
 function saveHook(existingId) {
@@ -1241,75 +1350,90 @@ function saveHook(existingId) {
   const data = { title, source: document.getElementById('hook-source').value.trim(),
     status: document.getElementById('hook-status').value,
     description: document.getElementById('hook-desc').value.trim() };
-  if (existingId) {
-    const idx = s.hooks.findIndex(h=>h.id===existingId);
-    s.hooks[idx] = { ...s.hooks[idx], ...data };
-  } else {
-    s.hooks.push({ id: uid(), ...data });
-  }
+  if (existingId) { const idx = s.hooks.findIndex(h=>h.id===existingId); s.hooks[idx]={...s.hooks[idx],...data}; }
+  else s.hooks.push({ id: uid(), ...data });
   save(); closeModal(); renderHooks();
   toast(existingId ? 'Hook updated.' : 'Hook added!');
 }
 function deleteHook(id) {
   const s = getSession(activeSessionId); if (!s) return;
-  s.hooks = s.hooks.filter(h => h.id !== id);
+  s.hooks = s.hooks.filter(h=>h.id!==id);
   save(); renderHooks(); toast('Hook removed.');
 }
 
 /* ══════════════════════════════════════════
-   LOOT (SESSION)
+   LOOT — SESSION VIEW
+   Each session stores: loot.items[], loot.coins{}, loot.divided (bool)
 ══════════════════════════════════════════ */
+function ensureLoot(s) {
+  if (!s.loot) s.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0}, divided:false };
+  if (!s.loot.coins) s.loot.coins = {gp:0,sp:0,cp:0,pp:0,ep:0};
+  if (typeof s.loot.divided === 'undefined') s.loot.divided = false;
+}
+
 function renderLootSession() {
   const s = getSession(activeSessionId); if (!s) return;
-  if (!s.loot) s.loot = { items: [], coins: { gp:0,sp:0,cp:0,pp:0,ep:0 } };
+  ensureLoot(s);
   const el = document.getElementById('loot-session-container');
-  el.innerHTML = renderLootBlock(s.loot);
-}
-function renderLootBlock(loot) {
-  const coins = loot.coins || {};
-  const coinStr = ['pp','gp','ep','sp','cp'].filter(k=>coins[k]>0).map(k=>`<div class="wealth-item"><div class="wealth-coin">${coins[k]}</div><div class="wealth-label">${k.toUpperCase()}</div></div>`).join('');
-  return `
-    ${coinStr ? `<div class="card" style="margin-bottom:12px;">
+  const coins  = s.loot.coins;
+  const isDivided = s.loot.divided;
+
+  // Coin display
+  const coinKeys = ['pp','gp','ep','sp','cp'];
+  const coinDisplay = coinKeys.filter(k=>coins[k]>0)
+    .map(k=>`<div class="wealth-item"><div class="wealth-coin">${coins[k]}</div><div class="wealth-label">${k.toUpperCase()}</div></div>`)
+    .join('') || '<span style="color:var(--text-muted);font-size:0.85rem;">No coins yet.</span>';
+
+  // Items table
+  const itemsHtml = !s.loot.items.length
+    ? `<div style="color:var(--text-muted);font-size:0.9rem;padding:16px 0;">No items recorded.</div>`
+    : `<table class="loot-table"><thead><tr><th>Item</th><th>Type</th><th>Qty</th><th>Value</th><th style="width:70px;"></th></tr></thead><tbody>` +
+      s.loot.items.map(item => `<tr>
+        <td>${escHtml(item.name)}${item.notes?`<br><span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">${escHtml(item.notes)}</span>`:''}</td>
+        <td><span class="loot-type-tag loot-type-${lootTypeClass(item.type)}">${item.type||'Misc'}</span></td>
+        <td class="loot-qty">${item.qty||1}</td>
+        <td class="loot-value">${escHtml(item.value||'—')}</td>
+        <td style="display:flex;gap:4px;padding:8px 12px;">
+          <button class="btn btn-sm" style="padding:3px 7px;" onclick="openEditLootItem('${item.id}')">✏</button>
+          <button class="btn btn-sm btn-danger" style="padding:3px 7px;" onclick="deleteLootItem('${item.id}')">✕</button>
+        </td>
+      </tr>`).join('') + `</tbody></table>`;
+
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:12px;">
       <div class="card-title">💰 Coins &amp; Wealth</div>
-      <div class="wealth-row">${coinStr}</div>
-    </div>` : ''}
+      <div class="wealth-row">${coinDisplay}</div>
+      <div class="divided-row">
+        <label class="divided-toggle">
+          <input type="checkbox" id="divided-chk" ${isDivided?'checked':''} onchange="toggleDivided(this.checked)">
+          <span class="divided-slider"></span>
+        </label>
+        <span class="divided-label ${isDivided?'on':''}">Divided</span>
+        <span class="divided-hint">— exclude these coins from the Campaign Loot total</span>
+      </div>
+    </div>
     <div class="card">
       <div class="card-title">💎 Items</div>
-      ${!loot.items.length ? `<div style="color:var(--text-muted);font-size:0.9rem;padding:16px 0;">No items recorded.</div>` :
-        `<table class="loot-table"><thead><tr><th>Item</th><th>Type</th><th>Qty</th><th>Value</th><th style="width:70px;"></th></tr></thead><tbody>` +
-        loot.items.map(item => `<tr>
-          <td>${escHtml(item.name)}${item.notes?`<br><span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">${escHtml(item.notes)}</span>`:''}</td>
-          <td><span class="loot-type-tag loot-type-${(item.type||'misc').toLowerCase().replace(/\s+/g,'-').replace('magic-item','magic')}">${item.type||'Misc'}</span></td>
-          <td class="loot-qty">${item.qty||1}</td>
-          <td class="loot-value">${item.value||'—'}</td>
-          <td style="display:flex;gap:4px;padding:8px 12px;">
-            <button class="btn btn-sm" style="padding:3px 7px;" onclick="openEditLootItem('${item.id}','session')">✏</button>
-            <button class="btn btn-sm btn-danger" style="padding:3px 7px;" onclick="deleteLootItem('${item.id}','session')">✕</button>
-          </td>
-        </tr>`).join('') + `</tbody></table>`
-      }
+      ${itemsHtml}
     </div>`;
 }
 
-function openAddLoot(ctx) {
-  activeLootCtx = ctx;
-  showLootModal(null);
+function toggleDivided(checked) {
+  const s = getSession(activeSessionId); if (!s) return;
+  ensureLoot(s);
+  s.loot.divided = checked;
+  save();
+  // Update label colour instantly without full re-render
+  const lbl = document.querySelector('.divided-label');
+  if (lbl) lbl.className = 'divided-label' + (checked?' on':'');
+  toast(checked ? 'Coins excluded from campaign total.' : 'Coins included in campaign total.');
 }
-function openEditLootItem(id, ctx) {
-  activeLootCtx = ctx;
-  const loot = getLootSource(ctx);
-  showLootModal(loot.items.find(x=>x.id===id)||null);
-}
-function getLootSource(ctx) {
-  if (ctx === 'session') {
-    const s = getSession(activeSessionId);
-    if (!s.loot) s.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
-    return s.loot;
-  } else {
-    const c = getCampaign(activeCampaignId);
-    if (!c.loot) c.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
-    return c.loot;
-  }
+
+function openAddLoot() { showLootModal(null); }
+function openEditLootItem(id) {
+  const s = getSession(activeSessionId); if (!s) return;
+  ensureLoot(s);
+  showLootModal(s.loot.items.find(x=>x.id===id)||null);
 }
 function showLootModal(item) {
   const isEdit = !!item;
@@ -1318,62 +1442,46 @@ function showLootModal(item) {
     <label>Item Name *</label>
     <input type="text" id="li-name" placeholder="+1 Longsword, Potion of Healing…" value="${escHtml(item?.name||'')}">
     <div class="form-row">
-      <div>
-        <label>Type</label>
-        <select id="li-type">
-          ${LOOT_TYPES.map(t=>`<option value="${t}" ${(item?.type||'Misc')===t?'selected':''}>${t}</option>`).join('')}
-        </select>
+      <div><label>Type</label>
+        <select id="li-type">${LOOT_TYPES.map(t=>`<option value="${t}" ${(item?.type||'Misc')===t?'selected':''}>${t}</option>`).join('')}</select>
       </div>
-      <div>
-        <label>Quantity</label>
-        <input type="number" id="li-qty" value="${item?.qty||1}" min="1">
-      </div>
+      <div><label>Quantity</label><input type="number" id="li-qty" value="${item?.qty||1}" min="1"></div>
     </div>
     <label>Value / Price</label>
     <input type="text" id="li-value" placeholder="250 gp, Priceless, Trade…" value="${escHtml(item?.value||'')}">
     <label>Notes</label>
-    <input type="text" id="li-notes" placeholder="Attunement required, cursed…" value="${escHtml(item?.notes||'')}">
-  `;
+    <input type="text" id="li-notes" placeholder="Attunement required, cursed…" value="${escHtml(item?.notes||'')}">`;
   document.getElementById('modal-actions').innerHTML = `
     <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary btn-sm" onclick="saveLootItem(${isEdit?`'${item.id}'`:null})">${isEdit?'Save':'Add Item'}</button>
-  `;
+    <button class="btn btn-primary btn-sm" onclick="saveLootItem(${isEdit?`'${item.id}'`:null})">${isEdit?'Save':'Add Item'}</button>`;
   openModal();
 }
 function saveLootItem(existingId) {
-  const loot = getLootSource(activeLootCtx);
+  const s = getSession(activeSessionId); if (!s) return;
+  ensureLoot(s);
   const name = document.getElementById('li-name').value.trim();
   if (!name) { toast('Item name is required.'); return; }
   const data = { name, type: document.getElementById('li-type').value,
     qty: parseInt(document.getElementById('li-qty').value)||1,
     value: document.getElementById('li-value').value.trim(),
     notes: document.getElementById('li-notes').value.trim() };
-  if (existingId) {
-    const idx = loot.items.findIndex(x=>x.id===existingId);
-    loot.items[idx] = { ...loot.items[idx], ...data };
-  } else {
-    loot.items.push({ id: uid(), ...data });
-  }
-  save(); closeModal();
-  if (activeLootCtx === 'session') renderLootSession();
-  else renderLootMain();
+  if (existingId) { const idx = s.loot.items.findIndex(x=>x.id===existingId); s.loot.items[idx]={...s.loot.items[idx],...data}; }
+  else s.loot.items.push({ id: uid(), ...data });
+  save(); closeModal(); renderLootSession();
   toast(existingId ? 'Item updated.' : 'Item added!');
 }
-function deleteLootItem(id, ctx) {
-  const loot = getLootSource(ctx);
-  loot.items = loot.items.filter(x => x.id !== id);
-  save();
-  if (ctx === 'session') renderLootSession();
-  else renderLootMain();
-  toast('Item removed.');
+function deleteLootItem(id) {
+  const s = getSession(activeSessionId); if (!s) return;
+  s.loot.items = s.loot.items.filter(x=>x.id!==id);
+  save(); renderLootSession(); toast('Item removed.');
 }
-function openAddWealth(ctx) {
-  activeLootCtx = ctx || 'session';
-  const loot = getLootSource(activeLootCtx);
-  const coins = loot.coins || {};
-  document.getElementById('modal-title').textContent = 'Add / Edit Coins';
+function openEditSessionCoins() {
+  const s = getSession(activeSessionId); if (!s) return;
+  ensureLoot(s);
+  const coins = s.loot.coins;
+  document.getElementById('modal-title').textContent = 'Edit Session Coins';
   document.getElementById('modal-content').innerHTML = `
-    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;">Enter current totals for each denomination.</p>
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:14px;">Enter the coins collected this session.</p>
     <div class="form-row-3">
       <div><label>PP (Platinum)</label><input type="number" id="coin-pp" value="${coins.pp||0}" min="0"></div>
       <div><label>GP (Gold)</label><input type="number" id="coin-gp" value="${coins.gp||0}" min="0"></div>
@@ -1382,62 +1490,123 @@ function openAddWealth(ctx) {
     <div class="form-row">
       <div><label>SP (Silver)</label><input type="number" id="coin-sp" value="${coins.sp||0}" min="0"></div>
       <div><label>CP (Copper)</label><input type="number" id="coin-cp" value="${coins.cp||0}" min="0"></div>
-    </div>
-  `;
+    </div>`;
   document.getElementById('modal-actions').innerHTML = `
     <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary btn-sm" onclick="saveCoins()">Save Coins</button>
-  `;
+    <button class="btn btn-primary btn-sm" onclick="saveSessionCoins()">Save Coins</button>`;
   openModal();
 }
-function saveCoins() {
-  const loot = getLootSource(activeLootCtx);
-  loot.coins = {
+function saveSessionCoins() {
+  const s = getSession(activeSessionId); if (!s) return;
+  ensureLoot(s);
+  s.loot.coins = {
     pp: parseInt(document.getElementById('coin-pp').value)||0,
     gp: parseInt(document.getElementById('coin-gp').value)||0,
     ep: parseInt(document.getElementById('coin-ep').value)||0,
     sp: parseInt(document.getElementById('coin-sp').value)||0,
     cp: parseInt(document.getElementById('coin-cp').value)||0,
   };
-  save(); closeModal();
-  if (activeLootCtx === 'session') renderLootSession();
-  else renderLootMain();
-  toast('Coins updated!');
+  save(); closeModal(); renderLootSession(); toast('Coins updated!');
+}
+function lootTypeClass(t) {
+  const map = { 'Weapon':'weapon','Armor':'armor','Magic Item':'magic','Coin':'coin','Misc':'misc' };
+  return map[t] || 'misc';
 }
 
 /* ══════════════════════════════════════════
-   LOOT (MAIN / CAMPAIGN LEDGER)
+   LOOT LEDGER — CAMPAIGN AGGREGATE VIEW
+   Aggregates all sessions for the active campaign.
+   Items tagged with their session. Coins summed,
+   skipping sessions with loot.divided === true.
 ══════════════════════════════════════════ */
-function renderLootMain() {
-  renderCampaignSelector('loot-campaign-selector', 'loot-filter', () => {
-    lootFilterId = activeCampaignId;
-    renderLootMainContent();
-  });
-  renderLootMainContent();
+function renderLootLedger() {
+  renderCampaignSelector('loot-campaign-selector', 'loot-filter', renderLootLedgerContent);
+  renderLootLedgerContent();
 }
-function renderLootMainContent() {
-  const c = getCampaign(activeCampaignId);
+function renderLootLedgerContent() {
+  const c  = getCampaign(activeCampaignId);
   const el = document.getElementById('loot-main-container');
-  if (!c) { el.innerHTML = `<div class="empty-state"><div class="big-icon">💰</div><p>Select a campaign to view its loot ledger.</p></div>`; return; }
-  if (!c.loot) c.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
-  el.innerHTML = renderLootBlock(c.loot);
-}
-function clearAllLoot() {
-  const c = getCampaign(activeCampaignId); if (!c) return;
-  if (!confirm('Clear all loot for this campaign?')) return;
-  c.loot = { items:[], coins:{gp:0,sp:0,cp:0,pp:0,ep:0} };
-  save(); renderLootMain(); toast('Loot cleared.');
+  if (!c) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">💰</div><p>Select a campaign to view its aggregated loot.</p></div>`;
+    return;
+  }
+  const sessions = getSessions(c.id).filter(s => s.loot && (s.loot.items?.length || Object.values(s.loot.coins||{}).some(v=>v>0)));
+  if (!sessions.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">💎</div><p>No loot recorded for any session in this campaign yet.</p></div>`;
+    return;
+  }
+
+  // ── Aggregate coins (skip divided sessions) ──
+  const coinKeys = ['pp','gp','ep','sp','cp'];
+  const totals = { pp:0, gp:0, ep:0, sp:0, cp:0 };
+  sessions.forEach(s => {
+    if (!s.loot.divided) {
+      coinKeys.forEach(k => { totals[k] += (s.loot.coins?.[k]||0); });
+    }
+  });
+
+  // ── Build coin total display ──
+  const coinTotalHtml = coinKeys.filter(k=>totals[k]>0)
+    .map(k=>{
+      // breakdown per session
+      const breakdown = sessions.filter(s=>!s.loot.divided && s.loot.coins?.[k]>0)
+        .map(s=>`S${s.number}: ${s.loot.coins[k]}`).join(', ');
+      return `<div class="coin-sum-item">
+        <div class="coin-sum-val">${totals[k]}</div>
+        <div class="coin-sum-label">${k.toUpperCase()}</div>
+        ${breakdown?`<div class="coin-sum-breakdown">${breakdown}</div>`:''}
+      </div>`;
+    }).join('');
+
+  const dividedSessions = sessions.filter(s=>s.loot.divided);
+  const dividedNote = dividedSessions.length
+    ? `<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic;margin-top:10px;">
+        ${dividedSessions.map(s=>`Session ${s.number}`).join(', ')} marked as Divided — coins excluded from total.
+       </div>`
+    : '';
+
+  // ── All items grouped by session ──
+  const allItems = sessions.flatMap(s =>
+    (s.loot.items||[]).map(item => ({ ...item, sessionNum: s.number, sessionTitle: s.title||'Untitled' }))
+  );
+
+  const itemsHtml = !allItems.length
+    ? `<div style="color:var(--text-muted);font-size:0.9rem;padding:16px 0;">No items recorded across any session.</div>`
+    : `<table class="loot-table">
+        <thead><tr><th>Item</th><th>Session</th><th>Type</th><th>Qty</th><th>Value</th></tr></thead>
+        <tbody>` +
+      allItems.map(item=>`<tr>
+        <td>${escHtml(item.name)}${item.notes?`<br><span style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">${escHtml(item.notes)}</span>`:''}</td>
+        <td style="white-space:nowrap;">
+          <span class="tool-badge badge-muted" style="font-size:0.5rem;">S${item.sessionNum}</span>
+          <span style="font-size:0.78rem;color:var(--text-muted);display:block;margin-top:2px;">${escHtml(item.sessionTitle)}</span>
+        </td>
+        <td><span class="loot-type-tag loot-type-${lootTypeClass(item.type)}">${item.type||'Misc'}</span></td>
+        <td class="loot-qty">${item.qty||1}</td>
+        <td class="loot-value">${escHtml(item.value||'—')}</td>
+      </tr>`).join('') + `</tbody></table>`;
+
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">💰 Campaign Coin Total</div>
+      ${coinTotalHtml ? `<div class="coin-sum-row">${coinTotalHtml}</div>` : '<div style="color:var(--text-muted);font-size:0.88rem;padding:8px 0;">No coins recorded (or all sessions marked Divided).</div>'}
+      ${dividedNote}
+    </div>
+    <div class="card">
+      <div class="card-title">💎 All Items</div>
+      ${itemsHtml}
+    </div>`;
 }
 
 /* ══════════════════════════════════════════
    PARTY
 ══════════════════════════════════════════ */
 function renderPartyView() {
-  renderCampaignSelector('party-campaign-selector', 'party-filter', () => { renderPartyContent(); });
+  renderCampaignSelector('party-campaign-selector', 'party-filter', renderPartyContent);
   renderPartyContent();
 }
 function renderPartyContent() {
-  const c = getCampaign(activeCampaignId);
+  const c  = getCampaign(activeCampaignId);
   const el = document.getElementById('party-list-container');
   if (!c) { el.innerHTML = `<div class="empty-state"><div class="big-icon">⚔</div><p>Select a campaign to manage its party.</p></div>`; return; }
   if (!c.party) c.party = [];
@@ -1459,18 +1628,15 @@ function renderPartyContent() {
 function buildPartyStatRows(p) {
   const rows = [];
   if (p.hp_current || p.hp_max) rows.push(['HP', `${p.hp_current||'?'} / ${p.hp_max||'?'}`]);
-  if (p.ac)             rows.push(['AC', p.ac]);
-  if (p.speed)          rows.push(['Speed', p.speed]);
-  if (p.passive_perc)   rows.push(['Passive Perc', p.passive_perc]);
-  if (p.initiative)     rows.push(['Initiative', p.initiative]);
-  if (p.notes)          rows.push(['Notes', p.notes]);
+  if (p.ac)           rows.push(['AC', p.ac]);
+  if (p.speed)        rows.push(['Speed', p.speed]);
+  if (p.passive_perc) rows.push(['Passive Perc', p.passive_perc]);
+  if (p.initiative)   rows.push(['Initiative', p.initiative]);
+  if (p.notes)        rows.push(['Notes', p.notes]);
   return rows.map(([l,v]) => `<div class="party-stat-row"><span class="party-stat-label">${l}</span><span class="party-stat-val">${escHtml(String(v))}</span></div>`).join('');
 }
-function openAddPartyMember()     { showPartyModal(null); }
-function openEditPartyMember(id)  {
-  const c = getCampaign(activeCampaignId);
-  showPartyModal(c?.party.find(p=>p.id===id)||null);
-}
+function openAddPartyMember()    { showPartyModal(null); }
+function openEditPartyMember(id) { const c=getCampaign(activeCampaignId); showPartyModal(c?.party.find(p=>p.id===id)||null); }
 function showPartyModal(p) {
   const isEdit = !!p;
   document.getElementById('modal-title').textContent = isEdit ? 'Edit Party Member' : 'Add Party Member';
@@ -1494,12 +1660,10 @@ function showPartyModal(p) {
       <div><label>Passive Perc</label><input type="number" id="pm-pp" value="${p?.passive_perc||''}"></div>
     </div>
     <label>Notes</label>
-    <textarea id="pm-notes" placeholder="Conditions, special abilities, languages…">${escHtml(p?.notes||'')}</textarea>
-  `;
+    <textarea id="pm-notes" placeholder="Conditions, special abilities, languages…">${escHtml(p?.notes||'')}</textarea>`;
   document.getElementById('modal-actions').innerHTML = `
     <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary btn-sm" onclick="savePartyMember(${isEdit?`'${p.id}'`:null})">${isEdit?'Save':'Add Member'}</button>
-  `;
+    <button class="btn btn-primary btn-sm" onclick="savePartyMember(${isEdit?`'${p.id}'`:null})">${isEdit?'Save':'Add Member'}</button>`;
   openModal();
 }
 function savePartyMember(existingId) {
@@ -1507,8 +1671,7 @@ function savePartyMember(existingId) {
   if (!c.party) c.party = [];
   const name = document.getElementById('pm-name').value.trim();
   if (!name) { toast('Character name is required.'); return; }
-  const data = {
-    name, player: document.getElementById('pm-player').value.trim(),
+  const data = { name, player: document.getElementById('pm-player').value.trim(),
     class: document.getElementById('pm-class').value.trim(),
     level: parseInt(document.getElementById('pm-level').value)||1,
     hp_current: parseInt(document.getElementById('pm-hpc').value)||null,
@@ -1517,30 +1680,24 @@ function savePartyMember(existingId) {
     speed: document.getElementById('pm-speed').value.trim(),
     initiative: document.getElementById('pm-init').value.trim(),
     passive_perc: parseInt(document.getElementById('pm-pp').value)||null,
-    notes: document.getElementById('pm-notes').value.trim(),
-  };
-  if (existingId) {
-    const idx = c.party.findIndex(p=>p.id===existingId);
-    c.party[idx] = { ...c.party[idx], ...data };
-  } else {
-    c.party.push({ id: uid(), ...data });
-  }
+    notes: document.getElementById('pm-notes').value.trim() };
+  if (existingId) { const idx=c.party.findIndex(p=>p.id===existingId); c.party[idx]={...c.party[idx],...data}; }
+  else c.party.push({ id: uid(), ...data });
   save(); closeModal(); renderPartyContent();
   toast(existingId ? 'Member updated.' : 'Member added!');
 }
 function deletePartyMember(id) {
   const c = getCampaign(activeCampaignId); if (!c) return;
-  c.party = c.party.filter(p => p.id !== id);
+  c.party = c.party.filter(p=>p.id!==id);
   save(); renderPartyContent(); toast('Member removed.');
 }
 
 /* ══════════════════════════════════════════
-   CAMPAIGN SELECTOR (for Party / Loot views)
+   CAMPAIGN SELECTOR
 ══════════════════════════════════════════ */
 function renderCampaignSelector(containerId, selectId, onChange) {
   const el = document.getElementById(containerId);
   if (!state.campaigns.length) { el.innerHTML = ''; return; }
-  // Auto-select if only one or if activeCampaignId already set
   if (!activeCampaignId && state.campaigns.length === 1) activeCampaignId = state.campaigns[0].id;
   el.innerHTML = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
     <label style="margin:0;white-space:nowrap;">Campaign:</label>
@@ -1552,49 +1709,13 @@ function renderCampaignSelector(containerId, selectId, onChange) {
 }
 
 /* ══════════════════════════════════════════
-   SESSION NOTES EDITING
-══════════════════════════════════════════ */
-function editNotes() {
-  const s = getSession(activeSessionId); if (!s) return;
-  document.getElementById('modal-title').textContent = 'Edit Session Notes';
-  document.getElementById('modal-content').innerHTML = `
-    <textarea id="notes-edit" style="min-height:260px;">${escHtml(s.notes||'')}</textarea>`;
-  document.getElementById('modal-actions').innerHTML = `
-    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary btn-sm" onclick="saveNotes()">Save Notes</button>`;
-  openModal();
-}
-function saveNotes() {
-  const s = getSession(activeSessionId); if (!s) return;
-  s.notes = document.getElementById('notes-edit').value;
-  save(); closeModal(); renderNotes();
-  toast('Notes saved!');
-}
-function editSummary() {
-  const s = getSession(activeSessionId); if (!s) return;
-  document.getElementById('modal-title').textContent = 'Edit Session Summary';
-  document.getElementById('modal-content').innerHTML = `
-    <textarea id="summary-edit" style="min-height:120px;">${escHtml(s.summary||'')}</textarea>`;
-  document.getElementById('modal-actions').innerHTML = `
-    <button class="btn btn-sm" onclick="closeModal()">Cancel</button>
-    <button class="btn btn-primary btn-sm" onclick="saveSummary()">Save Summary</button>`;
-  openModal();
-}
-function saveSummary() {
-  const s = getSession(activeSessionId); if (!s) return;
-  s.summary = document.getElementById('summary-edit').value;
-  save(); closeModal(); renderNotes();
-  toast('Summary saved!');
-}
-
-/* ══════════════════════════════════════════
    EXPORT / IMPORT
 ══════════════════════════════════════════ */
 function exportAll() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `session-scribe-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `session-scribe-${new Date().toISOString().slice(0,10)}.json`;
   a.click(); toast('Exported!');
 }
 function triggerImport() { document.getElementById('import-file').click(); }
@@ -1606,11 +1727,10 @@ function importAll(e) {
       const d = JSON.parse(ev.target.result);
       if (d.campaigns && d.sessions) {
         if (!confirm(`Import ${d.campaigns.length} campaign(s) and ${d.sessions.length} session(s)? This will merge with existing data.`)) return;
-        // Merge: skip duplicates by id
         d.campaigns.forEach(c => { if (!getCampaign(c.id)) state.campaigns.push(c); });
         d.sessions.forEach(s  => { if (!getSession(s.id))   state.sessions.push(s);  });
         save(); renderCampaigns(); toast('Import successful!');
-      } else { toast('Invalid file format.'); }
+      } else toast('Invalid file format.');
     } catch { toast('Import failed — invalid JSON.'); }
   };
   r.readAsText(file);
@@ -1622,13 +1742,7 @@ function importAll(e) {
 ══════════════════════════════════════════ */
 function openModal()  { document.getElementById('modal-overlay').classList.add('open'); }
 function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
-
-/* ══════════════════════════════════════════
-   KEYBOARD
-══════════════════════════════════════════ */
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
 /* ══════════════════════════════════════════
    INIT
