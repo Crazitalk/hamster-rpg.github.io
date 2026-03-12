@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#162333">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Savage Worlds AE — Character Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rye&family=Bitter:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Oswald:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── rpg-swade Palette ── */
+    --sw-prussian:   #162333;
+    --sw-olive:      #816a36;
+    --sw-vanilla:    #f0dd9a;
+    --sw-silver:     #c2bfb2;
+    --sw-red:        #e20a00;
+
+    /* ── Semantic Tokens ── */
+    --bg-deep:       #0e1822;
+    --bg-card:       #1a2b3d;
+    --bg-card2:      #1e3248;
+    --bg-card3:      #12202e;
+    --accent-gold:   var(--sw-vanilla);
+    --accent-gold2:  #f7edbb;
+    --accent-brown:  var(--sw-olive);
+    --accent-red:    var(--sw-red);
+    --accent-silver: var(--sw-silver);
+    --text-primary:  #f0ece3;
+    --text-muted:    #8fa3b4;
+    --text-gold:     var(--sw-vanilla);
+    --border:        rgba(240,221,154,0.18);
+    --border-bright: rgba(240,221,154,0.5);
+    --shadow:        0 8px 40px rgba(0,0,0,0.7);
+    --glow-gold:     0 0 18px rgba(240,221,154,0.22);
+    --glow-red:      0 0 18px rgba(226,10,0,0.4);
+    --transition:    all 0.22s cubic-bezier(0.4,0,0.2,1);
+    --radius:        6px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-deep);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    color: var(--text-primary);
+    font-family: 'Bitter', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 45% at 5% 0%,  rgba(226,10,0,0.09)    0%, transparent 55%),
+      radial-gradient(ellipse 55% 55% at 92% 95%, rgba(129,106,54,0.12)  0%, transparent 55%),
+      radial-gradient(ellipse 40% 50% at 50% 50%, rgba(22,35,51,0.4)     0%, transparent 80%);
+    pointer-events: none; z-index: 0;
+  }
+
+  #app { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 0 0 60px; }
+
+  /* ── BANNER ── */
+  .site-banner {
+    background: #0a1520;
+    padding: 9px 20px;
+    border-bottom: 1px solid rgba(226,10,0,0.3);
+  }
+  .site-banner a {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--sw-vanilla); text-decoration: none; transition: color 0.2s;
+  }
+  .site-banner a:hover { color: var(--sw-red); }
+
+  /* ── HEADER ── */
+  .app-header {
+    text-align: center;
+    padding: 32px 20px 24px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .app-header::after {
+    content: '';
+    position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--sw-red), transparent);
+  }
+  .header-emoji { font-size: 2.8rem; line-height: 1; margin-bottom: 8px; filter: drop-shadow(0 0 12px rgba(240,221,154,0.4)); }
+  .header-title {
+    font-family: 'Rye', serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: var(--accent-gold);
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 12px rgba(240,221,154,0.3);
+    margin-bottom: 6px;
+  }
+  .header-divider {
+    width: 120px; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--sw-olive), transparent);
+    margin: 8px auto;
+  }
+  .header-subtitle {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .header-subtitle a { color: var(--accent-brown); text-decoration: none; }
+  .header-subtitle a:hover { color: var(--accent-gold); }
+
+  /* ── NAV ── */
+  .nav-tabs {
+    display: flex; background: #0e1822;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 50;
+    overflow-x: auto;
+  }
+  .nav-tab {
+    flex: 1; min-width: 80px;
+    padding: 13px 10px;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+  .nav-tab:hover { color: var(--accent-gold); }
+  .nav-tab.active { color: var(--accent-gold); border-bottom-color: var(--sw-red); }
+
+  /* ── VIEWS ── */
+  .view { display: none; padding: 18px 14px; }
+  .view.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent-gold); margin-bottom: 14px;
+    border-bottom: 1px solid var(--border); padding-bottom: 8px;
+  }
+  .card-title span { color: var(--sw-red); }
+
+  /* ── DICE DISPLAY ── */
+  .die-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(240,221,154,0.08);
+    border: 1px solid var(--border-bright);
+    border-radius: 4px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.75rem; color: var(--accent-gold);
+    padding: 2px 8px; min-width: 36px; cursor: pointer;
+    transition: var(--transition);
+  }
+  .die-badge:hover { background: rgba(240,221,154,0.18); box-shadow: var(--glow-gold); }
+
+  /* ── TRAIT DIE STEPPER ── */
+  .trait-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(240,221,154,0.07);
+  }
+  .trait-row:last-child { border-bottom: none; }
+  .trait-name { flex: 1; font-size: 0.92rem; }
+  .trait-mod { font-size: 0.78rem; color: var(--text-muted); margin-left: 4px; }
+  .die-stepper { display: flex; align-items: center; gap: 5px; }
+  .die-step-btn {
+    width: 22px; height: 22px; border: 1px solid var(--border);
+    background: rgba(240,221,154,0.06); color: var(--accent-gold);
+    border-radius: 3px; font-size: 0.85rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .die-step-btn:hover { background: rgba(240,221,154,0.18); }
+
+  /* ── WILD CARD indicator ── */
+  .wc-badge {
+    font-family: 'Oswald', sans-serif; font-size: 0.62rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: rgba(226,10,0,0.15); border: 1px solid rgba(226,10,0,0.4);
+    color: var(--sw-red); border-radius: 3px; padding: 1px 6px;
+  }
+
+  /* ── SKILL ROWS ── */
+  .skill-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(240,221,154,0.06);
+    font-size: 0.88rem;
+  }
+  .skill-row:last-child { border-bottom: none; }
+  .skill-name { flex: 1; }
+  .skill-linked { font-size: 0.72rem; color: var(--accent-brown); font-style: italic; }
+
+  /* ── WOUND / FATIGUE / BENNIES ── */
+  .pip-row { display: flex; gap: 7px; flex-wrap: wrap; }
+  .pip {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 2px solid var(--border-bright);
+    background: rgba(240,221,154,0.05);
+    cursor: pointer; transition: var(--transition);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+  }
+  .pip.wound { border-color: var(--sw-red); }
+  .pip.wound.filled { background: var(--sw-red); box-shadow: var(--glow-red); }
+  .pip.fatigue { border-color: var(--sw-olive); }
+  .pip.fatigue.filled { background: var(--sw-olive); }
+  .pip.benny { border-color: var(--sw-vanilla); }
+  .pip.benny.filled { background: var(--sw-vanilla); box-shadow: var(--glow-gold); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 9px 18px;
+    background: rgba(240,221,154,0.08);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: var(--transition);
+  }
+  .btn:hover { background: rgba(240,221,154,0.16); border-color: var(--border-bright); }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+  .btn-primary {
+    background: rgba(226,10,0,0.18);
+    border-color: rgba(226,10,0,0.55);
+    color: var(--accent-gold2);
+  }
+  .btn-primary:hover { background: rgba(226,10,0,0.32); box-shadow: var(--glow-red); }
+  .btn-sm { padding: 6px 12px; font-size: 0.72rem; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 12px; }
+  .form-label {
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 4px;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 8px 11px;
+    background: rgba(240,221,154,0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: 'Bitter', Georgia, serif;
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none; border-color: var(--border-bright);
+    background: rgba(240,221,154,0.07);
+    box-shadow: var(--glow-gold);
+  }
+  .form-select option { background: var(--bg-card); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* ── CHARACTER LIST ── */
+  .char-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    cursor: pointer; transition: var(--transition);
+    position: relative;
+  }
+  .char-card:hover { border-color: var(--border-bright); background: rgba(30,50,72,0.9); }
+  .char-card.active-char { border-color: rgba(226,10,0,0.55); }
+  .char-card-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .char-card-info { flex: 1; }
+  .char-card-name { font-family: 'Rye', serif; font-size: 1rem; color: var(--accent-gold); }
+  .char-card-sub {
+    font-family: 'Oswald', sans-serif; font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); margin-top: 2px;
+  }
+  .char-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .char-card-btn {
+    width: 28px; height: 28px; border-radius: 4px;
+    background: rgba(240,221,154,0.06); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 0.75rem;
+    cursor: pointer; transition: var(--transition);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .char-card-btn:hover { background: rgba(240,221,154,0.16); color: var(--accent-gold); }
+  .char-card-btn.del:hover { background: rgba(226,10,0,0.2); color: var(--sw-red); border-color: rgba(226,10,0,0.4); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+  .empty-state .big-icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state p { margin-bottom: 16px; font-size: 0.9rem; }
+
+  /* ── WIZARD ── */
+  .wizard-progress {
+    display: flex; justify-content: center; flex-wrap: wrap;
+    gap: 4px; margin-bottom: 22px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .wz-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid rgba(240,221,154,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Oswald', sans-serif; font-size: 0.58rem; letter-spacing: 0.05em;
+    color: var(--text-muted); cursor: pointer; transition: var(--transition);
+    position: relative;
+  }
+  .wz-dot[data-label]::after {
+    content: attr(data-label);
+    position: absolute; top: 34px; left: 50%; transform: translateX(-50%);
+    font-size: 0.55rem; letter-spacing: 0.05em; white-space: nowrap;
+    color: var(--text-muted);
+  }
+  .wz-dot.done { border-color: var(--sw-olive); background: rgba(129,106,54,0.2); color: var(--sw-olive); }
+  .wz-dot.current { border-color: var(--sw-red); background: rgba(226,10,0,0.15); color: var(--sw-red); }
+  .step-title {
+    font-family: 'Rye', serif; font-size: 1.15rem;
+    color: var(--accent-gold); margin-bottom: 6px;
+  }
+  .step-hint { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px; }
+  .wizard-nav { display: flex; justify-content: space-between; margin-top: 18px; }
+
+  /* ── SELECTION GRID ── */
+  .sel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .sel-option {
+    padding: 11px 10px;
+    background: rgba(240,221,154,0.04); border: 1px solid var(--border);
+    border-radius: var(--radius); cursor: pointer; text-align: center;
+    transition: var(--transition);
+  }
+  .sel-option:hover { border-color: var(--border-bright); background: rgba(240,221,154,0.1); }
+  .sel-option.selected { border-color: var(--sw-red); background: rgba(226,10,0,0.12); }
+  .sel-name { font-family: 'Oswald', sans-serif; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-gold); margin-top: 4px; }
+  .sel-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+  .sel-detail {
+    padding: 14px; background: rgba(240,221,154,0.04);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;
+  }
+  .sel-detail strong { color: var(--accent-gold); font-family: 'Oswald', sans-serif; }
+
+  /* ── EDGE / HINDRANCE TAGS ── */
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-family: 'Oswald', sans-serif; font-size: 0.68rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 12px;
+    border: 1px solid; cursor: pointer; transition: var(--transition);
+  }
+  .tag.edge { border-color: rgba(240,221,154,0.35); color: var(--accent-gold); background: rgba(240,221,154,0.05); }
+  .tag.edge:hover, .tag.edge.active { background: rgba(240,221,154,0.18); }
+  .tag.hindrance { border-color: rgba(226,10,0,0.35); color: var(--sw-red); background: rgba(226,10,0,0.05); }
+  .tag.hindrance:hover, .tag.hindrance.active { background: rgba(226,10,0,0.18); }
+  .tag.minor { border-style: dashed; }
+
+  /* ── TRACKER LAYOUT ── */
+  .tracker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:520px){ .tracker-grid { grid-template-columns: 1fr; } }
+  .stat-big {
+    font-family: 'Rye', serif; font-size: 2.2rem;
+    color: var(--accent-gold); line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Oswald', sans-serif; font-size: 0.68rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-muted); margin-top: 2px;
+  }
+  .inc-dec { display: flex; gap: 6px; margin-top: 8px; }
+  .inc-btn {
+    width: 32px; height: 32px; border: 1px solid var(--border);
+    background: rgba(240,221,154,0.06); color: var(--accent-gold);
+    border-radius: var(--radius); font-size: 1.1rem; cursor: pointer;
+    transition: var(--transition); display: flex; align-items: center; justify-content: center;
+  }
+  .inc-btn:hover { background: rgba(240,221,154,0.18); }
+
+  /* ── INLINE NOTE ── */
+  .inline-note {
+    background: rgba(129,106,54,0.12); border-left: 3px solid var(--sw-olive);
+    padding: 6px 10px; font-size: 0.82rem; color: var(--text-muted);
+    border-radius: 0 4px 4px 0; margin-bottom: 8px;
+  }
+  .inline-note strong { color: var(--accent-brown); }
+
+  /* ── DICE ROLLER ── */
+  .dice-result {
+    min-height: 80px; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: rgba(240,221,154,0.03); margin-bottom: 14px; padding: 16px;
+    text-align: center;
+  }
+  .dice-roll-num {
+    font-family: 'Rye', serif; font-size: 2.8rem; color: var(--accent-gold);
+    text-shadow: var(--glow-gold);
+  }
+  .dice-roll-detail { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+  .dice-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .die-btn {
+    width: 52px; height: 52px; border: 1px solid var(--border);
+    background: rgba(240,221,154,0.06); color: var(--accent-gold);
+    border-radius: var(--radius);
+    font-family: 'Oswald', sans-serif; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .die-btn:hover { background: rgba(240,221,154,0.18); box-shadow: var(--glow-gold); }
+  .die-btn.wild { border-color: rgba(226,10,0,0.5); color: var(--sw-red); background: rgba(226,10,0,0.07); }
+  .die-btn.wild:hover { background: rgba(226,10,0,0.2); box-shadow: var(--glow-red); }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ── STATUS ROW ── */
+  .status-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .status-tag {
+    font-family: 'Oswald', sans-serif; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 3px;
+    background: rgba(240,221,154,0.06); border: 1px solid var(--border);
+    color: var(--text-muted); cursor: pointer; transition: var(--transition);
+  }
+  .status-tag.on { background: rgba(226,10,0,0.18); border-color: rgba(226,10,0,0.5); color: var(--sw-red); }
+  .status-tag:hover { border-color: var(--border-bright); }
+
+  /* ── CHAR TRACKER HEADER ── */
+  .tc-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tc-icon { font-size: 2.2rem; }
+  .tc-name { font-family: 'Rye', serif; font-size: 1.3rem; color: var(--accent-gold); }
+  .tc-sub {
+    font-family: 'Oswald', sans-serif; font-size: 0.68rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(60px);
+    background: var(--bg-card); border: 1px solid var(--border-bright);
+    padding: 10px 22px; border-radius: var(--radius);
+    font-family: 'Oswald', sans-serif; font-size: 0.75rem; letter-spacing: 0.1em;
+    color: var(--accent-gold); transition: transform 0.35s; z-index: 999; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 24px 16px;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--text-muted);
+    font-family: 'Oswald', sans-serif; letter-spacing: 0.08em;
+  }
+
+  /* ── REVIEW TABLE ── */
+  .review-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .review-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+  .review-table td:first-child { color: var(--text-muted); font-family: 'Oswald', sans-serif; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; }
+  .review-table td:last-child { color: var(--accent-gold); text-align: right; }
+
+  /* ── ADVANCE SECTION ── */
+  .advance-option {
+    padding: 10px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius); cursor: pointer;
+    transition: var(--transition); margin-bottom: 7px; font-size: 0.88rem;
+  }
+  .advance-option:hover { border-color: var(--border-bright); background: rgba(240,221,154,0.05); }
+  .advance-option strong { color: var(--accent-gold); display: block; font-family: 'Oswald', sans-serif; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 2px; }
+
+  /* ── SHAKEN ── */
+  .shaken-indicator {
+    background: rgba(226,10,0,0.15); border: 1px solid rgba(226,10,0,0.5);
+    border-radius: var(--radius); padding: 8px 14px;
+    font-family: 'Oswald', sans-serif; font-size: 0.75rem; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--sw-red);
+    text-align: center; margin-bottom: 10px; display: none;
+  }
+  .shaken-indicator.visible { display: block; }
+
+  /* ── RUNNING STATE ── */
+  .running-die { animation: spin 0.4s linear; }
+  @keyframes spin { from {transform:rotate(0deg)} to {transform:rotate(360deg)} }
+
+  .gold { color: var(--accent-gold); }
+  .muted { color: var(--text-muted); }
+  .red { color: var(--sw-red); }
+</style>
+</head>
+<body>
+    <!-- ========= Banner ========= -->
+<div style="background:#0d0221;padding:10px 20px;">
+  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Studio 347 Home</a>
+</div>
+<hr style="border:none;border-top:1px solid #511a91;margin:0;">
+<div id="app">
+<hr style="border:none;border-top:1px solid rgba(226,10,0,0.3);margin:0;">
+
+<div id="app">
+  <header class="app-header">
+    <div class="header-emoji">🦁</div>
+    <div class="header-title">SWAdE Character Forge</div>
+    <div class="header-divider"></div>
+    <div class="header-subtitle">Pinnacle Entertainment Group · <a href="https://peginc.com/savage-settings/savage-worlds/" target="_blank">Official Site</a></div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('characters')">📜 Characters</button>
+    <button class="nav-tab" onclick="showView('builder')">✦ Builder</button>
+    <button class="nav-tab" onclick="showView('tracker')">🛡 Tracker</button>
+    <button class="nav-tab" onclick="showView('dice')">🎲 Dice</button>
+  </nav>
+
+  <!-- CHARACTERS -->
+  <div id="view-characters" class="view active">
+    <div class="card">
+      <div class="card-title">Your Characters</div>
+      <div id="char-list"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="startBuilder()">+ New Character</button>
+      <button class="btn" onclick="importChar()">↑ Import JSON</button>
+    </div>
+  </div>
+
+  <!-- BUILDER -->
+  <div id="view-builder" class="view">
+    <div class="card">
+      <div class="card-title">Character Builder</div>
+      <div class="wizard-progress" id="wizard-progress"></div>
+      <div id="wizard-pages"></div>
+    </div>
+  </div>
+
+  <!-- TRACKER -->
+  <div id="view-tracker" class="view">
+    <div id="tracker-content">
+      <div class="empty-state">
+        <div class="big-icon">📜</div>
+        <p>Select or create a character to track.</p>
+        <button class="btn btn-primary" onclick="showView('characters')">Go to Characters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICE -->
+  <div id="view-dice" class="view">
+    <div class="card">
+      <div class="card-title">🎲 Trait Dice</div>
+      <div class="dice-result" id="dice-result">
+        <div style="color:var(--text-muted);font-family:'Oswald',sans-serif;font-size:0.78rem;letter-spacing:0.15em;">Choose a die to roll...</div>
+      </div>
+      <div class="dice-row" style="margin-bottom:12px;">
+        <button class="die-btn" onclick="rollTrait(4)">d4</button>
+        <button class="die-btn" onclick="rollTrait(6)">d6</button>
+        <button class="die-btn" onclick="rollTrait(8)">d8</button>
+        <button class="die-btn" onclick="rollTrait(10)">d10</button>
+        <button class="die-btn" onclick="rollTrait(12)">d12</button>
+      </div>
+      <div class="inline-note">Wild Cards roll a Wild Die (d6) alongside their Trait Die — take the higher result.</div>
+      <div class="dice-row" style="margin-bottom:6px;">
+        <button class="die-btn wild" onclick="rollWild(4)">d4+W</button>
+        <button class="die-btn wild" onclick="rollWild(6)">d6+W</button>
+        <button class="die-btn wild" onclick="rollWild(8)">d8+W</button>
+        <button class="die-btn wild" onclick="rollWild(10)">d10+W</button>
+        <button class="die-btn wild" onclick="rollWild(12)">d12+W</button>
+      </div>
+      <div class="divider"></div>
+      <div class="card-title">Standard Dice</div>
+      <div class="dice-row">
+        <button class="die-btn" onclick="rollStd(4)">d4</button>
+        <button class="die-btn" onclick="rollStd(6)">d6</button>
+        <button class="die-btn" onclick="rollStd(8)">d8</button>
+        <button class="die-btn" onclick="rollStd(10)">d10</button>
+        <button class="die-btn" onclick="rollStd(12)">d12</button>
+        <button class="die-btn" onclick="rollStd(20)">d20</button>
+        <button class="die-btn" onclick="rollStd(100)">d%</button>
+      </div>
+      <div id="std-result" style="margin-top:12px;text-align:center;font-family:'Rye',serif;font-size:1.3rem;color:var(--accent-gold);min-height:36px;"></div>
+    </div>
+  </div>
+
+  <footer>Savage Worlds Adventure Edition Character Forge — Unofficial Companion Tool<br>
+  Savage Worlds is a trademark of Pinnacle Entertainment Group.</footer>
+</div>
+
+<div id="toast">✓ Saved</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════════════
+// GAME DATA
+// ═══════════════════════════════════════════════════════════════════════
+const DIE_STEPS = [4, 6, 8, 10, 12];
+const DIE_LABELS = { 4:'d4', 6:'d6', 8:'d8', 10:'d10', 12:'d12' };
+
+const ATTRIBUTES = ['Agility','Smarts','Spirit','Strength','Vigor'];
+
+const SKILLS_DATA = [
+  { name:'Athletics',    linked:'Agility',  core:true  },
+  { name:'Common Knowledge', linked:'Smarts', core:true },
+  { name:'Notice',       linked:'Smarts',   core:true  },
+  { name:'Persuasion',   linked:'Spirit',   core:true  },
+  { name:'Stealth',      linked:'Agility',  core:true  },
+  { name:'Academics',    linked:'Smarts',   core:false },
+  { name:'Battle',       linked:'Smarts',   core:false },
+  { name:'Boating',      linked:'Agility',  core:false },
+  { name:'Driving',      linked:'Agility',  core:false },
+  { name:'Electronics',  linked:'Smarts',   core:false },
+  { name:'Faith',        linked:'Spirit',   core:false },
+  { name:'Fighting',     linked:'Agility',  core:false },
+  { name:'Focus',        linked:'Spirit',   core:false },
+  { name:'Gambling',     linked:'Smarts',   core:false },
+  { name:'Hacking',      linked:'Smarts',   core:false },
+  { name:'Healing',      linked:'Smarts',   core:false },
+  { name:'Intimidation', linked:'Spirit',   core:false },
+  { name:'Language',     linked:'Smarts',   core:false },
+  { name:'Occult',       linked:'Smarts',   core:false },
+  { name:'Performance',  linked:'Spirit',   core:false },
+  { name:'Piloting',     linked:'Agility',  core:false },
+  { name:'Psionics',     linked:'Smarts',   core:false },
+  { name:'Repair',       linked:'Smarts',   core:false },
+  { name:'Research',     linked:'Smarts',   core:false },
+  { name:'Riding',       linked:'Agility',  core:false },
+  { name:'Science',      linked:'Smarts',   core:false },
+  { name:'Shooting',     linked:'Agility',  core:false },
+  { name:'Spellcasting', linked:'Smarts',   core:false },
+  { name:'Survival',     linked:'Smarts',   core:false },
+  { name:'Taunt',        linked:'Smarts',   core:false },
+  { name:'Thievery',     linked:'Agility',  core:false },
+  { name:'Tracking',     linked:'Smarts',   core:false },
+  { name:'Weird Science',linked:'Smarts',   core:false },
+];
+
+const ANCESTRIES = [
+  { name:'Human',    icon:'👤', desc:'The most adaptable of peoples. Humans begin with an additional Edge and are natural Wild Cards.', bonus:'Extra Edge at character creation.' },
+  { name:'Android',  icon:'🤖', desc:'Artificial beings of metal and circuitry. Cold-blooded and tireless, but struggle to feel.', bonus:'Constructed (immune to disease/poison), but −2 Charisma in settings that distrust androids.' },
+  { name:'Dwarf',    icon:'⛏', desc:'Stout folk of mountain halls, renowned for their endurance and craftsmanship.', bonus:'+1 Vigor die type; starts with d6 in a craft or trade skill.' },
+  { name:'Elf',      icon:'🌿', desc:'Graceful and long-lived, elves possess keen senses and natural elegance.', bonus:'+1 Agility die type; Low Light Vision.' },
+  { name:'Half-Elf', icon:'🍂', desc:'Children of two worlds, half-elves inherit the grace of the elven and the drive of humanity.', bonus:'Low Light Vision; one additional skill point.' },
+  { name:'Half-Folk',icon:'🌾', desc:'Small and nimble, half-folk are surprisingly courageous and hard to hit.', bonus:'Size −1 (−1 Toughness); Luck (extra Benny); Spirited.' },
+  { name:'Half-Orc', icon:'🪓', desc:'Powerful and fierce, half-orcs carry orcish strength and human determination.', bonus:'+1 Strength die type; Infravision.' },
+  { name:'Rakashan', icon:'🐱', desc:'Feline humanoids with retractable claws and predatory grace.', bonus:'Claws (STR+d4); Low Light Vision; Outsider.' },
+  { name:'Saurian',  icon:'🦎', desc:'Reptilian folk with ancient instincts and armored hides.', bonus:'Natural armor +2; Infravision; Outsider.' },
+];
+
+const CONCEPTS = [
+  { name:'Warrior',       icon:'⚔️', desc:'Seasoned fighter, soldier, or brawler. Excels in direct combat.' },
+  { name:'Rogue',         icon:'🗝️', desc:'Cunning, quick-fingered, skilled at deception and stealth.' },
+  { name:'Spellcaster',   icon:'🔮', desc:'Wields arcane or divine power through Spellcasting, Psionics, or Faith.' },
+  { name:'Support',       icon:'💊', desc:'Healer and enabler — keeps the posse in fighting shape.' },
+  { name:'Investigator',  icon:'🔍', desc:'Scholar, detective, or researcher who solves problems with brains.' },
+  { name:'Pilot / Driver',icon:'🚁', desc:'Ace behind the wheel, stick, or saddle. Speed is their domain.' },
+  { name:'Leader',        icon:'🎖️', desc:'Commander and motivator. Buffs allies and bends battles.' },
+  { name:'Wild Card',     icon:'🃏', desc:'A truly free-form character with an unexpected mix of talents.' },
+];
+
+const EDGES_SAMPLE = [
+  // Background
+  { name:'Alertness',      cat:'Background', req:'',              desc:'+2 to Notice rolls.' },
+  { name:'Ambidextrous',   cat:'Background', req:'Agility d8',    desc:'Ignore −2 off-hand penalty.' },
+  { name:'Arcane Background', cat:'Background', req:'',           desc:'Access to one arcane power source.' },
+  { name:'Rich',           cat:'Background', req:'',              desc:'Start with 3× normal funds; generous income.' },
+  // Combat
+  { name:'Block',          cat:'Combat',     req:'Fighting d8',   desc:'+1 Parry.' },
+  { name:'Brawler',        cat:'Combat',     req:'Strength d8',   desc:'+2 unarmed damage.' },
+  { name:'Dodge',          cat:'Combat',     req:'Agility d8',    desc:'Attackers −1 to hit; +1 evasion.' },
+  { name:'First Strike',   cat:'Combat',     req:'Agility d8',    desc:'Free attack when foe moves adjacent.' },
+  { name:'Frenzy',         cat:'Combat',     req:'Fighting d10',  desc:'Extra Fighting attack at −2.' },
+  { name:'Marksman',       cat:'Combat',     req:'Athletics/Shooting d8', desc:'+1 aimed shot without moving.' },
+  { name:'Quick',          cat:'Combat',     req:'Agility d8',    desc:'Discard action cards of 5 or lower.' },
+  { name:'Steady Hands',   cat:'Combat',     req:'Agility d8',    desc:'Ignore unstable platform penalty.' },
+  // Leadership
+  { name:'Command',        cat:'Leadership', req:'Smarts d6',     desc:'+1 to rolls to recover from Shaken.' },
+  { name:'Natural Leader', cat:'Leadership', req:'Spirit d8, Command', desc:'Share Benny pool with Wild Cards.' },
+  // Power
+  { name:'New Powers',     cat:'Power',      req:'Arcane Background', desc:'Gain 2 new powers.' },
+  { name:'Power Points',   cat:'Power',      req:'Arcane Background', desc:'+5 Power Points.' },
+  // Social
+  { name:'Charismatic',    cat:'Social',     req:'Spirit d8',     desc:'+2 Persuasion.' },
+  { name:'Connections',    cat:'Social',     req:'',              desc:'Call on allies with a Persuasion roll.' },
+  // Weird
+  { name:'Danger Sense',   cat:'Weird',      req:'',              desc:'Notice roll to avoid surprise.' },
+  { name:'Sixth Sense',    cat:'Weird',      req:'',              desc:'Hint when enemies are about to attack.' },
+];
+
+const HINDRANCES_SAMPLE = [
+  { name:'All Thumbs',    major:false, desc:'−2 to repair/use mechanical/electronic devices.' },
+  { name:'Anemic',        major:false, desc:'−2 to Vigor checks vs. poison, disease, fatigue.' },
+  { name:'Arrogant',      major:true,  desc:'Must challenge the most powerful foe; show off.' },
+  { name:'Bad Eyes',      major:false, desc:'−2 to ranged attacks; −1 Notice at Far range.' },
+  { name:'Big Mouth',     major:false, desc:'Cannot keep secrets; blurts sensitive info.' },
+  { name:'Cautious',      major:false, desc:'Must plan extensively; hesitates before acting.' },
+  { name:'Clueless',      major:true,  desc:'−2 to Common Knowledge and Notice.' },
+  { name:'Code of Honor', major:true,  desc:'Strict moral code; never break word or take foul advantage.' },
+  { name:'Cowardly',      major:true,  desc:'Feared: Spirit roll (−2 wild die) when outnumbered or surprised.' },
+  { name:'Curious',       major:true,  desc:'Must investigate mysteries; can be lured into traps.' },
+  { name:'Death Wish',    major:false, desc:'Has a goal worth dying for; Fearless in pursuit of it.' },
+  { name:'Delusional',    major:false, desc:'Believes something crazy but mostly harmless.' },
+  { name:'Hard of Hearing',major:false,desc:'−4 Notice for hearing; deaf when asleep.' },
+  { name:'Heroic',        major:true,  desc:'Always helps those in need, no questions asked.' },
+  { name:'Loyal',         major:false, desc:'Will risk life for close friends; never betrays.' },
+  { name:'Mean',          major:false, desc:'−2 Persuasion; enjoys intimidating others.' },
+  { name:'Overconfident', major:true,  desc:'Believes they can handle anything; overextends.' },
+  { name:'Phobia',        major:false, desc:'−2 (minor) or −4 (major) to Trait rolls near fear source.' },
+  { name:'Stubborn',      major:false, desc:'Never admits mistake; rarely backs down.' },
+  { name:'Vow',           major:false, desc:'A pledge that must be upheld even at personal cost.' },
+  { name:'Vengeful',      major:false, desc:'Harbors grudges; seeks revenge when wronged.' },
+  { name:'Young',         major:true,  desc:'−2 to one Attribute; only 3 Attribute points instead of 5.' },
+];
+
+const STATUSES = ['Shaken','Distracted','Vulnerable','Bleeding Out','Entangled','Bound','Stunned'];
+
+// Advancement options in SWAdE
+const ADVANCE_OPTIONS = [
+  { label:'Raise Attribute', desc:'+1 die type to one Attribute (max d12). Costs 2 advances to raise an Attribute past d12 with a new Edge.' },
+  { label:'Pick an Edge', desc:'Choose any Edge you qualify for.' },
+  { label:'Raise a Skill (above linked Attribute)', desc:'Raise a skill one die type that is already ≥ its linked Attribute.' },
+  { label:'Raise two Skills (at/below linked Attribute)', desc:'Raise up to two skills each by one die type, each ≤ its linked Attribute.' },
+  { label:'New Skill at d4', desc:'Learn a brand-new skill at d4.' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════
+let characters   = [];
+let activeCharId = null;
+let currentView  = 'characters';
+let wz           = null;
+let wzStep       = 0;
+
+const WZ_STEPS = ['Ancestry','Concept','Attributes','Skills','Edges','Hindrances','Identity','Review'];
+
+try { characters = JSON.parse(localStorage.getItem('swade_chars') || '[]'); } catch(e){ characters = []; }
+try { activeCharId = localStorage.getItem('swade_active') || null; } catch(e){ activeCharId = null; }
+
+function save()       { try { localStorage.setItem('swade_chars',  JSON.stringify(characters)); } catch(e){} }
+function saveActive() { try { localStorage.setItem('swade_active', activeCharId); } catch(e){} }
+function getActive()  { return characters.find(c => c.id === activeCharId) || null; }
+function withChar(fn) { const c = getActive(); if(!c) return; fn(c); save(); renderTracker(); }
+
+function newChar() {
+  const attrs = {};
+  ATTRIBUTES.forEach(a => { attrs[a] = 4; }); // default d4
+  const skills = {};
+  SKILLS_DATA.filter(s => s.core).forEach(s => { skills[s.name] = 4; });
+  return {
+    id: 'sw_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    name: '', player: '', concept: '', ancestry: '',
+    // Attrs stored as die values (4,6,8,10,12)
+    attrs,
+    skills,
+    edges: [],
+    hindrances: [],
+    // derived
+    pace: 6, parry: 2, toughness: 2,
+    wounds: { max: 3, current: 0 },
+    fatigue: { max: 2, current: 0 },
+    bennies: 3,
+    pp: 0, ppMax: 0,
+    statuses: [],
+    advances: 0,
+    rank: 'Novice',
+    wildCard: true,
+    gear: '',
+    notes: '',
+    backstory: '',
+    createdAt: Date.now(),
+  };
+}
+
+function rankFromAdvances(adv) {
+  if (adv < 4)  return 'Novice';
+  if (adv < 8)  return 'Seasoned';
+  if (adv < 12) return 'Veteran';
+  if (adv < 16) return 'Heroic';
+  return 'Legendary';
+}
+
+function dieToughness(vigor) {
+  const map = {4:4, 6:5, 8:6, 10:7, 12:8};
+  return 2 + (map[vigor] || 4);
+}
+
+function dieParry(fighting) {
+  const map = {0:2, 4:2, 6:3, 8:4, 10:5, 12:6};
+  return 2 + Math.floor((map[fighting] || 2));
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// VIEWS
+// ═══════════════════════════════════════════════════════════════════════
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  const map = ['characters','builder','tracker','dice'];
+  const idx = map.indexOf(v);
+  if (idx >= 0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if (v === 'characters') renderCharList();
+  if (v === 'tracker')    renderTracker();
+  if (v === 'builder' && wz) renderWzStep();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CHARACTER LIST
+// ═══════════════════════════════════════════════════════════════════════
+function renderCharList() {
+  const el = document.getElementById('char-list');
+  if (!characters.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">📜</div><p>No characters yet. The frontier awaits.</p></div>`;
+    return;
+  }
+  el.innerHTML = characters.map(c => `
+    <div class="char-card ${c.id===activeCharId?'active-char':''}" onclick="selectChar('${c.id}')">
+      <div class="char-card-icon">📜</div>
+      <div class="char-card-info">
+        <div class="char-card-name">${c.name || 'Unnamed Hero'}</div>
+        <div class="char-card-sub">${c.ancestry || '—'} · ${c.concept || '—'} · ${c.rank || 'Novice'}</div>
+      </div>
+      <div class="char-card-actions">
+        <button class="char-card-btn" onclick="event.stopPropagation();editChar('${c.id}')" title="Edit">✏️</button>
+        <button class="char-card-btn" onclick="event.stopPropagation();exportChar('${c.id}')" title="Export">↓</button>
+        <button class="char-card-btn del" onclick="event.stopPropagation();deleteChar('${c.id}')" title="Delete">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectChar(id) {
+  activeCharId = id; saveActive();
+  showView('tracker');
+}
+
+function editChar(id) {
+  const c = characters.find(x => x.id === id);
+  if (!c) return;
+  wz = JSON.parse(JSON.stringify(c));
+  wzStep = 0;
+  showView('builder');
+}
+
+function deleteChar(id) {
+  if (!confirm('Delete this character? This cannot be undone.')) return;
+  characters = characters.filter(c => c.id !== id);
+  if (activeCharId === id) { activeCharId = null; saveActive(); }
+  save(); renderCharList();
+}
+
+function exportChar(id) {
+  const c = characters.find(x => x.id === id);
+  if (!c) return;
+  const blob = new Blob([JSON.stringify(c, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (c.name || 'swade-char') + '.json';
+  a.click();
+}
+
+function importChar() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const c = JSON.parse(ev.target.result);
+        c.id = 'sw_' + Date.now();
+        characters.push(c); save();
+        toast('Character imported!'); renderCharList();
+      } catch { toast('Invalid JSON file'); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// BUILDER
+// ═══════════════════════════════════════════════════════════════════════
+function startBuilder() {
+  wz = newChar(); wzStep = 0;
+  showView('builder');
+  renderWzStep();
+}
+
+function renderWzStep() {
+  // Progress
+  const prog = document.getElementById('wizard-progress');
+  prog.innerHTML = WZ_STEPS.map((s,i) => {
+    let cls = i < wzStep ? 'done' : i === wzStep ? 'current' : '';
+    return `<div class="wz-dot ${cls}" data-label="${s}" onclick="if(${i}<${wzStep})goWzStep(${i})">${i+1}</div>`;
+  }).join('');
+
+  const pages = document.getElementById('wizard-pages');
+  pages.innerHTML = '';
+  switch(wzStep) {
+    case 0: pages.innerHTML = pgAncestry();   break;
+    case 1: pages.innerHTML = pgConcept();    break;
+    case 2: pages.innerHTML = pgAttributes(); break;
+    case 3: pages.innerHTML = pgSkills();     break;
+    case 4: pages.innerHTML = pgEdges();      break;
+    case 5: pages.innerHTML = pgHindrances(); break;
+    case 6: pages.innerHTML = pgIdentity();   break;
+    case 7: pages.innerHTML = pgReview();     break;
+  }
+}
+
+function goWzStep(i) { wzStep = i; renderWzStep(); }
+
+function wzPrev() { if(wzStep > 0) { wzStep--; renderWzStep(); } }
+function wzNext() {
+  if (wzStep < WZ_STEPS.length - 1) { wzStep++; renderWzStep(); }
+  else { saveCharacter(); }
+}
+
+function saveCharacter() {
+  // derive stats
+  wz.rank = rankFromAdvances(wz.advances || 0);
+  wz.toughness = dieToughness(wz.attrs['Vigor'] || 4);
+  const fightDie = wz.skills['Fighting'] || 0;
+  wz.parry = 2 + Math.floor((fightDie || 0) / 4);
+
+  const existing = characters.find(c => c.id === wz.id);
+  if (existing) {
+    Object.assign(existing, wz);
+  } else {
+    characters.push(wz);
+    activeCharId = wz.id; saveActive();
+  }
+  save();
+  toast('Character saved!');
+  showView('tracker');
+}
+
+// ── Step 0: Ancestry ──────────────────────────────────────────────────
+function pgAncestry() {
+  const detail = wz.ancestry ? (() => {
+    const a = ANCESTRIES.find(x => x.name === wz.ancestry);
+    return a ? `<div class="sel-detail"><strong>${a.name}</strong> — ${a.desc}<br><em style="color:var(--accent-gold)">${a.bonus}</em></div>` : '';
+  })() : '';
+  return `
+    <div class="step-title">Step 1: Ancestry</div>
+    <div class="step-hint">Choose your character's heritage. Each ancestry provides unique racial abilities.</div>
+    <div class="sel-grid">
+      ${ANCESTRIES.map(a => `
+        <div class="sel-option ${wz.ancestry===a.name?'selected':''}" onclick="pickAncestry('${a.name}')">
+          <div style="font-size:1.5rem;">${a.icon}</div>
+          <div class="sel-name">${a.name}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${detail}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()" style="visibility:hidden">← Back</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${!wz.ancestry?'disabled':''}>Concept →</button>
+    </div>
+  `;
+}
+function pickAncestry(n) { wz.ancestry = n; renderWzStep(); }
+
+// ── Step 1: Concept ───────────────────────────────────────────────────
+function pgConcept() {
+  const detail = wz.concept ? (() => {
+    const c = CONCEPTS.find(x => x.name === wz.concept);
+    return c ? `<div class="sel-detail"><strong>${c.name}</strong> — ${c.desc}</div>` : '';
+  })() : '';
+  return `
+    <div class="step-title">Step 2: Concept</div>
+    <div class="step-hint">Pick a broad concept — this guides your Edges, Skills, and story.</div>
+    <div class="sel-grid">
+      ${CONCEPTS.map(c => `
+        <div class="sel-option ${wz.concept===c.name?'selected':''}" onclick="pickConcept('${c.name}')">
+          <div style="font-size:1.4rem;">${c.icon}</div>
+          <div class="sel-name">${c.name}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${detail}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Ancestry</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${!wz.concept?'disabled':''}>Attributes →</button>
+    </div>
+  `;
+}
+function pickConcept(n) { wz.concept = n; renderWzStep(); }
+
+// ── Step 2: Attributes ────────────────────────────────────────────────
+function pgAttributes() {
+  // 5 points to distribute; Human gets 1 extra
+  const isHuman = wz.ancestry === 'Human';
+  const totalPts = isHuman ? 6 : 5;
+  const baseDie = 4;
+  // cost: each step above d4 costs 1 point
+  const spent = ATTRIBUTES.reduce((sum, a) => sum + ((wz.attrs[a] - baseDie) / 2), 0);
+  const remaining = totalPts - spent;
+
+  return `
+    <div class="step-title">Step 3: Attributes</div>
+    <div class="step-hint">You have <strong class="gold">${totalPts} points</strong> to raise Attributes. Each point raises one die type (d4→d6→d8→d10→d12).
+    Points remaining: <strong class="${remaining < 0 ? 'red' : 'gold'}">${remaining}</strong></div>
+    <div class="card" style="margin-bottom:0;">
+      ${ATTRIBUTES.map(a => {
+        const val = wz.attrs[a] || 4;
+        const stepIdx = DIE_STEPS.indexOf(val);
+        return `<div class="trait-row">
+          <div class="trait-name">${a}</div>
+          <div class="die-stepper">
+            <button class="die-step-btn" onclick="stepAttr('${a}',-1)" ${stepIdx<=0?'disabled':''}>−</button>
+            <span class="die-badge">${DIE_LABELS[val]}</span>
+            <button class="die-step-btn" onclick="stepAttr('${a}',1)" ${stepIdx>=4||remaining<=0?'disabled':''}>+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Concept</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${remaining < 0 ? 'disabled':''}>Skills →</button>
+    </div>
+  `;
+}
+function stepAttr(attr, dir) {
+  const idx = DIE_STEPS.indexOf(wz.attrs[attr] || 4);
+  const newIdx = Math.max(0, Math.min(4, idx + dir));
+  wz.attrs[attr] = DIE_STEPS[newIdx];
+  renderWzStep();
+}
+
+// ── Step 3: Skills ────────────────────────────────────────────────────
+function pgSkills() {
+  // 15 points for Novice; each point = 1 die step
+  // Skills at/below linked attr cost 1 pt per step; above cost 2 per step
+  const totalPts = 15;
+  let spent = 0;
+  SKILLS_DATA.forEach(sk => {
+    const val = wz.skills[sk.name] || 0;
+    if (!val) return;
+    const attrDie = wz.attrs[sk.linked] || 4;
+    const steps = (val - 4) / 2 + 1; // d4 costs 1 point
+    // steps at or below attr linked
+    const attrSteps = (attrDie - 4) / 2 + 1;
+    const belowSteps = Math.min(steps, attrSteps);
+    const aboveSteps = Math.max(0, steps - attrSteps);
+    spent += belowSteps + aboveSteps * 2;
+  });
+  const remaining = totalPts - spent;
+
+  const core = SKILLS_DATA.filter(s => s.core);
+  const extra = SKILLS_DATA.filter(s => !s.core);
+
+  const skillRow = sk => {
+    const val = wz.skills[sk.name] || 0;
+    const stepIdx = val ? DIE_STEPS.indexOf(val) : -1;
+    const attrDie = wz.attrs[sk.linked] || 4;
+    const dieLabel = val ? DIE_LABELS[val] : '—';
+    return `<div class="skill-row">
+      <div class="skill-name">${sk.name} <span class="skill-linked">(${sk.linked[0]+sk.linked.slice(1,3)})</span></div>
+      <div class="die-stepper">
+        <button class="die-step-btn" onclick="stepSkill('${sk.name}',-1)" ${stepIdx<=(sk.core?0:-1)?'disabled':''}>−</button>
+        <span class="die-badge" style="${val?'':'opacity:0.4'}">${dieLabel}</span>
+        <button class="die-step-btn" onclick="stepSkill('${sk.name}',1)" ${stepIdx>=4||remaining<=0?'disabled':''}>+</button>
+      </div>
+    </div>`;
+  };
+
+  return `
+    <div class="step-title">Step 4: Skills</div>
+    <div class="step-hint">You have <strong class="gold">15 points</strong>. Each point raises a skill one step up to its linked Attribute; raising above the Attribute costs 2 points per step.
+    Remaining: <strong class="${remaining<0?'red':'gold'}">${remaining}</strong></div>
+    <div class="card">
+      <div class="card-title">Core Skills <span>(free at d4)</span></div>
+      ${core.map(skillRow).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Additional Skills</div>
+      ${extra.map(skillRow).join('')}
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Attributes</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${remaining<0?'disabled':''}>Edges →</button>
+    </div>
+  `;
+}
+function stepSkill(name, dir) {
+  const sk = SKILLS_DATA.find(s => s.name === name);
+  const isCore = sk && sk.core;
+  const val = wz.skills[name] || 0;
+  const stepIdx = val ? DIE_STEPS.indexOf(val) : -1;
+  const newIdx = stepIdx + dir;
+  if (newIdx < (isCore ? 0 : -1) || newIdx > 4) return;
+  if (newIdx === -1) { delete wz.skills[name]; } else { wz.skills[name] = DIE_STEPS[newIdx]; }
+  renderWzStep();
+}
+
+// ── Step 4: Edges ─────────────────────────────────────────────────────
+function pgEdges() {
+  // Novice: 1 Edge + human gets extra
+  const isHuman = wz.ancestry === 'Human';
+  const maxEdges = isHuman ? 2 : 1;
+  const cats = [...new Set(EDGES_SAMPLE.map(e => e.cat))];
+
+  return `
+    <div class="step-title">Step 5: Edges</div>
+    <div class="step-hint">Select up to <strong class="gold">${maxEdges} Edge${maxEdges>1?'s':''}</strong> (Humans get a bonus Edge). Selected: <strong class="gold">${wz.edges.length}/${maxEdges}</strong>. Requirements shown — enforce these yourself for now.</div>
+    ${cats.map(cat => `
+      <div class="card">
+        <div class="card-title">${cat} Edges</div>
+        <div class="tag-list">
+          ${EDGES_SAMPLE.filter(e=>e.cat===cat).map(e => `
+            <div class="tag edge ${wz.edges.includes(e.name)?'active':''}" onclick="toggleEdge('${e.name}',${maxEdges})" title="${e.req ? 'Req: '+e.req : 'No requirements'}">${e.name}</div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+    ${wz.edges.length ? `<div class="sel-detail">${wz.edges.map(n=>{const e=EDGES_SAMPLE.find(x=>x.name===n);return e?`<strong>${e.name}</strong>: ${e.desc}`:n}).join('<br>')}</div>` : ''}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Skills</button>
+      <button class="btn btn-primary" onclick="wzNext()">Hindrances →</button>
+    </div>
+  `;
+}
+function toggleEdge(name, max) {
+  if (wz.edges.includes(name)) { wz.edges = wz.edges.filter(e=>e!==name); }
+  else if (wz.edges.length < max) { wz.edges.push(name); }
+  renderWzStep();
+}
+
+// ── Step 5: Hindrances ────────────────────────────────────────────────
+function pgHindrances() {
+  // 1 Major OR 2 Minor Hindrances give points; Major = 2 pts, Minor = 1 pt
+  // Spend points: +1 attr raise / +2 skills / +1 Edge / +100 currency
+  const major = wz.hindrances.filter(n => HINDRANCES_SAMPLE.find(h=>h.name===n&&h.major));
+  const minor  = wz.hindrances.filter(n => HINDRANCES_SAMPLE.find(h=>h.name===n&&!h.major));
+  const pts = major.length * 2 + minor.length;
+
+  return `
+    <div class="step-title">Step 6: Hindrances</div>
+    <div class="step-hint">Hindrances grant build points. <strong class="gold">Major</strong> Hindrances = 2 pts each; <strong>Minor</strong> = 1 pt. Spend points on: +1 Attribute raise, +2 Skill points, a new Edge, or +$100 starting funds. Points earned: <strong class="gold">${pts}</strong></div>
+    <div class="form-row" style="margin-bottom:14px;">
+      <div>
+        <div class="form-label" style="color:var(--sw-red);">Major Hindrances</div>
+        <div class="tag-list">
+          ${HINDRANCES_SAMPLE.filter(h=>h.major).map(h => `
+            <div class="tag hindrance ${wz.hindrances.includes(h.name)?'active':''}" onclick="toggleHindrance('${h.name}')" title="${h.desc}">${h.name}</div>
+          `).join('')}
+        </div>
+      </div>
+      <div>
+        <div class="form-label">Minor Hindrances</div>
+        <div class="tag-list">
+          ${HINDRANCES_SAMPLE.filter(h=>!h.major).map(h => `
+            <div class="tag hindrance minor ${wz.hindrances.includes(h.name)?'active':''}" onclick="toggleHindrance('${h.name}')" title="${h.desc}">${h.name}</div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    ${wz.hindrances.length ? `<div class="sel-detail">${wz.hindrances.map(n=>{const h=HINDRANCES_SAMPLE.find(x=>x.name===n);return h?`<strong>${h.name}</strong> (${h.major?'Major':'Minor'}): ${h.desc}`:n}).join('<br>')}</div>` : ''}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Edges</button>
+      <button class="btn btn-primary" onclick="wzNext()">Identity →</button>
+    </div>
+  `;
+}
+function toggleHindrance(name) {
+  if (wz.hindrances.includes(name)) { wz.hindrances = wz.hindrances.filter(h=>h!==name); }
+  else { wz.hindrances.push(name); }
+  renderWzStep();
+}
+
+// ── Step 6: Identity ──────────────────────────────────────────────────
+function pgIdentity() {
+  return `
+    <div class="step-title">Step 7: Identity</div>
+    <div class="step-hint">Name your hero and fill in the personal details.</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Character Name</label>
+        <input class="form-input" value="${wz.name||''}" onchange="wz.name=this.value" placeholder="Enter name…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Player Name</label>
+        <input class="form-input" value="${wz.player||''}" onchange="wz.player=this.value" placeholder="Optional…">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Pace</label>
+        <input class="form-input" type="number" min="1" max="20" value="${wz.pace||6}" onchange="wz.pace=+this.value" placeholder="6">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Power Points</label>
+        <input class="form-input" type="number" min="0" value="${wz.ppMax||0}" onchange="wz.ppMax=+this.value;wz.pp=+this.value" placeholder="0 if no Arcane Bg">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Starting Gear & Currency</label>
+      <textarea class="form-textarea" onchange="wz.gear=this.value" placeholder="List gear, weapons, armor, currency…">${wz.gear||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Backstory / Notes</label>
+      <textarea class="form-textarea" onchange="wz.backstory=this.value" placeholder="Who is this character? What drives them?">${wz.backstory||''}</textarea>
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Hindrances</button>
+      <button class="btn btn-primary" onclick="wzNext()">Review →</button>
+    </div>
+  `;
+}
+
+// ── Step 7: Review ────────────────────────────────────────────────────
+function pgReview() {
+  const attrs = ATTRIBUTES.map(a => `
+    <tr><td>${a}</td><td>${DIE_LABELS[wz.attrs[a]||4]}</td></tr>
+  `).join('');
+  const skills = Object.entries(wz.skills).filter(([,v])=>v).map(([k,v])=>`
+    <tr><td>${k}</td><td>${DIE_LABELS[v]||v}</td></tr>
+  `).join('');
+  const toughness = dieToughness(wz.attrs['Vigor']||4);
+  const fightDie  = wz.skills['Fighting'] || 0;
+  const parry     = 2 + Math.floor(fightDie / 4);
+
+  return `
+    <div class="step-title">Step 8: Review</div>
+    <div class="step-hint">Check everything looks right, then forge your hero!</div>
+    <div class="form-row">
+      <div>
+        <div class="card-title">Identity</div>
+        <table class="review-table">
+          <tr><td>Name</td><td>${wz.name||'—'}</td></tr>
+          <tr><td>Player</td><td>${wz.player||'—'}</td></tr>
+          <tr><td>Ancestry</td><td>${wz.ancestry||'—'}</td></tr>
+          <tr><td>Concept</td><td>${wz.concept||'—'}</td></tr>
+          <tr><td>Rank</td><td>Novice</td></tr>
+          <tr><td>Wild Card</td><td>✅ Yes</td></tr>
+        </table>
+        <div class="card-title" style="margin-top:14px;">Derived Stats</div>
+        <table class="review-table">
+          <tr><td>Toughness</td><td>${toughness}</td></tr>
+          <tr><td>Parry</td><td>${parry}</td></tr>
+          <tr><td>Pace</td><td>${wz.pace||6}</td></tr>
+          <tr><td>Wounds (max)</td><td>3</td></tr>
+          <tr><td>Bennies (start)</td><td>3</td></tr>
+          ${wz.ppMax ? `<tr><td>Power Points</td><td>${wz.ppMax}</td></tr>` : ''}
+        </table>
+        <div class="card-title" style="margin-top:14px;">Edges</div>
+        <div>${wz.edges.length ? wz.edges.map(e=>`<span class="tag edge" style="margin:2px">${e}</span>`).join('') : '<span class="muted">None</span>'}</div>
+        <div class="card-title" style="margin-top:12px;">Hindrances</div>
+        <div>${wz.hindrances.length ? wz.hindrances.map(h=>{const hd=HINDRANCES_SAMPLE.find(x=>x.name===h);return`<span class="tag hindrance ${hd&&!hd.major?'minor':''}" style="margin:2px">${h}</span>`}).join('') : '<span class="muted">None</span>'}</div>
+      </div>
+      <div>
+        <div class="card-title">Attributes</div>
+        <table class="review-table">${attrs}</table>
+        <div class="card-title" style="margin-top:14px;">Skills</div>
+        <table class="review-table">${skills || '<tr><td colspan="2" class="muted">None allocated</td></tr>'}</table>
+      </div>
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Identity</button>
+      <button class="btn btn-primary" onclick="saveCharacter()">📜 Forge Character!</button>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TRACKER
+// ═══════════════════════════════════════════════════════════════════════
+function renderTracker() {
+  const c = getActive();
+  const el = document.getElementById('tracker-content');
+  if (!c) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">📜</div><p>No character selected.</p><button class="btn btn-primary" onclick="showView('characters')">Go to Characters</button></div>`;
+    return;
+  }
+
+  const toughness = dieToughness(c.attrs['Vigor']||4);
+  const fightDie  = c.skills['Fighting'] || 0;
+  const parry     = 2 + Math.floor(fightDie / 4);
+
+  // Wounds pips (max 3; Incapacitated at 4th)
+  const woundPips = [1,2,3].map(i =>
+    `<div class="pip wound ${i<=(c.wounds.current||0)?'filled':''}" onclick="setWound(${i<=c.wounds.current?i-1:i})">${i}</div>`
+  ).join('');
+
+  // Fatigue pips (max 2)
+  const fatiguePips = [1,2].map(i =>
+    `<div class="pip fatigue ${i<=(c.fatigue.current||0)?'filled':''}" onclick="setFatigue(${i<=c.fatigue.current?i-1:i})">${i}</div>`
+  ).join('');
+
+  // Bennies
+  const benniePips = [1,2,3,4,5].map(i =>
+    `<div class="pip benny ${i<=(c.bennies||0)?'filled':''}" onclick="setBennies(${i<=c.bennies?i-1:i})">✦</div>`
+  ).join('');
+
+  const shaken = c.statuses && c.statuses.includes('Shaken');
+  const incap = (c.wounds.current||0) >= 4;
+
+  // Skills for quick roll
+  const skillRollBtns = Object.entries(c.skills).filter(([,v])=>v).slice(0,10).map(([k,v]) =>
+    `<button class="btn btn-sm" onclick="quickRoll('${k}',${v})">${k} (${DIE_LABELS[v]})</button>`
+  ).join('');
+
+  el.innerHTML = `
+    <div class="${shaken?'shaken-indicator visible':'shaken-indicator'}">⚠ SHAKEN — Spirit roll TN 4 to recover</div>
+    ${incap ? `<div class="shaken-indicator visible" style="background:rgba(226,10,0,0.25)">💀 INCAPACITATED — Roll Vigor or bleed out!</div>` : ''}
+
+    <div class="card">
+      <div class="tc-header">
+        <div class="tc-icon">📜</div>
+        <div>
+          <div class="tc-name">${c.name || 'Unnamed Hero'} <span class="wc-badge">Wild Card</span></div>
+          <div class="tc-sub">${c.ancestry||'—'} · ${c.concept||'—'} · ${c.rank||'Novice'}</div>
+        </div>
+      </div>
+      <div class="tracker-grid">
+        <div>
+          <div class="stat-label">Toughness</div>
+          <div class="stat-big">${toughness}</div>
+        </div>
+        <div>
+          <div class="stat-label">Parry</div>
+          <div class="stat-big">${parry}</div>
+        </div>
+        <div>
+          <div class="stat-label">Pace</div>
+          <div class="stat-big">${c.pace||6}</div>
+        </div>
+        <div>
+          <div class="stat-label">Run</div>
+          <div class="stat-big">+d6</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tracker-grid">
+      <div class="card">
+        <div class="card-title">💔 Wounds <span>(Incap at 4)</span></div>
+        <div class="pip-row">${woundPips}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">Each wound: −1 to all Trait rolls</div>
+        <div class="btn-row">
+          <button class="btn btn-sm" onclick="setWound(Math.min(4,(${c.wounds.current||0})+1))">+ Wound</button>
+          <button class="btn btn-sm" onclick="setWound(Math.max(0,(${c.wounds.current||0})-1))">Heal</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">😓 Fatigue</div>
+        <div class="pip-row">${fatiguePips}</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">Each fatigue: −1 to all Trait rolls</div>
+        <div class="btn-row">
+          <button class="btn btn-sm" onclick="setFatigue(Math.min(2,(${c.fatigue.current||0})+1))">+ Fatigue</button>
+          <button class="btn btn-sm" onclick="setFatigue(Math.max(0,(${c.fatigue.current||0})-1))">Rest</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">✦ Bennies</div>
+      <div class="pip-row">${benniePips}</div>
+      <div class="btn-row">
+        <button class="btn btn-sm" onclick="setBennies(Math.min(5,(${c.bennies||3})+1))">+ Benny</button>
+        <button class="btn btn-sm" onclick="setBennies(Math.max(0,(${c.bennies||3})-1))">Spend</button>
+        <button class="btn btn-sm" onclick="setBennies(3)">Reset (3)</button>
+      </div>
+    </div>
+
+    ${c.ppMax ? `
+    <div class="card">
+      <div class="card-title">⚡ Power Points: ${c.pp||0} / ${c.ppMax}</div>
+      <div class="btn-row">
+        <button class="btn btn-sm" onclick="setPP(Math.max(0,(${c.pp||0})-1))">− Spend</button>
+        <button class="btn btn-sm" onclick="setPP(Math.min(${c.ppMax},(${c.pp||0})+1))">+ Recover</button>
+        <button class="btn btn-sm" onclick="setPP(${c.ppMax})">Full Restore</button>
+      </div>
+    </div>` : ''}
+
+    <div class="card">
+      <div class="card-title">🎭 Status</div>
+      <div class="status-row">
+        ${STATUSES.map(s => `<div class="status-tag ${(c.statuses||[]).includes(s)?'on':''}" onclick="toggleStatus('${s}')">${s}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 Attributes</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${ATTRIBUTES.map(a => {
+          const die = c.attrs[a] || 4;
+          return `<div style="text-align:center;min-width:70px;">
+            <div style="font-family:'Rye',serif;color:var(--accent-gold);font-size:1.1rem;">${DIE_LABELS[die]}</div>
+            <div style="font-family:'Oswald',sans-serif;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);">${a}</div>
+            <button class="btn btn-sm" onclick="quickRoll('${a}',${die},true)" style="margin-top:4px;font-size:0.62rem;padding:3px 8px;">Roll</button>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎯 Skills</div>
+      ${Object.entries(c.skills).filter(([,v])=>v).map(([k,v]) => {
+        const linked = (SKILLS_DATA.find(s=>s.name===k)||{}).linked||'';
+        return `<div class="skill-row">
+          <div class="skill-name">${k} <span class="skill-linked">(${linked.slice(0,3)})</span></div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="die-badge">${DIE_LABELS[v]}</span>
+            <button class="btn btn-sm" onclick="quickRoll('${k}',${v},true)" style="padding:4px 10px;">Roll</button>
+          </div>
+        </div>`;
+      }).join('') || '<p class="muted" style="font-size:0.85rem;">No skills recorded.</p>'}
+    </div>
+
+    ${(c.edges.length||c.hindrances.length) ? `
+    <div class="card">
+      <div class="card-title">Edges &amp; Hindrances</div>
+      <div class="tag-list" style="margin-bottom:8px;">${c.edges.map(e=>`<span class="tag edge">${e}</span>`).join('')}</div>
+      <div class="tag-list">${c.hindrances.map(h=>{const hd=HINDRANCES_SAMPLE.find(x=>x.name===h);return`<span class="tag hindrance ${hd&&!hd.major?'minor':''}">${h}</span>`}).join('')}</div>
+    </div>` : ''}
+
+    <div class="card">
+      <div class="card-title">📈 Advances · ${c.rank||'Novice'} (${c.advances||0} total)</div>
+      <div class="btn-row" style="margin-bottom:12px;">
+        <button class="btn btn-sm" onclick="addAdvance()">+ Advance</button>
+        <button class="btn btn-sm" onclick="removeAdvance()">− Advance</button>
+      </div>
+      <div class="inline-note">Advances required — Seasoned: 4 · Veteran: 8 · Heroic: 12 · Legendary: 16</div>
+    </div>
+
+    ${c.gear ? `<div class="card"><div class="card-title">🎒 Gear</div><pre style="white-space:pre-wrap;font-size:0.88rem;color:var(--text-muted);font-family:'Bitter',serif;">${c.gear}</pre></div>` : ''}
+
+    <div class="card">
+      <div class="card-title">📝 Notes</div>
+      <textarea class="form-textarea" placeholder="Session notes, contacts, objectives…" onchange="saveNotes(this.value)">${c.notes||''}</textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="editChar('${c.id}')">✏️ Edit Character</button>
+      <button class="btn" onclick="exportChar('${c.id}')">↓ Export JSON</button>
+    </div>
+  `;
+}
+
+// Tracker mutations
+function setWound(v)    { withChar(c => { c.wounds.current = Math.max(0,Math.min(4,v)); }); }
+function setFatigue(v)  { withChar(c => { c.fatigue.current = Math.max(0,Math.min(2,v)); }); }
+function setBennies(v)  { withChar(c => { c.bennies = Math.max(0,Math.min(5,v)); }); }
+function setPP(v)       { withChar(c => { c.pp = Math.max(0,Math.min(c.ppMax,v)); }); }
+function saveNotes(v)   { withChar(c => { c.notes = v; }); }
+function toggleStatus(s){ withChar(c => {
+  if (!c.statuses) c.statuses = [];
+  const idx = c.statuses.indexOf(s);
+  if (idx>=0) c.statuses.splice(idx,1); else c.statuses.push(s);
+}); }
+function addAdvance()    { withChar(c => { c.advances=(c.advances||0)+1; c.rank=rankFromAdvances(c.advances); }); }
+function removeAdvance() { withChar(c => { c.advances=Math.max(0,(c.advances||0)-1); c.rank=rankFromAdvances(c.advances); }); }
+
+// ═══════════════════════════════════════════════════════════════════════
+// QUICK ROLL from Tracker
+// ═══════════════════════════════════════════════════════════════════════
+function quickRoll(name, dieSides, wildCard) {
+  const traitRoll = rollExploding(dieSides);
+  const woundPenalty = -(((getActive()||{}).wounds||{}).current||0) - (((getActive()||{}).fatigue||{}).current||0);
+  let result, detail;
+  if (wildCard) {
+    const wildRoll = rollExploding(6);
+    const traitFinal = traitRoll.total + woundPenalty;
+    const wildFinal  = wildRoll.total  + woundPenalty;
+    const best = Math.max(traitFinal, wildFinal);
+    const raises = Math.max(0, Math.floor((best - 4) / 4));
+    result = best;
+    detail = `d${dieSides}: ${traitRoll.rolls.join('+')}=${traitRoll.total} | Wild d6: ${wildRoll.rolls.join('+')}=${wildRoll.total}${woundPenalty<0?' | Penalty: '+woundPenalty:''} → Best: ${best}${raises?' ('+raises+' raise'+(raises>1?'s':'')+')':''}`;
+  } else {
+    result = traitRoll.total + woundPenalty;
+    detail = `d${dieSides}: ${traitRoll.rolls.join('+')}=${traitRoll.total}${woundPenalty<0?' | Penalty: '+woundPenalty:''}`;
+  }
+  const tn = 4;
+  const success = result >= tn;
+  const raises = success ? Math.max(0, Math.floor((result - tn) / 4)) : 0;
+  const resultEl = document.getElementById('dice-result');
+  if (resultEl) {
+    const color = result >= 4 ? 'var(--accent-gold)' : 'var(--sw-red)';
+    resultEl.innerHTML = `
+      <div>
+        <div style="font-family:'Oswald',sans-serif;font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">${name}</div>
+        <div class="dice-roll-num" style="color:${color}">${result}</div>
+        <div class="dice-roll-detail">${detail}</div>
+        <div style="margin-top:6px;font-family:'Oswald',sans-serif;font-size:0.72rem;letter-spacing:0.1em;color:${color};">${result<4?'FAILURE':raises?'SUCCESS + '+raises+' RAISE'+(raises>1?'S':''):'SUCCESS'}</div>
+      </div>
+    `;
+    showView('dice');
+  }
+  toast(`${name}: ${result} — ${result<4?'Failure':raises?'Success + '+raises+' raise'+(raises>1?'s':''):'Success'}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DICE ROLLER
+// ═══════════════════════════════════════════════════════════════════════
+function rollExploding(sides) {
+  const rolls = [];
+  let total = 0, r;
+  do {
+    r = Math.floor(Math.random() * sides) + 1;
+    rolls.push(r);
+    total += r;
+  } while (r === sides && rolls.length < 10);
+  return { total, rolls };
+}
+
+function rollTrait(sides) {
+  const r = rollExploding(sides);
+  const tn = 4;
+  const success = r.total >= tn;
+  const raises = success ? Math.max(0, Math.floor((r.total - tn) / 4)) : 0;
+  const color = success ? 'var(--accent-gold)' : 'var(--sw-red)';
+  document.getElementById('dice-result').innerHTML = `
+    <div>
+      <div style="font-family:'Oswald',sans-serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:4px;">Trait d${sides}</div>
+      <div class="dice-roll-num" style="color:${color}">${r.total}</div>
+      <div class="dice-roll-detail">Rolls: ${r.rolls.join(' → ')}${r.rolls.length>1?' (Ace!)':''}</div>
+      <div style="margin-top:6px;font-family:'Oswald',sans-serif;font-size:0.72rem;letter-spacing:0.1em;color:${color};">${!success?'FAILURE':raises?'SUCCESS + '+raises+' RAISE'+(raises>1?'S':''):'SUCCESS'}</div>
+    </div>
+  `;
+}
+
+function rollWild(sides) {
+  const tr = rollExploding(sides);
+  const wr = rollExploding(6);
+  const best = Math.max(tr.total, wr.total);
+  const tn = 4;
+  const success = best >= tn;
+  const raises = success ? Math.max(0, Math.floor((best - tn) / 4)) : 0;
+  const color = success ? 'var(--accent-gold)' : 'var(--sw-red)';
+  document.getElementById('dice-result').innerHTML = `
+    <div>
+      <div style="font-family:'Oswald',sans-serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:4px;">Wild Card d${sides} + Wild Die</div>
+      <div class="dice-roll-num" style="color:${color}">${best}</div>
+      <div class="dice-roll-detail">d${sides}: ${tr.rolls.join('+')}=${tr.total} | Wild d6: ${wr.rolls.join('+')}=${wr.total} → Best: ${best}</div>
+      <div style="margin-top:6px;font-family:'Oswald',sans-serif;font-size:0.72rem;letter-spacing:0.1em;color:${color};">${!success?'FAILURE':raises?'SUCCESS + '+raises+' RAISE'+(raises>1?'S':''):'SUCCESS'}</div>
+    </div>
+  `;
+}
+
+function rollStd(sides) {
+  const r = Math.floor(Math.random() * sides) + 1;
+  document.getElementById('std-result').textContent = `d${sides} → ${r}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════
+renderCharList();
+</script>
+</body>
+</html>

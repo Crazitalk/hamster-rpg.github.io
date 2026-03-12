@@ -1,0 +1,1891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0d0d0d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>ICRPG — Character Forge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Special+Elite&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── rpg-icrpg Palette ── */
+    --ic-black:        #000000;
+    --ic-silver:       #c6c4c4;
+    --ic-flag-red:     #d01c29;
+    --ic-harvest-gold: #d89b30;
+    --ic-white:        #ffffff;
+
+    /* ── Semantic Tokens ── */
+    --bg-deep:        #0d0d0d;
+    --bg-card:        #161616;
+    --bg-card2:       #1c1c1c;
+    --bg-indexcard:   #f5f0e8;   /* cream index card */
+    --bg-indexcard2:  #ede7d4;
+    --accent-red:     var(--ic-flag-red);
+    --accent-red2:    #e8222f;
+    --accent-gold:    var(--ic-harvest-gold);
+    --accent-gold2:   #f0b040;
+    --accent-silver:  var(--ic-silver);
+    --text-primary:   #f0ece3;
+    --text-dark:      #1a1a1a;
+    --text-muted:     #8a8a8a;
+    --text-silver:    var(--ic-silver);
+    --border:         rgba(198,196,196,0.18);
+    --border-bright:  rgba(198,196,196,0.45);
+    --border-red:     rgba(208,28,41,0.5);
+    --border-gold:    rgba(216,155,48,0.45);
+    --shadow:         0 6px 30px rgba(0,0,0,0.8);
+    --glow-red:       0 0 16px rgba(208,28,41,0.35);
+    --glow-gold:      0 0 16px rgba(216,155,48,0.3);
+    --transition:     all 0.2s cubic-bezier(0.4,0,0.2,1);
+    --radius:         3px;          /* ICRPG is boxy/sharp */
+    --radius-card:    2px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg-deep);
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(198,196,196,0.03) 32px),
+      repeating-linear-gradient(90deg, transparent, transparent 31px, rgba(198,196,196,0.03) 32px);
+    color: var(--text-primary);
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* grid-paper texture on body */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 40% at 10% 0%,  rgba(208,28,41,0.08)   0%, transparent 55%),
+      radial-gradient(ellipse 55% 50% at 88% 95%, rgba(216,155,48,0.07)  0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+
+  #app { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 0 0 70px; }
+
+  /* ── BANNER ── */
+  .site-banner {
+    background: var(--ic-black);
+    padding: 9px 20px;
+    border-bottom: 2px solid var(--ic-flag-red);
+  }
+  .site-banner a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-gold); text-decoration: none; transition: color 0.2s;
+  }
+  .site-banner a:hover { color: var(--accent-red); }
+
+  /* ── HEADER ── */
+  .app-header {
+    background: var(--ic-black);
+    text-align: center;
+    padding: 28px 20px 22px;
+    border-bottom: 3px solid var(--ic-flag-red);
+    position: relative;
+    overflow: hidden;
+  }
+  /* Hatch marks decorative */
+  .app-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 8px,
+      rgba(208,28,41,0.04) 8px, rgba(208,28,41,0.04) 9px
+    );
+    pointer-events: none;
+  }
+  .header-emoji {
+    font-size: 2.6rem; line-height: 1; margin-bottom: 8px;
+    filter: drop-shadow(0 0 10px rgba(216,155,48,0.5));
+    position: relative;
+  }
+  .header-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(1.5rem, 5vw, 2.4rem);
+    color: var(--ic-white);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1;
+    position: relative;
+  }
+  .header-title span { color: var(--accent-red); }
+  .header-subtitle-row {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-top: 10px; position: relative;
+  }
+  .header-rule {
+    flex: 1; height: 2px; max-width: 80px;
+    background: linear-gradient(90deg, transparent, var(--ic-silver));
+  }
+  .header-rule.right { background: linear-gradient(90deg, var(--ic-silver), transparent); }
+  .header-subtitle {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent-silver);
+  }
+  .header-subtitle a { color: var(--accent-gold); text-decoration: none; }
+  .header-subtitle a:hover { color: var(--accent-red); }
+
+  /* ── NAV ── */
+  .nav-tabs {
+    display: flex; background: #0a0a0a;
+    border-bottom: 2px solid var(--accent-red);
+    position: sticky; top: 0; z-index: 50;
+    overflow-x: auto;
+  }
+  .nav-tab {
+    flex: 1; min-width: 80px;
+    padding: 12px 10px;
+    background: none; border: none; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+  .nav-tab:hover { color: var(--accent-gold); }
+  .nav-tab.active { color: var(--accent-red); border-bottom-color: var(--accent-gold); }
+
+  /* ── VIEWS ── */
+  .view { display: none; padding: 16px 12px; }
+  .view.active { display: block; }
+
+  /* ── INDEX CARD ── */
+  /* The core visual metaphor: actual index cards */
+  .index-card {
+    background: var(--bg-indexcard);
+    border: 1px solid #c8bfa0;
+    border-radius: var(--radius-card);
+    padding: 0;
+    margin-bottom: 14px;
+    box-shadow: 3px 4px 0 rgba(0,0,0,0.5), var(--shadow);
+    position: relative;
+    overflow: hidden;
+    color: var(--text-dark);
+  }
+  .index-card::before {
+    /* Red margin line */
+    content: '';
+    position: absolute; left: 38px; top: 0; bottom: 0;
+    width: 2px; background: rgba(208,28,41,0.4);
+    pointer-events: none;
+  }
+  /* Ruled lines */
+  .index-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      180deg,
+      transparent 0, transparent 25px,
+      rgba(100,120,180,0.12) 25px, rgba(100,120,180,0.12) 26px
+    );
+    pointer-events: none;
+  }
+  .ic-header {
+    background: var(--accent-red);
+    padding: 7px 14px 7px 48px;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ic-white);
+    position: relative; z-index: 1;
+  }
+  .ic-header .ic-tag {
+    float: right;
+    background: rgba(255,255,255,0.2);
+    padding: 0 8px; border-radius: 2px;
+    font-size: 0.65rem; letter-spacing: 0.1em;
+  }
+  .ic-body {
+    padding: 14px 14px 14px 50px;
+    position: relative; z-index: 1;
+    font-family: 'Special Elite', serif;
+  }
+  .ic-body-plain {
+    padding: 14px 14px 14px 50px;
+    position: relative; z-index: 1;
+  }
+
+  /* ── DARK CARDS (for non-index-card UI) ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    border-top: 2px solid var(--accent-red);
+  }
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-gold); margin-bottom: 12px;
+    border-bottom: 1px solid var(--border); padding-bottom: 7px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .ct-accent { color: var(--accent-red); }
+
+  /* ── STAT BOX (the iconic ICRPG stat display) ── */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .stat-box {
+    background: var(--ic-white);
+    border: 2px solid var(--text-dark);
+    border-radius: 2px;
+    padding: 8px 6px;
+    text-align: center;
+    position: relative;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    color: var(--text-dark);
+  }
+  .stat-box.dark {
+    background: var(--bg-card2);
+    border-color: var(--border);
+    color: var(--text-primary);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+  }
+  .stat-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent-red); margin-bottom: 3px;
+  }
+  .stat-val {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.8rem; line-height: 1; color: var(--text-dark);
+  }
+  .stat-box.dark .stat-val { color: var(--accent-gold); }
+  .stat-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-top: 2px;
+  }
+  .stat-box.dark .stat-sub { color: var(--text-muted); }
+  .stat-base-loot {
+    display: flex; gap: 4px; justify-content: center; margin-top: 5px;
+  }
+  .sbl-field {
+    flex: 1;
+    background: rgba(0,0,0,0.06);
+    border-top: 1px solid rgba(0,0,0,0.15);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 2px 3px; text-align: center;
+  }
+  .stat-box.dark .sbl-field { background: rgba(255,255,255,0.04); border-top-color: rgba(255,255,255,0.1); }
+
+  /* ── EFFORT BOXES ── */
+  .effort-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  @media(max-width:480px) { .effort-grid { grid-template-columns: repeat(3,1fr); } }
+  .effort-box {
+    background: var(--ic-black);
+    border: 2px solid var(--accent-gold);
+    border-radius: 2px;
+    padding: 7px 4px;
+    text-align: center;
+    box-shadow: 2px 2px 0 rgba(216,155,48,0.3);
+  }
+  .effort-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.58rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent-gold); margin-bottom: 3px;
+  }
+  .effort-die {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.3rem; line-height: 1; color: var(--ic-white);
+  }
+  .effort-bonus {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.6rem; color: var(--accent-gold2); margin-top: 2px;
+  }
+
+  /* ── HEARTS ── */
+  .hearts-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .heart {
+    font-size: 1.6rem; cursor: pointer;
+    transition: var(--transition); filter: grayscale(1) opacity(0.35);
+  }
+  .heart.filled { filter: none; }
+  .heart:hover { transform: scale(1.15); }
+  .hp-track {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .hp-pip {
+    width: 22px; height: 22px; border-radius: 2px;
+    border: 1.5px solid var(--accent-red);
+    background: rgba(208,28,41,0.07);
+    cursor: pointer; transition: var(--transition);
+  }
+  .hp-pip.filled { background: var(--accent-red); box-shadow: var(--glow-red); }
+  .hp-pip:hover { border-color: var(--accent-red2); }
+
+  /* ── HERO COIN ── */
+  .hero-coin {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 3px solid var(--accent-gold);
+    background: var(--ic-black);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 0 0 2px var(--accent-gold2), var(--glow-gold);
+  }
+  .hero-coin.used {
+    border-color: var(--text-muted);
+    box-shadow: none; filter: grayscale(0.8) opacity(0.5);
+  }
+  .hero-coin:hover:not(.used) { transform: scale(1.1); }
+
+  /* ── MASTERY TRACK ── */
+  .mastery-track { display: flex; gap: 3px; flex-wrap: wrap; }
+  .mastery-pip {
+    width: 18px; height: 18px; border-radius: 2px;
+    border: 1.5px solid var(--accent-gold);
+    background: rgba(216,155,48,0.05);
+    cursor: pointer; transition: var(--transition);
+    font-size: 0.5rem; display: flex; align-items: center; justify-content: center;
+  }
+  .mastery-pip.filled { background: var(--accent-gold); }
+  .mastery-pip.tier { border-color: var(--accent-red); }
+  .mastery-pip.tier.filled { background: var(--accent-red); }
+
+  /* ── LOOT CARDS ── */
+  .loot-list { display: flex; flex-direction: column; gap: 6px; }
+  .loot-item {
+    background: var(--bg-indexcard);
+    border: 1px solid #c0b898;
+    border-left: 4px solid var(--accent-gold);
+    border-radius: 2px;
+    padding: 8px 10px;
+    color: var(--text-dark);
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+    display: flex; align-items: flex-start; gap: 8px;
+    transition: var(--transition);
+  }
+  .loot-item:hover { border-left-color: var(--accent-red); }
+  .loot-item.equipped { border-left-color: var(--accent-red); }
+  .loot-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700; font-size: 0.88rem; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--text-dark); flex: 1;
+  }
+  .loot-bonus {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 0.75rem; color: var(--accent-red);
+    white-space: nowrap;
+  }
+  .loot-desc { font-size: 0.78rem; color: #555; font-family: 'Special Elite', serif; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+    padding: 9px 16px;
+    background: rgba(198,196,196,0.07);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; transition: var(--transition);
+  }
+  .btn:hover { background: rgba(198,196,196,0.14); border-color: var(--border-bright); }
+  .btn:disabled { opacity: 0.35; cursor: default; }
+  .btn-primary {
+    background: rgba(208,28,41,0.15);
+    border-color: rgba(208,28,41,0.55);
+    color: var(--ic-white);
+  }
+  .btn-primary:hover { background: rgba(208,28,41,0.3); box-shadow: var(--glow-red); }
+  .btn-gold {
+    background: rgba(216,155,48,0.12);
+    border-color: rgba(216,155,48,0.5);
+    color: var(--accent-gold2);
+  }
+  .btn-gold:hover { background: rgba(216,155,48,0.25); box-shadow: var(--glow-gold); }
+  .btn-sm { padding: 5px 11px; font-size: 0.7rem; }
+  .btn-row { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 11px; }
+  .form-label {
+    display: block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent-gold); margin-bottom: 4px;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 8px 10px;
+    background: rgba(198,196,196,0.04);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none; border-color: var(--border-bright);
+    background: rgba(198,196,196,0.08);
+  }
+  .form-select option { background: var(--bg-card); }
+  .form-textarea { resize: vertical; min-height: 72px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+  /* ── SPINNER CONTROL ── */
+  .spinner-row { display: flex; align-items: center; gap: 6px; }
+  .spin-btn {
+    width: 26px; height: 26px;
+    background: rgba(208,28,41,0.1); border: 1.5px solid var(--border-red);
+    border-radius: 2px; color: var(--accent-red);
+    font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-family: 'Black Han Sans', sans-serif;
+    transition: var(--transition); flex-shrink: 0;
+  }
+  .spin-btn:hover { background: rgba(208,28,41,0.25); }
+  .spin-val {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.4rem; color: var(--accent-gold);
+    min-width: 36px; text-align: center; line-height: 1;
+  }
+  .spin-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── CHARACTER LIST ── */
+  .char-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent-red);
+    border-radius: var(--radius);
+    margin-bottom: 9px;
+    cursor: pointer; transition: var(--transition);
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
+  }
+  .char-card:hover { border-color: var(--border-bright); border-left-color: var(--accent-gold); background: rgba(30,30,30,0.95); }
+  .char-card.active-char { border-left-color: var(--accent-gold); }
+  .char-card-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .char-card-info { flex: 1; }
+  .char-card-name {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1rem; text-transform: uppercase; color: var(--ic-white);
+    letter-spacing: 0.04em;
+  }
+  .char-card-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted); margin-top: 2px;
+  }
+  .char-card-actions { display: flex; gap: 5px; flex-shrink: 0; }
+  .cca-btn {
+    width: 26px; height: 26px; border-radius: 2px;
+    background: rgba(198,196,196,0.06); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 0.75rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .cca-btn:hover { background: rgba(198,196,196,0.16); color: var(--ic-white); }
+  .cca-btn.del:hover { background: rgba(208,28,41,0.2); color: var(--accent-red); border-color: var(--border-red); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; padding: 44px 20px; color: var(--text-muted);
+  }
+  .empty-state .big-icon { font-size: 3.5rem; margin-bottom: 12px; opacity: 0.7; }
+  .empty-state p { margin-bottom: 16px; font-size: 0.9rem; }
+
+  /* ── WIZARD ── */
+  .wizard-progress {
+    display: flex; justify-content: center; flex-wrap: wrap;
+    gap: 3px; margin-bottom: 20px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--border);
+  }
+  .wz-dot {
+    width: 28px; height: 28px; border-radius: 2px;
+    border: 2px solid rgba(198,196,196,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 0.58rem; font-weight: 800;
+    letter-spacing: 0.04em; color: var(--text-muted);
+    cursor: pointer; transition: var(--transition); position: relative;
+  }
+  .wz-dot[data-label]::after {
+    content: attr(data-label);
+    position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
+    font-size: 0.5rem; letter-spacing: 0.04em; white-space: nowrap; color: var(--text-muted);
+  }
+  .wz-dot.done { border-color: var(--accent-gold); background: rgba(216,155,48,0.15); color: var(--accent-gold); }
+  .wz-dot.current { border-color: var(--accent-red); background: rgba(208,28,41,0.15); color: var(--accent-red); }
+  .step-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--ic-white); margin-bottom: 5px;
+  }
+  .step-hint {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;
+  }
+  .wizard-nav { display: flex; justify-content: space-between; margin-top: 16px; }
+
+  /* ── SELECTION GRID ── */
+  .sel-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(120px,1fr)); gap: 7px; margin-bottom: 12px; }
+  .sel-option {
+    padding: 10px 8px;
+    background: rgba(198,196,196,0.04); border: 1.5px solid var(--border);
+    border-radius: var(--radius); cursor: pointer; text-align: center;
+    transition: var(--transition); box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+  }
+  .sel-option:hover { border-color: var(--border-bright); background: rgba(198,196,196,0.09); box-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
+  .sel-option.selected { border-color: var(--accent-red); background: rgba(208,28,41,0.1); box-shadow: 3px 3px 0 rgba(208,28,41,0.25); }
+  .sel-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.78rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ic-white); margin-top: 4px;
+  }
+  .sel-sub { font-size: 0.68rem; color: var(--accent-gold); margin-top: 2px; }
+  .sel-detail {
+    background: var(--bg-indexcard); border: 1px solid #c0b898;
+    border-left: 4px solid var(--accent-red);
+    padding: 12px 14px; border-radius: 2px; color: var(--text-dark);
+    font-family: 'Barlow', sans-serif; font-size: 0.85rem;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.3); margin-bottom: 12px;
+  }
+  .sel-detail strong { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; text-transform: uppercase; color: var(--ic-black); }
+
+  /* ── TARGET NUMBER ── */
+  .target-display {
+    background: var(--ic-black);
+    border: 3px solid var(--accent-red);
+    border-radius: 3px;
+    padding: 14px 20px;
+    text-align: center;
+    box-shadow: 4px 4px 0 rgba(208,28,41,0.3);
+  }
+  .target-num {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 3.5rem; line-height: 1; color: var(--accent-red);
+    text-shadow: 0 0 20px rgba(208,28,41,0.5);
+  }
+  .target-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--accent-silver); margin-top: 4px;
+  }
+
+  /* ── DICE ROLLER ── */
+  .dice-result {
+    min-height: 100px; display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--border);
+    border-top: 3px solid var(--accent-red);
+    border-radius: var(--radius);
+    background: rgba(198,196,196,0.02);
+    margin-bottom: 12px; padding: 14px; text-align: center;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
+  }
+  .roll-num {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 3.5rem; line-height: 1; color: var(--ic-white);
+  }
+  .roll-num.nat20 { color: var(--accent-gold); text-shadow: var(--glow-gold); }
+  .roll-num.fail { color: var(--accent-red); }
+  .roll-detail { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.06em; }
+  .roll-verdict {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.82rem; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase;
+    margin-top: 6px;
+  }
+  .dice-btn-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-bottom: 10px; }
+  @media(max-width:400px){ .dice-btn-grid { grid-template-columns: repeat(3,1fr); } }
+  .die-btn {
+    padding: 12px 6px;
+    background: rgba(198,196,196,0.06); border: 1.5px solid var(--border);
+    border-top: 2px solid var(--accent-red);
+    border-radius: var(--radius);
+    color: var(--ic-white);
+    font-family: 'Black Han Sans', sans-serif; font-size: 1rem;
+    cursor: pointer; transition: var(--transition);
+    text-align: center; box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+  }
+  .die-btn:hover { background: rgba(208,28,41,0.12); border-top-color: var(--accent-gold); box-shadow: 3px 3px 0 rgba(0,0,0,0.5); transform: translateY(-1px); }
+  .die-btn .die-label { font-size: 0.58rem; color: var(--text-muted); font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.1em; }
+  .effort-roll-btn {
+    background: rgba(216,155,48,0.06); border: 1.5px solid var(--border-gold);
+    border-top: 2px solid var(--accent-gold);
+  }
+  .effort-roll-btn:hover { background: rgba(216,155,48,0.2); border-top-color: var(--accent-gold2); }
+  .divider { height: 1px; background: var(--border); margin: 14px 0; }
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--accent-silver); margin-bottom: 8px;
+  }
+
+  /* ── INLINE NOTE ── */
+  .ic-note {
+    background: rgba(216,155,48,0.06);
+    border-left: 3px solid var(--accent-gold);
+    padding: 7px 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem; color: var(--text-muted);
+    border-radius: 0 2px 2px 0; margin-bottom: 10px;
+  }
+  .ic-note strong { color: var(--accent-gold2); }
+
+  /* ── REVIEW ── */
+  .review-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 5px 0; border-bottom: 1px solid rgba(198,196,196,0.06);
+    font-size: 0.86rem;
+  }
+  .review-row:last-child { border-bottom: none; }
+  .review-row span:first-child {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .review-row span:last-child { color: var(--accent-gold); text-align: right; }
+
+  /* ── ABILITY / TYPE ABILITY TAG ── */
+  .ability-tag {
+    display: inline-block;
+    background: rgba(208,28,41,0.08);
+    border: 1px solid var(--border-red);
+    border-radius: 2px;
+    padding: 3px 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-red);
+    margin: 2px;
+  }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: var(--ic-black);
+    border: 1.5px solid var(--accent-gold);
+    border-left: 4px solid var(--accent-red);
+    padding: 9px 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent-gold);
+    transition: transform 0.3s; z-index: 999; white-space: nowrap;
+    box-shadow: 3px 3px 0 rgba(208,28,41,0.3);
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── TRACKER SPECIFIC ── */
+  .tracker-top {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent-red);
+  }
+  .tc-icon { font-size: 2.4rem; }
+  .tc-name {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.2rem; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--ic-white);
+  }
+  .tc-sub {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .tc-tier {
+    margin-left: auto;
+    background: var(--accent-red);
+    padding: 3px 10px; border-radius: 2px;
+    font-family: 'Black Han Sans', sans-serif; font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--ic-white);
+    box-shadow: 2px 2px 0 rgba(208,28,41,0.4); flex-shrink: 0;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media(max-width:480px){ .two-col { grid-template-columns: 1fr; } }
+  .gold { color: var(--accent-gold); }
+  .red { color: var(--accent-red); }
+  .muted { color: var(--text-muted); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 22px 16px;
+    border-top: 2px solid var(--accent-red);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+    color: var(--text-muted); text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+  <!-- ========= Banner ========= -->
+<div style="background:#0d0221;padding:10px 20px;">
+  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Studio 347 Home</a>
+</div>
+<hr style="border:none;border-top:1px solid #511a91;margin:0;">
+<div id="app">
+  <header class="app-header">
+    <div class="header-emoji">📇</div>
+    <div class="header-title">Index Card <span>RPG</span></div>
+    <div class="header-title" style="font-size:clamp(0.9rem,2.5vw,1.2rem);letter-spacing:0.12em;color:var(--accent-silver);margin-top:2px;">Character Forge</div>
+    <div class="header-subtitle-row">
+      <div class="header-rule"></div>
+      <div class="header-subtitle">Runehammer Games · <a href="https://icrpgcommunitycontent.com" target="_blank">icrpgcommunitycontent.com</a></div>
+      <div class="header-rule right"></div>
+    </div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('characters')">📜 Characters</button>
+    <button class="nav-tab" onclick="showView('builder')">✦ Builder</button>
+    <button class="nav-tab" onclick="showView('tracker')">❤️ Tracker</button>
+    <button class="nav-tab" onclick="showView('dice')">🎲 Dice</button>
+  </nav>
+
+  <!-- CHARACTERS -->
+  <div id="view-characters" class="view active">
+    <div class="card">
+      <div class="card-title">📜 Your Characters</div>
+      <div id="char-list"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="startBuilder()">+ New Character</button>
+      <button class="btn" onclick="importChar()">↑ Import JSON</button>
+    </div>
+  </div>
+
+  <!-- BUILDER -->
+  <div id="view-builder" class="view">
+    <div class="card">
+      <div class="card-title">✦ Character Builder</div>
+      <div class="wizard-progress" id="wizard-progress"></div>
+      <div id="wizard-pages"></div>
+    </div>
+  </div>
+
+  <!-- TRACKER -->
+  <div id="view-tracker" class="view">
+    <div id="tracker-content">
+      <div class="empty-state">
+        <div class="big-icon">📜</div>
+        <p>No character loaded. Select or create one.</p>
+        <button class="btn btn-primary" onclick="showView('characters')">Go to Characters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICE -->
+  <div id="view-dice" class="view">
+    <div class="card">
+      <div class="card-title">🎲 <ct-accent>Dice Tower</ct-accent></div>
+      <div class="target-display" style="margin-bottom:12px;" id="target-box">
+        <div class="target-num" id="target-num">10</div>
+        <div class="target-label">Room Target</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;">
+          <button class="spin-btn" onclick="changeTarget(-1)">−</button>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.68rem;letter-spacing:0.15em;color:var(--accent-silver);">EASY −3 · HARD +3</span>
+          <button class="spin-btn" onclick="changeTarget(1)">+</button>
+        </div>
+      </div>
+      <div class="dice-result" id="dice-result">
+        <div style="color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;letter-spacing:0.18em;text-transform:uppercase;">Roll the dice, hero...</div>
+      </div>
+      <div class="section-label">Attempt (d20 + Stat)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        ${['STR','DEX','CON','INT','WIS','CHA'].map(s=>
+          `<button class="btn btn-sm" onclick="rollAttempt('${s}')" id="qroll-${s}">${s}</button>`
+        ).join('')}
+        <button class="btn btn-sm btn-primary" onclick="rollD20(0)">d20 (no mod)</button>
+        <button class="btn btn-sm btn-gold" onclick="rollEasy()">EASY (d20+d20 high)</button>
+        <button class="btn btn-sm" onclick="rollHard()">HARD (d20+d20 low)</button>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label">Effort Dice</div>
+      <div class="dice-btn-grid">
+        <button class="die-btn effort-roll-btn" onclick="rollEffort('BASIC',4)">
+          <div>d4</div><div class="die-label">BASIC</div>
+        </button>
+        <button class="die-btn effort-roll-btn" onclick="rollEffort('WEAPON',6)">
+          <div>d6</div><div class="die-label">WEAPON</div>
+        </button>
+        <button class="die-btn effort-roll-btn" onclick="rollEffort('GUN',8)">
+          <div>d8</div><div class="die-label">GUN</div>
+        </button>
+        <button class="die-btn effort-roll-btn" onclick="rollEffort('MAGIC',10)">
+          <div>d10</div><div class="die-label">MAGIC</div>
+        </button>
+        <button class="die-btn effort-roll-btn" onclick="rollEffort('ULTIMATE',12)">
+          <div>d12</div><div class="die-label">ULTIMATE</div>
+        </button>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label">Standard Dice</div>
+      <div class="dice-btn-grid">
+        ${[4,6,8,10,12,20,100].map(d=>`<button class="die-btn" onclick="rollStd(${d})"><div>d${d}</div></button>`).join('')}
+      </div>
+      <div id="std-roll" style="text-align:center;margin-top:10px;font-family:'Black Han Sans',sans-serif;font-size:1.4rem;color:var(--accent-gold);min-height:30px;"></div>
+    </div>
+  </div>
+
+  <footer>Index Card RPG Character Forge — Unofficial Companion Tool<br>
+  ICRPG is a trademark of Runehammer Games / Hankerin Ferinale · Made for the Shield Wall 🛡</footer>
+</div>
+
+<div id="toast">✓ Saved</div>
+
+<script>
+'use strict';
+// ════════════════════════════════════════════════════════════════════
+// GAME DATA
+// ════════════════════════════════════════════════════════════════════
+const STATS  = ['STR','DEX','CON','INT','WIS','CHA'];
+const EFFORT_TYPES = [
+  { name:'BASIC',   die:4,  desc:'Unarmed, improvised, or basic tools.' },
+  { name:'WEAPON',  die:6,  desc:'Swords, axes, bows, melee & ranged arms.' },
+  { name:'GUN',     die:8,  desc:'Firearms, crossbows, heavy ranged weapons.' },
+  { name:'MAGIC',   die:10, desc:'Spells, energy, arcane or divine power.' },
+  { name:'ULTIMATE',die:12, desc:'Critical effects, rare tech, nat-20 bonus.' },
+];
+
+const LIFE_FORMS = [
+  { name:'Human',   icon:'👤', bonuses:'+1 to any two STATS of choice',              special:'Adaptable: Once per session, reroll any one die and take the better result.',    desc:'The most common folk in any world — driven, ambitious, and surprisingly tough.' },
+  { name:'Elf',     icon:'🌿', bonuses:'+1 DEX, +1 INT',                              special:'Low Light Vision. DEX rolls at FAR range are always EASY.',                     desc:'Highborn from the age of immortals, beautiful, graceful, elegant — with ages of wisdom.' },
+  { name:'Dwarf',   icon:'⛏️', bonuses:'+1 CON, +1 STR',                              special:'Stone Sense: Know depth underground, detect structural weaknesses. CON saves EASY.', desc:'Stubborn as bedrock, with hearts of iron and hands made for war and forge.' },
+  { name:'Halfling',icon:'🌾', bonuses:'+1 DEX, +1 CHA',                              special:'Lucky: When you roll a NAT 1, immediately reroll once — keep the new result.',  desc:'Small folk with enormous hearts and uncanny fortune on their side.' },
+  { name:'Torton',  icon:'🐢', bonuses:'+1 CON, +1 WIS',                              special:'Shell: Spend an action to gain +4 ARMOR until your next turn. Cannot move while shelled.', desc:'Slow, ancient, and nearly indestructible — Tortons carry the world on their backs.' },
+  { name:'Gerblin', icon:'🐀', bonuses:'+1 DEX, +1 INT',                              special:'Scurry: Move through NEAR range as a free action once per round.',              desc:'Chaotic little creatures of cunning and desperation — always underestimated.' },
+  { name:'Wolfkin', icon:'🐺', bonuses:'+1 STR, +1 WIS',                              special:'Pack Instinct: When fighting alongside an ally, both gain +1 to ATTEMPT rolls.', desc:'Noble hunters and warriors who run in packs and live by an unbroken code of loyalty.' },
+  { name:'Clockwork',icon:'⚙️',bonuses:'+1 CON, +1 INT',                             special:'Constructed: Immune to poison, disease. Eat/drink nothing. Repair with TOOLS instead of HEALING.', desc:'Gears and memory, forged to serve — but something in the machine learned to dream.' },
+];
+
+const TYPES = [
+  {
+    name:'WARRIOR', icon:'⚔️', color:'#d01c29',
+    stat:'STR', effortFocus:'WEAPON',
+    desc:'The shield of the party. Masters of melee, armor, and endurance.',
+    startAbilities:[
+      { name:'HARD TO KILL',    desc:'Add one extra HEART to your maximum HP.' },
+      { name:'RECKLESS ATTACK', desc:'Grant yourself +3 STR and −3 DEFENSE for 1 ROUND as a free action.' },
+      { name:'WEAPONLESS FURY', desc:'+3 to STR checks using bare hands and feet.' },
+    ],
+    startLoot:[
+      { name:'GREAT SWORD',     bonus:'+2 WEAPON effort',  desc:'Massive blade. Two-handed. Crit on 19-20.' },
+      { name:'WAR AXE & SHIELD',bonus:'+1 WEAPON, +2 ARMOR',desc:'Reliable loadout for any front-liner.' },
+      { name:'HEAVY PLATE',     bonus:'+4 ARMOR',          desc:'DEX rolls are always HARD while worn.' },
+    ],
+    milestones:[
+      { name:'EXTRA ATTACK',   desc:'After slaying an enemy with melee, make one more melee attack this round.' },
+      { name:'INDOMITABLE',    desc:'Once per session, when you would take a Killing Blow, stay at 1 HP instead.' },
+      { name:'BATTLECRY',      desc:'All allies within NEAR range gain +2 to ATTEMPT rolls for 1 round.' },
+    ],
+  },
+  {
+    name:'WIZARD', icon:'🔮', color:'#9b59b6',
+    stat:'INT', effortFocus:'MAGIC',
+    desc:'Wielder of arcane power. Spells are your weapons, your armor, your legacy.',
+    startAbilities:[
+      { name:'SPELLCASTER',    desc:'Roll INT to cast spells. On fail, roll SPELLBURN: lose that many rounds of casting.' },
+      { name:'ARCANE WARD',    desc:'Spend MAGIC effort on self: add result as temp HP until your next turn.' },
+      { name:'CANTRIP',        desc:'Minor magical tricks require no roll — light, whisper, minor illusion.' },
+    ],
+    startLoot:[
+      { name:'SPELLBOOK',      bonus:'+2 MAGIC effort',    desc:'Contains 3 chosen spells. Study adds more.' },
+      { name:'WAND OF FORCE',  bonus:'+1 INT, +1 MAGIC',   desc:'Fire force bolts as a free action 1/round.' },
+      { name:'ROBE OF WARDS',  bonus:'+2 ARMOR',            desc:'Shimmering robe of interwoven sigils.' },
+    ],
+    milestones:[
+      { name:'SURGE',          desc:'Roll INT: on success, double your MAGIC effort result this round.' },
+      { name:'LEYLINE TAP',    desc:'Once per session, recover all spent SPELL power or recast a failed spell.' },
+      { name:'SPELLSHIELD',    desc:'Deflect one incoming attack per session on a successful INT roll.' },
+    ],
+  },
+  {
+    name:'RANGER', icon:'🏹', color:'#27ae60',
+    stat:'DEX', effortFocus:'GUN/WEAPON',
+    desc:'Hunter, tracker, and ghost of the wilds. The enemy never sees them coming.',
+    startAbilities:[
+      { name:'DEAD EYE',       desc:'Use a full TURN to aim — your next shot is undetected and crits on 18-20.' },
+      { name:'HUNTER\'S MARK', desc:'Mark one target. All ATTEMPTS against it are EASY until it dies.' },
+      { name:'WILDERNESS LORE',desc:'WIS checks for tracking, foraging, or detecting ambushes are always EASY.' },
+    ],
+    startLoot:[
+      { name:'MASTER\'S BOW',  bonus:'+2 GUN effort',      desc:'Masterwork longbow. Far range. Silent.' },
+      { name:'TWIN BLADES',    bonus:'+1 WEAPON per blade', desc:'Two short swords. Attack twice if both equipped.' },
+      { name:'TRAPPER\'S GEAR',bonus:'+1 WIS',             desc:'Snares, tackle, camouflage kit. Set in seconds.' },
+    ],
+    milestones:[
+      { name:'VOLLEY',         desc:'Attack up to 3 FAR targets in one action, splitting GUN effort dice.' },
+      { name:'GHOST STEP',     desc:'Move through difficult terrain without slowing or leaving tracks.' },
+      { name:'FAVORED PREY',   desc:'Choose a creature type. All effort vs. them is ULTIMATE effort.' },
+    ],
+  },
+  {
+    name:'SHADOW', icon:'🗡️', color:'#2c3e50',
+    stat:'DEX', effortFocus:'WEAPON',
+    desc:'Master of stealth, subterfuge, and the blade in the dark.',
+    startAbilities:[
+      { name:'ASSASSIN',       desc:'If a target doesn\'t know you\'re there, your first attack cannot miss.' },
+      { name:'THIEF',          desc:'Stealth rolls and lock-picking checks are always EASY.' },
+      { name:'SCOUT',          desc:'When using WIS to seek hidden details or traps, roll EASY.' },
+    ],
+    startLoot:[
+      { name:'DAGGER KIT',     bonus:'+1 WEAPON, crits 18-20', desc:'Three masterwork blades. Always within reach.' },
+      { name:'SPIDER CLAWS',   bonus:'+2 DEX',                desc:'Move as normal on any surface, including ceilings.' },
+      { name:'POCKET CLOAK',   bonus:'+1 DEX',                desc:'Hidden pockets everywhere. +5 CARRIED slots.' },
+    ],
+    milestones:[
+      { name:'POISON BLADES',  desc:'After a blade attack, target takes the same damage again next round.' },
+      { name:'VANISH',         desc:'Once per session, disappear mid-fight — undetectable until you act.' },
+      { name:'DEATH MARK',     desc:'Spend your turn to study a foe. Your next attack deals ULTIMATE effort.' },
+    ],
+  },
+  {
+    name:'CLERIC', icon:'✝️', color:'#e67e22',
+    stat:'WIS', effortFocus:'MAGIC',
+    desc:'Divine warrior-priest. Heals the fallen, smites the wicked.',
+    startAbilities:[
+      { name:'HEALER\'S TOUCH', desc:'Roll INT or WIS: heal 1 HP to an ally with a Healer\'s Kit on success.' },
+      { name:'DIVINE FAVOR',   desc:'Call on your god: once per session, an ATTEMPT becomes EASY.' },
+      { name:'HOLY PRESENCE',  desc:'Undead and fiends treat your NEAR range as HARD territory.' },
+    ],
+    startLoot:[
+      { name:'MACE OF FAITH',  bonus:'+1 WEAPON, +1 MAGIC', desc:'Glows in the presence of evil. +2 vs undead.' },
+      { name:'HEALER\'S CASE', bonus:'+1 WIS',              desc:'Bandages, tinctures, anti-venom. Heal 1 HP per use.' },
+      { name:'CHAIN & HOLY SYMBOL',bonus:'+2 ARMOR, +1 CHA',desc:'Blessed mail. The symbol turns undead on WIS roll.' },
+    ],
+    milestones:[
+      { name:'MASS HEAL',      desc:'Spend your full turn to heal 1 HP to ALL allies in NEAR range.' },
+      { name:'SMITE',          desc:'Add MAGIC effort on top of any WEAPON attack once per round.' },
+      { name:'RESURRECTION',   desc:'Once per session, bring a downed ally back with 1 HP — no roll needed.' },
+    ],
+  },
+  {
+    name:'BARD', icon:'🎵', color:'#8e44ad',
+    stat:'CHA', effortFocus:'BASIC',
+    desc:'Charming performer, charismatic leader, and jack of all trades.',
+    startAbilities:[
+      { name:'INSPIRE',        desc:'Your words or music give one ally +3 on their next ATTEMPT roll.' },
+      { name:'JACK OF TRADES', desc:'Once per session, treat any STAT roll as if you have +1 in that STAT.' },
+      { name:'SILVER TONGUE',  desc:'CHA rolls to deceive, persuade, or charm are always EASY.' },
+    ],
+    startLoot:[
+      { name:'ENCHANTED LUTE', bonus:'+2 CHA',              desc:'Songs can calm mobs or break concentration.' },
+      { name:'RAPIER',         bonus:'+1 WEAPON',           desc:'Light, fast, and elegant. Crit on 19-20.' },
+      { name:'COAT OF TALES',  bonus:'+1 CHA, +1 ARMOR',   desc:'Lined with secret pockets and hidden blades.' },
+    ],
+    milestones:[
+      { name:'BARDIC SURGE',   desc:'Spend your turn performing. All allies\' next rolls are EASY.' },
+      { name:'TALE OF GLORY',  desc:'Narrate a legend mid-fight. Enemy must make WIS roll or be Stunned 1 round.' },
+      { name:'ANTHEM',         desc:'Your presence alone grants all allies +1 HEART for the rest of the scene.' },
+    ],
+  },
+];
+
+const BASIC_LOOT = [
+  { name:'MIXED ARMOR GARB',    bonus:'+2 ARMOR',   desc:'Padded gambeson, leather belts, armor odds & ends.' },
+  { name:'CLIMBING GEAR',       bonus:'+1 STR',     desc:'Grapple hooks, rope, boot crampons, iron spikes.' },
+  { name:'HEALER\'S CASE',      bonus:'+1 WIS',     desc:'Using this kit, heal 1 HP on ally with INT or WIS roll.' },
+  { name:'FISHERMAN\'S SATCHEL',bonus:'+1 DEX',     desc:'Net, poles, knife, swim fins, clumsy diving mask.' },
+  { name:'MENDER\'S TOOLBOX',   bonus:'+1 INT',     desc:'Hammer, pliers, rivets, scrap steel. Repair anything.' },
+  { name:'TRAVELER\'S PACK',    bonus:'+1 CON',     desc:'Bedroll, rations (7 days), fire kit, rope (50ft).' },
+  { name:'COMMON SHIELD',       bonus:'+1 ARMOR',   desc:'Round wooden shield. Easy to carry on the road.' },
+  { name:'LANTERN & OIL',       bonus:'+1 WIS',     desc:'6 hours of bright light in a 30-foot radius. 3 refills.' },
+  { name:'POUCH OF 50 COINS',   bonus:'Starting wealth', desc:'50 coins. Enough for a week of comfort or one night of fun.' },
+  { name:'WEAPONS KIT',         bonus:'+1 WEAPON',  desc:'Dagger, short sword, and a short bow with 12 arrows.' },
+];
+
+// ════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════
+let characters   = [];
+let activeCharId = null;
+let currentView  = 'characters';
+let wz           = null;
+let wzStep       = 0;
+let roomTarget   = 10;
+
+const WZ_STEPS = ['Life Form','Type','Stats','Effort','Loot','Identity','Review'];
+
+try { characters = JSON.parse(localStorage.getItem('icrpg_chars') || '[]'); } catch(e){ characters = []; }
+try { activeCharId = localStorage.getItem('icrpg_active') || null; } catch(e){ activeCharId = null; }
+
+function save()       { try { localStorage.setItem('icrpg_chars',  JSON.stringify(characters)); } catch(e){} }
+function saveActive() { try { localStorage.setItem('icrpg_active', activeCharId); } catch(e){} }
+function getActive()  { return characters.find(c => c.id === activeCharId) || null; }
+function withChar(fn) { const c = getActive(); if(!c) return; fn(c); save(); renderTracker(); }
+
+function newChar() {
+  const stats = {};
+  STATS.forEach(s => { stats[s] = 0; });
+  const effort = {};
+  EFFORT_TYPES.forEach(e => { effort[e.name] = 0; }); // bonus above base
+  return {
+    id: 'ic_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    name: '', player: '',
+    lifeform: '', type: '',
+    stats,           // base + points (modifiers, not scores)
+    effort,          // bonuses on top of die
+    lootItems: [],   // array of {name, bonus, desc, equipped}
+    abilities: [],   // chosen starting ability names
+    hp: { hearts: 1, current: 10 },
+    armor: { base: 10, loot: 0 },
+    heroCoin: false,
+    mastery: 0,
+    tier: 1,
+    notes: '',
+    description: '',
+    coins: 0,
+    createdAt: Date.now(),
+  };
+}
+
+function tierFromMastery(m) {
+  if (m < 20)  return 1;
+  if (m < 40)  return 2;
+  if (m < 60)  return 3;
+  return 4;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// VIEWS
+// ════════════════════════════════════════════════════════════════════
+function showView(v) {
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  const map = ['characters','builder','tracker','dice'];
+  const idx = map.indexOf(v);
+  if (idx >= 0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if (v === 'characters') renderCharList();
+  if (v === 'tracker')    renderTracker();
+  if (v === 'builder' && wz) renderWzStep();
+  // re-inject dice view template (has ${} in it we need to build dynamically)
+  if (v === 'dice') renderDiceView();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// DICE VIEW (dynamic so we can show active char stat bonuses)
+// ════════════════════════════════════════════════════════════════════
+function renderDiceView() {
+  const c = getActive();
+  const statBtns = STATS.map(s => {
+    const bonus = c ? (c.stats[s] || 0) : 0;
+    const label = bonus !== 0 ? `${s} ${bonus >= 0 ? '+' : ''}${bonus}` : s;
+    return `<button class="btn btn-sm" onclick="rollAttempt('${s}')">${label}</button>`;
+  }).join('');
+  document.getElementById('view-dice').innerHTML = `
+    <div class="card">
+      <div class="card-title">🎲 Dice Tower</div>
+      <div class="target-display" style="margin-bottom:12px;">
+        <div class="target-num" id="target-num">${roomTarget}</div>
+        <div class="target-label">Room Target</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;">
+          <button class="spin-btn" onclick="changeTarget(-1)">−</button>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:0.65rem;letter-spacing:0.15em;color:var(--accent-silver);">EASY −3 · HARD +3</span>
+          <button class="spin-btn" onclick="changeTarget(1)">+</button>
+        </div>
+      </div>
+      <div class="dice-result" id="dice-result">
+        <div style="color:var(--text-muted);font-family:'Barlow Condensed',sans-serif;font-size:0.8rem;letter-spacing:0.18em;text-transform:uppercase;">Roll the dice, hero...</div>
+      </div>
+      <div class="section-label">Attempt (d20 + Stat)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        ${statBtns}
+        <button class="btn btn-sm btn-primary" onclick="rollD20plain()">d20 Raw</button>
+        <button class="btn btn-sm btn-gold" onclick="rollEasy()">EASY</button>
+        <button class="btn btn-sm" onclick="rollHard()">HARD</button>
+      </div>
+      <div class="divider"></div>
+      <div class="section-label">Effort</div>
+      <div class="dice-btn-grid">
+        ${EFFORT_TYPES.map(e => {
+          const bonus = c ? (c.effort[e.name] || 0) : 0;
+          const label = bonus ? `d${e.die}${bonus >= 0 ? '+' : ''}${bonus}` : `d${e.die}`;
+          return `<button class="die-btn effort-roll-btn" onclick="rollEffort('${e.name}',${e.die},${bonus})">
+            <div>${label}</div><div class="die-label">${e.name}</div>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="divider"></div>
+      <div class="section-label">Standard</div>
+      <div class="dice-btn-grid">
+        ${[4,6,8,10,12,20,100].map(d=>`<button class="die-btn" onclick="rollStd(${d})"><div>d${d}</div></button>`).join('')}
+      </div>
+      <div id="std-roll" style="text-align:center;margin-top:10px;font-family:'Black Han Sans',sans-serif;font-size:1.4rem;color:var(--accent-gold);min-height:30px;"></div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// CHARACTER LIST
+// ════════════════════════════════════════════════════════════════════
+function renderCharList() {
+  const el = document.getElementById('char-list');
+  if (!characters.length) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">📜</div><p>No heroes yet. The dungeon awaits, Shield Wall.</p></div>`;
+    return;
+  }
+  el.innerHTML = characters.map(c => {
+    const type = TYPES.find(t => t.name === c.type);
+    return `
+    <div class="char-card ${c.id===activeCharId?'active-char':''}" onclick="selectChar('${c.id}')">
+      <div class="char-card-icon">${(type && type.icon) || '📜'}</div>
+      <div class="char-card-info">
+        <div class="char-card-name">${c.name || 'Unnamed Hero'}</div>
+        <div class="char-card-sub">${c.lifeform||'—'} · ${c.type||'—'} · Tier ${c.tier||1} · ${(c.hp&&c.hp.hearts)||1}❤️</div>
+      </div>
+      <div class="char-card-actions">
+        <button class="cca-btn" onclick="event.stopPropagation();editChar('${c.id}')" title="Edit">✏️</button>
+        <button class="cca-btn" onclick="event.stopPropagation();exportChar('${c.id}')" title="Export">↓</button>
+        <button class="cca-btn del" onclick="event.stopPropagation();deleteChar('${c.id}')" title="Delete">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function selectChar(id) { activeCharId = id; saveActive(); showView('tracker'); }
+function editChar(id) {
+  const c = characters.find(x => x.id === id); if (!c) return;
+  wz = JSON.parse(JSON.stringify(c)); wzStep = 0; showView('builder');
+}
+function deleteChar(id) {
+  if (!confirm('Delete this hero permanently?')) return;
+  characters = characters.filter(c => c.id !== id);
+  if (activeCharId === id) { activeCharId = null; saveActive(); }
+  save(); renderCharList();
+}
+function exportChar(id) {
+  const c = characters.find(x => x.id === id); if (!c) return;
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([JSON.stringify(c, null, 2)], {type:'application/json'})),
+    download: (c.name||'icrpg-hero') + '.json'
+  });
+  a.click();
+}
+function importChar() {
+  const inp = Object.assign(document.createElement('input'), {type:'file', accept:'.json'});
+  inp.onchange = e => {
+    const r = new FileReader();
+    r.onload = ev => {
+      try { const c = JSON.parse(ev.target.result); c.id = 'ic_' + Date.now(); characters.push(c); save(); toast('Character imported!'); renderCharList(); }
+      catch { toast('Invalid JSON'); }
+    };
+    r.readAsText(e.target.files[0]);
+  };
+  inp.click();
+}
+
+// ════════════════════════════════════════════════════════════════════
+// BUILDER WIZARD
+// ════════════════════════════════════════════════════════════════════
+function startBuilder() { wz = newChar(); wzStep = 0; showView('builder'); renderWzStep(); }
+
+function renderWzStep() {
+  document.getElementById('wizard-progress').innerHTML = WZ_STEPS.map((s,i) => {
+    const cls = i < wzStep ? 'done' : i === wzStep ? 'current' : '';
+    return `<div class="wz-dot ${cls}" data-label="${s}" onclick="if(${i}<${wzStep})goWz(${i})">${i+1}</div>`;
+  }).join('');
+  const pages = document.getElementById('wizard-pages');
+  pages.innerHTML = '';
+  switch(wzStep) {
+    case 0: pages.innerHTML = pgLifeForm();   break;
+    case 1: pages.innerHTML = pgType();       break;
+    case 2: pages.innerHTML = pgStats();      break;
+    case 3: pages.innerHTML = pgEffort();     break;
+    case 4: pages.innerHTML = pgLoot();       break;
+    case 5: pages.innerHTML = pgIdentity();   break;
+    case 6: pages.innerHTML = pgReview();     break;
+  }
+}
+function goWz(i) { wzStep = i; renderWzStep(); }
+function wzNext() { if(wzStep < WZ_STEPS.length - 1) { wzStep++; renderWzStep(); } else { saveCharacter(); } }
+function wzPrev() { if(wzStep > 0) { wzStep--; renderWzStep(); } }
+
+// ── Step 0: Life Form ────────────────────────────────────────────────
+function pgLifeForm() {
+  const detail = wz.lifeform ? (() => {
+    const lf = LIFE_FORMS.find(x => x.name === wz.lifeform);
+    return lf ? `<div class="sel-detail"><strong>${lf.name}</strong> — ${lf.desc}<br><em style="display:block;margin-top:6px;"><strong>BONUS:</strong> ${lf.bonuses}<br><strong>SPECIAL:</strong> ${lf.special}</em></div>` : '';
+  })() : '';
+  return `
+    <div class="step-title">Step 1: Life Form</div>
+    <div class="step-hint">Your biology, heritage, and people. Each Life Form grants stat bonuses and a unique special ability.</div>
+    <div class="sel-grid">
+      ${LIFE_FORMS.map(lf => `
+        <div class="sel-option ${wz.lifeform===lf.name?'selected':''}" onclick="pickLF('${lf.name}')">
+          <div style="font-size:1.5rem">${lf.icon}</div>
+          <div class="sel-name">${lf.name}</div>
+          <div class="sel-sub">${lf.bonuses.split(',')[0]}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${detail}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()" style="visibility:hidden">← Back</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${!wz.lifeform?'disabled':''}>Type →</button>
+    </div>`;
+}
+function pickLF(n) {
+  // Remove old lifeform bonuses
+  const old = LIFE_FORMS.find(x => x.name === wz.lifeform);
+  if (old) {
+    // We'll just reset — user can re-apply in stats step
+  }
+  wz.lifeform = n;
+  renderWzStep();
+}
+
+// ── Step 1: Type ─────────────────────────────────────────────────────
+function pgType() {
+  const detail = wz.type ? (() => {
+    const t = TYPES.find(x => x.name === wz.type);
+    if (!t) return '';
+    return `<div class="sel-detail">
+      <strong>${t.icon} ${t.name}</strong> — ${t.desc}
+      <div style="margin-top:8px;"><strong>Key STAT:</strong> ${t.stat} &nbsp;·&nbsp; <strong>Effort Focus:</strong> ${t.effortFocus}</div>
+    </div>`;
+  })() : '';
+  return `
+    <div class="step-title">Step 2: Type</div>
+    <div class="step-hint">Your class, calling, and fighting style. Types grant a starting ability, starting loot, and milestone abilities as you advance.</div>
+    <div class="sel-grid">
+      ${TYPES.map(t => `
+        <div class="sel-option ${wz.type===t.name?'selected':''}" onclick="pickType('${t.name}')">
+          <div style="font-size:1.5rem">${t.icon}</div>
+          <div class="sel-name">${t.name}</div>
+          <div class="sel-sub">${t.stat} / ${t.effortFocus}</div>
+        </div>
+      `).join('')}
+    </div>
+    ${detail}
+    ${wz.type ? (() => {
+      const t = TYPES.find(x => x.name === wz.type);
+      if (!t) return '';
+      return `
+        <div class="ic-note" style="margin-top:4px;"><strong>Choose 1 Starting Ability:</strong></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+          ${t.startAbilities.map(a => `
+            <div class="loot-item ${wz.abilities.includes(a.name)?'equipped':''}" style="cursor:pointer" onclick="toggleAbility('${a.name}')">
+              <div>
+                <div class="loot-name">${a.name}</div>
+                <div class="loot-desc">${a.desc}</div>
+              </div>
+              ${wz.abilities.includes(a.name) ? '<div class="loot-bonus">✓</div>' : ''}
+            </div>
+          `).join('')}
+        </div>`;
+    })() : ''}
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Life Form</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${!wz.type?'disabled':''}>Stats →</button>
+    </div>`;
+}
+function pickType(n) { wz.type = n; wz.abilities = []; renderWzStep(); }
+function toggleAbility(name) {
+  if (wz.abilities.includes(name)) { wz.abilities = wz.abilities.filter(a => a !== name); }
+  else if (wz.abilities.length < 1) { wz.abilities.push(name); }
+  renderWzStep();
+}
+
+// ── Step 2: Stats ─────────────────────────────────────────────────────
+function pgStats() {
+  const lf = LIFE_FORMS.find(x => x.name === wz.lifeform);
+  const spent = STATS.reduce((s, k) => s + (wz.stats[k] || 0), 0);
+  const total = 6;
+  const remaining = total - spent;
+  // Max per stat is 3 at creation (hard cap +10 ever)
+  return `
+    <div class="step-title">Step 3: Stats</div>
+    <div class="step-hint">Distribute <strong class="gold">${total} STAT POINTS</strong> among the 6 stats — each point is +1 to d20 rolls using that stat. Remaining: <strong class="${remaining < 0?'red':'gold'}">${remaining}</strong></div>
+    ${lf ? `<div class="ic-note"><strong>Life Form Bonus:</strong> ${lf.bonuses} — add these after your base points!</div>` : ''}
+    <div class="stat-grid">
+      ${STATS.map(s => {
+        const v = wz.stats[s] || 0;
+        return `<div class="stat-box dark">
+          <div class="stat-name">${s}</div>
+          <div class="stat-val">${v >= 0 ? '+' : ''}${v}</div>
+          <div class="stat-base-loot">
+            <button class="spin-btn" onclick="statStep('${s}',-1)" ${v<=0?'disabled':''} style="width:22px;height:22px;font-size:0.8rem">−</button>
+            <button class="spin-btn" onclick="statStep('${s}',1)"  ${remaining<=0||v>=6?'disabled':''} style="width:22px;height:22px;font-size:0.8rem">+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="ic-note" style="margin-top:4px;"><strong>STR</strong> = melee · <strong>DEX</strong> = ranged & finesse · <strong>CON</strong> = toughness (sets DEFENSE: 10 + CON) · <strong>INT</strong> = knowledge & magic · <strong>WIS</strong> = instinct & healing · <strong>CHA</strong> = charm & leadership</div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Type</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${remaining < 0?'disabled':''}>Effort →</button>
+    </div>`;
+}
+function statStep(stat, dir) {
+  const v = wz.stats[stat] || 0;
+  const spent = STATS.reduce((s, k) => s + (wz.stats[k] || 0), 0);
+  if (dir > 0 && (spent >= 6 || v >= 6)) return;
+  if (dir < 0 && v <= 0) return;
+  wz.stats[stat] = v + dir;
+  renderWzStep();
+}
+
+// ── Step 3: Effort ────────────────────────────────────────────────────
+function pgEffort() {
+  const spent = EFFORT_TYPES.reduce((s, e) => s + (wz.effort[e.name] || 0), 0);
+  const total = 4;
+  const remaining = total - spent;
+  return `
+    <div class="step-title">Step 4: Effort</div>
+    <div class="step-hint">Distribute <strong class="gold">${total} EFFORT POINTS</strong> as bonus damage/effect on effort dice. Each point = +1 to that die's roll. Remaining: <strong class="${remaining<0?'red':'gold'}">${remaining}</strong></div>
+    <div class="effort-grid">
+      ${EFFORT_TYPES.map(e => {
+        const v = wz.effort[e.name] || 0;
+        const total_val = e.die;
+        return `<div class="effort-box">
+          <div class="effort-name">${e.name}</div>
+          <div class="effort-die">d${total_val}</div>
+          <div class="effort-bonus">${v > 0 ? '+' + v : '±0'}</div>
+          <div style="display:flex;justify-content:center;gap:4px;margin-top:4px;">
+            <button class="spin-btn" style="width:20px;height:20px;font-size:0.75rem" onclick="effortStep('${e.name}',-1)" ${v<=0?'disabled':''}>−</button>
+            <button class="spin-btn" style="width:20px;height:20px;font-size:0.75rem" onclick="effortStep('${e.name}',1)" ${remaining<=0||v>=6?'disabled':''}>+</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="ic-note" style="margin-top:6px;">${EFFORT_TYPES.map(e=>`<strong>${e.name}</strong>: ${e.desc}`).join(' · ')}</div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Stats</button>
+      <button class="btn btn-primary" onclick="wzNext()" ${remaining<0?'disabled':''}>Loot →</button>
+    </div>`;
+}
+function effortStep(name, dir) {
+  const v = wz.effort[name] || 0;
+  const spent = EFFORT_TYPES.reduce((s, e) => s + (wz.effort[e.name] || 0), 0);
+  if (dir > 0 && (spent >= 4 || v >= 6)) return;
+  if (dir < 0 && v <= 0) return;
+  wz.effort[name] = v + dir;
+  renderWzStep();
+}
+
+// ── Step 4: Loot ──────────────────────────────────────────────────────
+function pgLoot() {
+  const t = TYPES.find(x => x.name === wz.type);
+  const chosenNames = wz.lootItems.map(l => l.name);
+  const maxTypeLoot = 1; // pick 1 from type
+  const maxBasicLoot = 3; // pick 3 from basic
+  const typePicked  = wz.lootItems.filter(l => t && t.startLoot.some(sl => sl.name === l.name)).length;
+  const basicPicked = wz.lootItems.filter(l => BASIC_LOOT.some(bl => bl.name === l.name)).length;
+  return `
+    <div class="step-title">Step 5: Starting Loot</div>
+    <div class="step-hint">LOOT is your power. Choose <strong class="gold">1 Type Loot</strong> (${typePicked}/${maxTypeLoot}) and <strong class="gold">3 Basic Loot</strong> items (${basicPicked}/${maxBasicLoot}).</div>
+    ${t ? `
+    <div class="card-title" style="margin-top:4px">⚔️ ${t.name} Starting Loot (pick 1)</div>
+    <div class="loot-list" style="margin-bottom:14px;">
+      ${t.startLoot.map(l => `
+        <div class="loot-item ${chosenNames.includes(l.name)?'equipped':''}" style="cursor:pointer" onclick="toggleLoot('${l.name}','type')">
+          <div style="flex:1">
+            <div class="loot-name">${l.name}</div>
+            <div class="loot-bonus">${l.bonus}</div>
+            <div class="loot-desc">${l.desc}</div>
+          </div>
+          ${chosenNames.includes(l.name) ? '<div style="color:var(--accent-red);font-size:1.2rem">✓</div>' : ''}
+        </div>
+      `).join('')}
+    </div>` : ''}
+    <div class="card-title">🎒 Basic Loot (pick 3)</div>
+    <div class="loot-list">
+      ${BASIC_LOOT.map(l => `
+        <div class="loot-item ${chosenNames.includes(l.name)?'equipped':''}" style="cursor:pointer" onclick="toggleLoot('${l.name}','basic')">
+          <div style="flex:1">
+            <div class="loot-name">${l.name}</div>
+            <div class="loot-bonus">${l.bonus}</div>
+            <div class="loot-desc">${l.desc}</div>
+          </div>
+          ${chosenNames.includes(l.name) ? '<div style="color:var(--accent-red);font-size:1.2rem">✓</div>' : ''}
+        </div>
+      `).join('')}
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Effort</button>
+      <button class="btn btn-primary" onclick="wzNext()">Identity →</button>
+    </div>`;
+}
+function toggleLoot(name, lootType) {
+  const t = TYPES.find(x => x.name === wz.type);
+  const typeLootNames = t ? t.startLoot.map(l => l.name) : [];
+  const basicLootNames = BASIC_LOOT.map(l => l.name);
+  const allLoot = [...(t ? t.startLoot : []), ...BASIC_LOOT];
+  const item = allLoot.find(l => l.name === name);
+  if (!item) return;
+  const idx = wz.lootItems.findIndex(l => l.name === name);
+  if (idx >= 0) { wz.lootItems.splice(idx, 1); }
+  else {
+    const typePicked  = wz.lootItems.filter(l => typeLootNames.includes(l.name)).length;
+    const basicPicked = wz.lootItems.filter(l => basicLootNames.includes(l.name)).length;
+    if (lootType === 'type'  && typePicked  >= 1) { toast('Only 1 Type Loot allowed'); return; }
+    if (lootType === 'basic' && basicPicked >= 3) { toast('Only 3 Basic Loot allowed'); return; }
+    wz.lootItems.push({ ...item, equipped: true });
+  }
+  renderWzStep();
+}
+
+// ── Step 5: Identity ──────────────────────────────────────────────────
+function pgIdentity() {
+  return `
+    <div class="step-title">Step 6: Identity</div>
+    <div class="step-hint">Name your hero. Give them a face, a past, a reason to risk it all.</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Character Name</label>
+        <input class="form-input" value="${wz.name||''}" oninput="wz.name=this.value" placeholder="Ha'Baka the Bold…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Player Name</label>
+        <input class="form-input" value="${wz.player||''}" oninput="wz.player=this.value" placeholder="Optional">
+      </div>
+    </div>
+    <div class="form-row3">
+      <div class="form-group">
+        <label class="form-label">Starting Coins</label>
+        <input class="form-input" type="number" min="0" value="${wz.coins||0}" oninput="wz.coins=+this.value" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Extra Hearts</label>
+        <input class="form-input" type="number" min="1" max="6" value="${wz.hp.hearts||1}" oninput="wz.hp.hearts=Math.max(1,+this.value);wz.hp.current=(wz.hp.hearts||1)*10;" placeholder="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Armor Bonus (LOOT)</label>
+        <input class="form-input" type="number" min="0" max="10" value="${wz.armor.loot||0}" oninput="wz.armor.loot=+this.value" placeholder="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Appearance</label>
+      <textarea class="form-textarea" oninput="wz.description=this.value" placeholder="What does this hero look like?">${wz.description||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes / Backstory</label>
+      <textarea class="form-textarea" oninput="wz.notes=this.value" placeholder="Why are they here? What do they fear?">${wz.notes||''}</textarea>
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Loot</button>
+      <button class="btn btn-primary" onclick="wzNext()">Review →</button>
+    </div>`;
+}
+
+// ── Step 6: Review ────────────────────────────────────────────────────
+function pgReview() {
+  const lf = LIFE_FORMS.find(x => x.name === wz.lifeform);
+  const t  = TYPES.find(x => x.name === wz.type);
+  const defense = (wz.armor.base || 10) + (wz.armor.loot || 0) + (wz.stats.CON || 0);
+  const hp = (wz.hp.hearts || 1) * 10;
+  return `
+    <div class="step-title">Step 7: Review</div>
+    <div class="step-hint">Everything in order? Forge your hero!</div>
+    <div class="two-col">
+      <div>
+        <div class="card-title">Identity</div>
+        <div class="review-row"><span>Name</span><span>${wz.name||'—'}</span></div>
+        <div class="review-row"><span>Life Form</span><span>${wz.lifeform||'—'} ${lf?lf.icon:''}</span></div>
+        <div class="review-row"><span>Type</span><span>${wz.type||'—'} ${t?t.icon:''}</span></div>
+        <div class="review-row"><span>Tier</span><span>1 (Novice)</span></div>
+        <div class="review-row"><span>Hearts</span><span>${wz.hp.hearts||1} ❤️  (${hp} HP)</span></div>
+        <div class="review-row"><span>Defense</span><span>${defense}</span></div>
+        <div class="review-row"><span>Coins</span><span>${wz.coins||0} 🪙</span></div>
+        <div class="card-title" style="margin-top:12px;">Stats</div>
+        ${STATS.map(s => `<div class="review-row"><span>${s}</span><span>${(wz.stats[s]||0) >= 0 ? '+' : ''}${wz.stats[s]||0}</span></div>`).join('')}
+      </div>
+      <div>
+        <div class="card-title">Effort</div>
+        ${EFFORT_TYPES.map(e => `<div class="review-row"><span>${e.name}</span><span>d${e.die}${wz.effort[e.name]?'+'+wz.effort[e.name]:''}</span></div>`).join('')}
+        <div class="card-title" style="margin-top:12px;">Abilities</div>
+        ${wz.abilities.length ? wz.abilities.map(a => `<div style="margin-bottom:4px;"><span class="ability-tag">${a}</span></div>`).join('') : '<div class="muted" style="font-size:0.82rem;">None selected</div>'}
+        <div class="card-title" style="margin-top:12px;">Loot (${wz.lootItems.length})</div>
+        ${wz.lootItems.length ? wz.lootItems.map(l => `<div class="review-row"><span>${l.name}</span><span>${l.bonus}</span></div>`).join('') : '<div class="muted" style="font-size:0.82rem;">No loot selected</div>'}
+      </div>
+    </div>
+    <div class="wizard-nav">
+      <button class="btn" onclick="wzPrev()">← Identity</button>
+      <button class="btn btn-primary" onclick="saveCharacter()">📜 Forge Hero!</button>
+    </div>`;
+}
+
+function saveCharacter() {
+  wz.tier = tierFromMastery(wz.mastery || 0);
+  wz.hp.current = wz.hp.current || (wz.hp.hearts || 1) * 10;
+  const existing = characters.find(c => c.id === wz.id);
+  if (existing) { Object.assign(existing, wz); }
+  else { characters.push(wz); activeCharId = wz.id; saveActive(); }
+  save(); toast('Hero forged! Ha\'Baka!'); showView('tracker');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// TRACKER
+// ════════════════════════════════════════════════════════════════════
+function renderTracker() {
+  const c = getActive();
+  const el = document.getElementById('tracker-content');
+  if (!c) {
+    el.innerHTML = `<div class="empty-state"><div class="big-icon">📜</div><p>No character loaded.</p><button class="btn btn-primary" onclick="showView('characters')">Go to Characters</button></div>`;
+    return;
+  }
+
+  const t = TYPES.find(x => x.name === c.type);
+  const lf = LIFE_FORMS.find(x => x.name === c.lifeform);
+  const hearts = c.hp.hearts || 1;
+  const maxHP  = hearts * 10;
+  const curHP  = Math.max(0, Math.min(maxHP, c.hp.current || maxHP));
+  const defense = (c.armor.base || 10) + (c.armor.loot || 0) + (c.stats.CON || 0);
+
+  // HP pips: 10 per heart
+  const hpPips = Array.from({length: maxHP}, (_, i) =>
+    `<div class="hp-pip ${i < curHP ? 'filled' : ''}" onclick="setHP(${i < curHP ? i : i + 1})"></div>`
+  ).join('');
+
+  // Hearts display
+  const heartIcons = Array.from({length: Math.max(hearts, 4)}, (_, i) =>
+    `<span class="heart ${i < hearts ? 'filled' : ''}">❤️</span>`
+  ).join('');
+
+  // Mastery track (20 pips per tier)
+  const totalMastery = 20; // show 20 at a time
+  const masteryPips = Array.from({length: totalMastery}, (_, i) => {
+    const globalIdx = (c.tier - 1) * 20 + i;
+    const filled = (c.mastery || 0) > (c.tier - 1) * 20 + i;
+    const isTier = (i + 1) % 20 === 0;
+    return `<div class="mastery-pip ${filled?'filled':''} ${isTier?'tier':''}" onclick="setMastery(${globalIdx + 1})" title="Mastery ${globalIdx + 1}"></div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="tracker-top">
+        <div class="tc-icon">${(t && t.icon) || '📜'}</div>
+        <div>
+          <div class="tc-name">${c.name || 'Unnamed Hero'}</div>
+          <div class="tc-sub">${c.lifeform||'—'} · ${c.type||'—'}</div>
+        </div>
+        <div class="tc-tier">Tier ${c.tier||1}</div>
+      </div>
+
+      <!-- Index card visual stat block -->
+      <div class="index-card" style="margin-bottom:12px;">
+        <div class="ic-header">Stats <span class="ic-tag">d20 + STAT vs TARGET</span></div>
+        <div class="ic-body-plain" style="padding-top:12px;">
+          <div class="stat-grid">
+            ${STATS.map(s => {
+              const v = c.stats[s] || 0;
+              return `<div class="stat-box" style="cursor:pointer" onclick="quickRollStat('${s}')" title="Roll ${s}">
+                <div class="stat-name">${s}</div>
+                <div class="stat-val">${v >= 0 ? '+' : ''}${v}</div>
+              </div>`;
+            }).join('')}
+          </div>
+          <div style="display:flex;gap:16px;margin-top:8px;padding:4px 0;">
+            <div style="text-align:center;">
+              <div style="font-family:'Black Han Sans',sans-serif;font-size:1.5rem;color:#d01c29;">${defense}</div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.6rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#555;">Defense</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-family:'Black Han Sans',sans-serif;font-size:1.5rem;color:#d01c29;">${c.coins||0}</div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.6rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#555;">Coins</div>
+            </div>
+            <div style="text-align:center;flex:1;">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.6rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;color:#555;margin-bottom:2px;">Armor (Loot bonus)</div>
+              <div style="display:flex;gap:5px;align-items:center;">
+                <button class="spin-btn" onclick="adjustArmor(-1)">−</button>
+                <span style="font-family:'Black Han Sans',sans-serif;font-size:1.2rem;color:#d01c29">${c.armor.loot||0}</span>
+                <button class="spin-btn" onclick="adjustArmor(1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Effort -->
+      <div class="index-card" style="margin-bottom:12px;">
+        <div class="ic-header">Effort <span class="ic-tag">Roll after a hit</span></div>
+        <div class="ic-body-plain" style="padding-top:10px;">
+          <div class="effort-grid">
+            ${EFFORT_TYPES.map(e => {
+              const bonus = c.effort[e.name] || 0;
+              const label = bonus ? `d${e.die}+${bonus}` : `d${e.die}`;
+              return `<div class="effort-box" style="cursor:pointer" onclick="quickRollEffort('${e.name}',${e.die},${bonus})" title="Roll ${e.name} effort">
+                <div class="effort-name">${e.name}</div>
+                <div class="effort-die">${label}</div>
+                <div class="effort-bonus">tap to roll</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HP & Hearts -->
+    <div class="card">
+      <div class="card-title">❤️ Hit Points — ${curHP} / ${maxHP}</div>
+      <div class="hearts-row" style="margin-bottom:8px;">
+        ${heartIcons}
+        <button class="btn btn-sm" onclick="addHeart()">+ Heart</button>
+        <button class="btn btn-sm" onclick="removeHeart()">− Heart</button>
+      </div>
+      <div class="hp-track">${hpPips}</div>
+      <div class="btn-row">
+        <button class="btn btn-sm" onclick="setHP(Math.max(0,${curHP}-1))">− 1 HP</button>
+        <button class="btn btn-sm" onclick="setHP(Math.min(${maxHP},${curHP}+1))">+ 1 HP</button>
+        <button class="btn btn-sm btn-gold" onclick="setHP(${maxHP})">Full Heal</button>
+        <button class="btn btn-sm btn-primary" onclick="setHP(0)">K.O.</button>
+      </div>
+    </div>
+
+    <!-- Hero Coin & Mastery -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">🏅 Hero Coin</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="hero-coin ${c.heroCoin?'used':''}" onclick="toggleHeroCoin()" title="${c.heroCoin?'Spend coin':'Has coin'}">🏅</div>
+          <div style="font-size:0.82rem;color:var(--text-muted);">
+            ${c.heroCoin ? '<span class="red">Spent — earn it back!</span>' : '<span class="gold">Available to spend!</span>'}
+            <div style="margin-top:4px;font-family:\'Barlow Condensed\',sans-serif;font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;">Use for a free reroll or GM boon</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⭐ Mastery — ${c.mastery||0} / 60</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">Mark on every Nat 20 · 20 pts = new Tier</div>
+        <div class="mastery-track">${masteryPips}</div>
+        <div class="btn-row">
+          <button class="btn btn-sm btn-gold" onclick="addMastery()">+ Nat 20!</button>
+          <button class="btn btn-sm" onclick="removeMastery()">−</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loot -->
+    <div class="card">
+      <div class="card-title">🎒 Loot</div>
+      <div class="loot-list" id="loot-list">
+        ${(c.lootItems||[]).map((l,i) => `
+          <div class="loot-item ${l.equipped?'equipped':''}">
+            <div style="flex:1">
+              <div class="loot-name">${l.name}</div>
+              <div class="loot-bonus">${l.bonus}</div>
+              ${l.desc ? `<div class="loot-desc">${l.desc}</div>` : ''}
+            </div>
+            <button class="cca-btn del" onclick="removeLoot(${i})" title="Remove">✕</button>
+          </div>
+        `).join('') || '<div class="muted" style="font-size:0.85rem;">No loot yet. The dungeon holds your destiny.</div>'}
+      </div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn btn-sm btn-gold" onclick="addLootPrompt()">+ Add Loot</button>
+      </div>
+    </div>
+
+    <!-- Abilities -->
+    ${(c.abilities && c.abilities.length) || (t && t.milestones && t.milestones.length) ? `
+    <div class="card">
+      <div class="card-title">⚡ Abilities</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${(c.abilities||[]).map(name => {
+          const allAbilities = TYPES.flatMap(t => [...t.startAbilities, ...t.milestones]);
+          const ab = allAbilities.find(a => a.name === name);
+          return `<div class="loot-item equipped">
+            <div><div class="loot-name">${name}</div>${ab ? `<div class="loot-desc">${ab.desc}</div>` : ''}</div>
+          </div>`;
+        }).join('')}
+        ${t && c.tier >= 1 ? `<div style="font-family:'Barlow Condensed',sans-serif;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-top:6px;">Milestone abilities — awarded by GM at each Tier</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          ${(t.milestones||[]).map(m => `<span class="ability-tag" title="${m.desc}">${m.name}</span>`).join('')}
+        </div>` : ''}
+      </div>
+    </div>` : ''}
+
+    <!-- Life Form Special -->
+    ${lf ? `<div class="card"><div class="card-title">${lf.icon} ${lf.name} Special</div>
+      <div style="font-size:0.88rem;color:var(--text-muted);">${lf.special}</div></div>` : ''}
+
+    <!-- Notes -->
+    <div class="card">
+      <div class="card-title">📝 Notes</div>
+      <textarea class="form-textarea" placeholder="Session notes, spells, objectives…" oninput="saveNotes(this.value)">${c.notes||''}</textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" onclick="editChar('${c.id}')">✏️ Edit</button>
+      <button class="btn" onclick="exportChar('${c.id}')">↓ Export JSON</button>
+      <button class="btn btn-primary" onclick="showView('dice')">🎲 Roll Dice</button>
+    </div>
+  `;
+}
+
+// Tracker mutations
+function setHP(v) { withChar(c => { const max = (c.hp.hearts||1)*10; c.hp.current = Math.max(0, Math.min(max, v)); }); }
+function addHeart()    { withChar(c => { c.hp.hearts = Math.min(6, (c.hp.hearts||1)+1); c.hp.current = Math.min(c.hp.current||10, c.hp.hearts*10); }); }
+function removeHeart() { withChar(c => { c.hp.hearts = Math.max(1, (c.hp.hearts||1)-1); c.hp.current = Math.min(c.hp.current||10, c.hp.hearts*10); }); }
+function toggleHeroCoin() { withChar(c => { c.heroCoin = !c.heroCoin; }); }
+function addMastery() {
+  withChar(c => {
+    c.mastery = Math.min(60, (c.mastery||0) + 1);
+    c.tier = tierFromMastery(c.mastery);
+    if (c.mastery % 20 === 0 && c.mastery > 0) toast(`🎉 Tier ${c.tier} reached! Choose a Milestone Ability!`);
+  });
+}
+function removeMastery() { withChar(c => { c.mastery = Math.max(0, (c.mastery||0)-1); c.tier = tierFromMastery(c.mastery); }); }
+function setMastery(v) { withChar(c => { c.mastery = Math.max(0, Math.min(60, v)); c.tier = tierFromMastery(c.mastery); }); }
+function adjustArmor(d) { withChar(c => { c.armor.loot = Math.max(0, Math.min(10, (c.armor.loot||0)+d)); }); }
+function saveNotes(v) { withChar(c => { c.notes = v; }); }
+function removeLoot(i) { withChar(c => { c.lootItems.splice(i, 1); }); }
+
+function addLootPrompt() {
+  const name = prompt('Loot name:'); if (!name) return;
+  const bonus = prompt('Bonus (e.g. +1 STR, +2 WEAPON):') || '';
+  const desc  = prompt('Description (optional):') || '';
+  withChar(c => { c.lootItems.push({ name, bonus, desc, equipped: true }); });
+}
+
+// ════════════════════════════════════════════════════════════════════
+// DICE ROLLING
+// ════════════════════════════════════════════════════════════════════
+let lastTarget = 10;
+
+function changeTarget(d) {
+  roomTarget = Math.max(3, Math.min(20, roomTarget + d));
+  const el = document.getElementById('target-num');
+  if (el) el.textContent = roomTarget;
+  lastTarget = roomTarget;
+}
+
+function showDiceResult(html) {
+  const el = document.getElementById('dice-result');
+  if (el) el.innerHTML = html;
+}
+
+function rollD20plain() { rollD20(0); }
+
+function rollD20(bonus, label) {
+  const roll = Math.floor(Math.random()*20)+1;
+  const total = roll + (bonus||0);
+  const tgt   = roomTarget;
+  const nat20 = roll === 20;
+  const nat1  = roll === 1;
+  const success = total >= tgt;
+  const cls = nat20 ? 'nat20' : (!success ? 'fail' : '');
+  const verdict = nat20 ? '⭐ NAT 20 — ULTIMATE EFFORT!' : nat1 ? '💀 NAT 1 — FUMBLE!' : success ? '✓ SUCCESS' : '✕ FAILURE';
+  const vcolor = nat20 ? 'var(--accent-gold)' : !success ? 'var(--accent-red)' : 'var(--ic-white)';
+  showDiceResult(`
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">${label||'d20 Roll'} vs Target ${tgt}</div>
+      <div class="roll-num ${cls}">${total}</div>
+      <div class="roll-detail">d20(${roll})${bonus?` + ${bonus} = ${total}`:''}</div>
+      <div class="roll-verdict" style="color:${vcolor}">${verdict}</div>
+    </div>
+  `);
+  if (nat20) toast('⭐ NAT 20! Mark Mastery!');
+}
+
+function rollAttempt(stat) {
+  const c = getActive();
+  const bonus = c ? (c.stats[stat] || 0) : 0;
+  rollD20(bonus, `${stat} ${bonus >= 0 ? '+' : ''}${bonus}`);
+  showView('dice');
+}
+
+function rollEasy() {
+  const r1 = Math.floor(Math.random()*20)+1;
+  const r2 = Math.floor(Math.random()*20)+1;
+  const roll = Math.max(r1, r2);
+  const success = roll >= roomTarget;
+  const cls = roll === 20 ? 'nat20' : (!success ? 'fail' : '');
+  showDiceResult(`
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent-gold);margin-bottom:4px;">EASY Roll (take higher)</div>
+      <div class="roll-num ${cls}">${roll}</div>
+      <div class="roll-detail">[${r1}] [${r2}] → take ${roll}</div>
+      <div class="roll-verdict" style="color:${success?'var(--ic-white)':'var(--accent-red)'}">${success?'✓ SUCCESS':'✕ FAILURE'} vs ${roomTarget}</div>
+    </div>
+  `);
+}
+
+function rollHard() {
+  const r1 = Math.floor(Math.random()*20)+1;
+  const r2 = Math.floor(Math.random()*20)+1;
+  const roll = Math.min(r1, r2);
+  const success = roll >= roomTarget;
+  showDiceResult(`
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent-silver);margin-bottom:4px;">HARD Roll (take lower)</div>
+      <div class="roll-num ${!success?'fail':''}">${roll}</div>
+      <div class="roll-detail">[${r1}] [${r2}] → take ${roll}</div>
+      <div class="roll-verdict" style="color:${success?'var(--ic-white)':'var(--accent-red)'}">${success?'✓ SUCCESS':'✕ FAILURE'} vs ${roomTarget}</div>
+    </div>
+  `);
+}
+
+function rollEffort(name, die, bonus) {
+  const roll = Math.floor(Math.random()*die)+1;
+  const total = roll + (bonus||0);
+  const ultimate = die === 12 || roll === die; // max roll on any die = "Ace!"
+  showDiceResult(`
+    <div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:0.65rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent-gold);margin-bottom:4px;">${name} Effort (d${die}${bonus?'+'+bonus:''})</div>
+      <div class="roll-num ${ultimate?'nat20':''}">${total}</div>
+      <div class="roll-detail">d${die}(${roll})${bonus?` + ${bonus} = ${total}`:''}</div>
+      <div class="roll-verdict" style="color:${ultimate?'var(--accent-gold)':'var(--ic-white)'}">${total} Effort dealt${ultimate?' — Maximum!':''}</div>
+    </div>
+  `);
+}
+
+function rollStd(sides) {
+  const r = Math.floor(Math.random()*sides)+1;
+  const el = document.getElementById('std-roll');
+  if (el) el.textContent = `d${sides} → ${r}`;
+}
+
+function quickRollStat(stat) {
+  const c = getActive(); if (!c) return;
+  const bonus = c.stats[stat] || 0;
+  rollD20(bonus, `${stat} ${bonus >= 0 ? '+' : ''}${bonus}`);
+  showView('dice');
+}
+
+function quickRollEffort(name, die, bonus) {
+  rollEffort(name, die, bonus || 0);
+  showView('dice');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════════════
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════
+renderCharList();
+renderDiceView();
+</script>
+</body>
+</html>
