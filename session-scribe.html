@@ -613,15 +613,39 @@
   .coin-sum-label { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); }
   .coin-sum-breakdown { font-size: 0.72rem; color: rgba(168,180,212,0.45); margin-top: 1px; }
 
+  /* ── BACK BANNER ──────────────────────────────────────── */
+  .back-banner {
+    grid-area: back;
+    background: var(--s347-deep-twilight);
+    border-bottom: 1px solid var(--s347-indigo-velvet);
+    padding: 7px 28px;
+    display: flex; gap: 24px;
+  }
+  .back-banner a {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--s347-dark-slate-grey); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-banner a:hover { color: var(--s347-emerald); }
+  .back-banner .bc-current { color: var(--s347-ghost-white); pointer-events: none; }
+
 </style>
 </head>
 <body>
 <div id="page">
 
   <!-- BACK BANNER -->
-  <div class="back-banner">
-    <a href="index.html">⟵ Studio 347 Home</a>
-  </div>
+<div class="back-banner">
+  <a href="index.html">⟵ Hamster RPG Home</a>
+  <a href="session-scribe.html" class="bc-current">Session Scribe</a>
+  <a href="ascii-dungeon.html">ASCII Dungeon</a>
+  <a href="daggerheart-character-forge.html">Daggerheart</a>
+  <a href="dnd5e-character-forge.html">D&D 5e</a>
+  <a href="pf2e-character-forge.html">PF2e</a>
+  <a href="icrpg-character-forge.html">ICRPG</a>
+  <a href="swade-character-forge.html">SWADE</a>
+</div>
+
 
   <!-- HEADER -->
   <header class="app-header">

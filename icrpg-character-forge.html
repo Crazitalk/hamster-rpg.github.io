@@ -18,6 +18,14 @@
     --ic-harvest-gold: #d89b30;
     --ic-white:        #ffffff;
 
+    /* ── Studio347 Palette ── */
+    --s347-midnight-violet: #0d0221;
+    --s347-deep-twilight:   #0f084b;
+    --s347-dark-slate-grey: #0b5351;
+    --s347-emerald:         #23ce6b;
+    --s347-indigo-velvet:   #511a91;
+    --s347-ghost-white:     #f6f8ff;
+
     /* ── Semantic Tokens ── */
     --bg-deep:        #0d0d0d;
     --bg-card:        #161616;
@@ -736,13 +744,39 @@
     font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
     color: var(--text-muted); text-transform: uppercase;
   }
+
+  /* ── BACK BANNER ──────────────────────────────────────── */
+  .back-banner {
+    grid-area: back;
+    background: var(--s347-deep-twilight);
+    border-bottom: 1px solid var(--s347-indigo-velvet);
+    padding: 7px 28px;
+    display: flex; gap: 24px;
+  }
+  .back-banner a {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--s347-dark-slate-grey); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-banner a:hover { color: var(--s347-emerald); }
+  .back-banner .bc-current { color: var(--s347-ghost-white); pointer-events: none; }
+
 </style>
 </head>
 <body>
-  <!-- ========= Banner ========= -->
-<div style="background:#0d0221;padding:10px 20px;">
-  <a href="index.html" style="font-family:'Cinzel',serif;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:#23ce6b;text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='#511a91'" onmouseout="this.style.color='#23ce6b'">⟵ Studio 347 Home</a>
+
+  <!-- BACK BANNER -->
+<div class="back-banner">
+  <a href="index.html">⟵ Hamster RPG Home</a>
+  <a href="session-scribe.html">Session Scribe</a>
+  <a href="ascii-dungeon.html">ASCII Dungeon</a>
+  <a href="daggerheart-character-forge.html">Daggerheart</a>
+  <a href="dnd5e-character-forge.html">D&D 5e</a>
+  <a href="pf2e-character-forge.html">PF2e</a>
+  <a href="icrpg-character-forge.html" class="bc-current">ICRPG</a>
+  <a href="swade-character-forge.html">SWADE</a>
 </div>
+
 <hr style="border:none;border-top:1px solid #511a91;margin:0;">
 <div id="app">
   <header class="app-header">

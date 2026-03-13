@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d0221">
+<title>Hamster RPG :: ASCII Dungeon Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── STUDIO 347 DESIGN SYSTEM ─────────────────────────── */
+  :root {
+    --s347-midnight-violet: #0d0221;
+    --s347-deep-twilight:   #0f084b;
+    --s347-dark-slate-grey: #0b5351;
+    --s347-emerald:         #23ce6b;
+    --s347-indigo-velvet:   #511a91;
+    --s347-ghost-white:     #f6f8ff;
+
+    --bg-deep:       var(--s347-midnight-violet);
+    --accent-gold:   var(--s347-emerald);
+    --accent-gold2:  #39e87e;
+    --accent-teal:   var(--s347-dark-slate-grey);
+    --accent-purple: var(--s347-indigo-velvet);
+    --text-primary:  var(--s347-ghost-white);
+    --text-muted:    #a8b4d4;
+    --border:        rgba(35,206,107,0.2);
+    --border-bright: rgba(35,206,107,0.55);
+    --shadow:        0 8px 40px rgba(0,0,0,0.6);
+    --radius:        8px;
+    --transition:    all 0.25s cubic-bezier(0.4,0,0.2,1);
+
+    /* Entity colours for the map */
+    --col-wall-outer: #2e4a36;
+    --col-wall-inner: #4a7a5a;
+    --col-floor:      #1a1e12;
+    --col-corridor:   #0d0f09;
+    --col-door:       #3a9080;
+    --col-stairs:     #23ce6b;
+    --col-start:      #39e87e;
+    --col-monster:    #e05050;
+    --col-treasure:   #d4b04a;
+    --col-trap:       #9040c0;
+    --col-feature:    #4a8abf;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-deep);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto auto;
+    grid-template-columns: 1fr 320px;
+    grid-template-areas:
+      "back    back"
+      "header  header"
+      "nav     nav"
+      "main    sidebar"
+      "legend  legend"
+      "footer  footer";
+  }
+
+  /* ── BACK BANNER ──────────────────────────────────────── */
+  .back-banner {
+    grid-area: back;
+    background: rgba(13,2,33,0.9);
+    border-bottom: 1px solid rgba(81,26,145,0.4);
+    padding: 7px 28px;
+    display: flex; gap: 24px;
+  }
+  .back-banner a {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent-gold); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-banner a:hover { color: var(--accent-purple); }
+  .back-banner .bc-current { color: var(--text-muted); pointer-events: none; }
+
+  /* ── APP HEADER ───────────────────────────────────────── */
+  .app-header {
+    grid-area: header;
+    padding: 36px 28px 28px;
+    text-align: center;
+    position: relative;
+    border-bottom: 2px solid rgba(35,206,107,0.25);
+    background: linear-gradient(180deg, rgba(81,26,145,0.18) 0%, transparent 100%);
+    overflow: hidden;
+  }
+  .app-header::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(105deg,transparent 0px,transparent 80px,
+      rgba(35,206,107,0.025) 80px,rgba(35,206,107,0.025) 81px);
+  }
+  .app-header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent-gold),
+      var(--accent-teal), var(--accent-gold), transparent);
+    filter: drop-shadow(0 0 20px rgba(35,206,107,0.4));
+  }
+  .app-header h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.9rem,6vw,3.8rem); font-weight: 700; color: var(--accent-gold2);
+    text-shadow: 0 0 30px rgba(35,206,107,0.5), 0 0 60px rgba(35,206,107,0.2),
+      0 2px 4px rgba(0,0,0,0.8);
+    position: relative; z-index: 1;
+  }
+  .header-sub {
+    position: relative; z-index: 1; margin-top: 6px;
+    font-family: 'Cinzel', serif; font-size: clamp(0.6rem,1.8vw,0.78rem);
+    letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-teal);
+  }
+  .header-sub::before {
+    content: ''; display: block; height: 1px; width: 120px; margin: 8px auto 6px;
+    background: linear-gradient(to right, transparent, rgba(24,168,158,0.8), transparent);
+  }
+
+  /* ── CONTROLS BAR ─────────────────────────────────────── */
+  .controls-bar {
+    grid-area: nav;
+    border-bottom: 1px solid rgba(35,206,107,0.12);
+    background: rgba(13,2,33,0.75);
+    display: flex; align-items: center; flex-wrap: wrap;
+    padding: 0 8px;
+  }
+  .ctrl-group {
+    display: flex; align-items: center; gap: 7px;
+    padding: 10px 14px;
+    border-right: 1px solid rgba(35,206,107,0.1);
+  }
+  .ctrl-group label {
+    font-family: 'Cinzel', serif; font-size: 0.62rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
+  }
+  .ctrl-group select,
+  .ctrl-group input[type=number],
+  .ctrl-group input[type=text] {
+    background: rgba(10,6,30,0.8);
+    border: 1px solid rgba(35,206,107,0.2); border-radius: 4px;
+    color: var(--accent-gold2);
+    font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.06em;
+    padding: 4px 8px; outline: none; transition: var(--transition); cursor: pointer;
+  }
+  .ctrl-group select          { width: 116px; }
+  .ctrl-group input[type=number] { width: 60px; }
+  .ctrl-group input[type=text]   { width: 88px; }
+  .ctrl-group select:focus,
+  .ctrl-group input:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 2px rgba(35,206,107,0.12);
+  }
+  .ctrl-group select option { background: #140a3a; color: var(--text-primary); }
+  .ctrl-buttons {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; margin-left: auto;
+  }
+
+  /* ── BUTTONS ──────────────────────────────────────────── */
+  .btn {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: 1.5px solid var(--accent-gold); background: transparent;
+    color: var(--accent-gold2); cursor: pointer; border-radius: 4px;
+    padding: 8px 18px; position: relative; overflow: hidden;
+    transition: var(--transition); display: inline-block;
+  }
+  .btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(35,206,107,0) 0%, rgba(35,206,107,0.08) 100%);
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .btn:hover::before { opacity: 1; }
+  .btn:hover { border-color: var(--accent-gold2); box-shadow: 0 0 16px rgba(35,206,107,0.3); color: #fff; }
+  .btn-primary {
+    background: linear-gradient(135deg, #18a858 0%, #23ce6b 50%, #15903e 100%);
+    color: #0d0221; border-color: #23ce6b; font-weight: 700;
+    box-shadow: 0 2px 16px rgba(35,206,107,0.35);
+  }
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #23ce6b 0%, #39e87e 50%, #1eb55e 100%);
+    box-shadow: 0 4px 24px rgba(35,206,107,0.5); color: #0d0221;
+  }
+  .btn-teal  { border-color: var(--accent-teal); color: #5ecfcb; }
+  .btn-teal:hover { background: rgba(11,83,81,0.2); box-shadow: 0 0 16px rgba(11,83,81,0.4); color: #fff; }
+  .btn-sm { padding: 5px 12px; font-size: 0.62rem; }
+
+  /* ── MAIN + SIDEBAR ───────────────────────────────────── */
+  main  {
+    grid-area: main;
+    padding: 18px 0 0 18px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    min-height: 0;
+  }
+  aside {
+    grid-area: sidebar;
+    border-left: 1px solid rgba(35,206,107,0.12);
+    overflow-y: auto;
+    background: rgba(13,2,33,0.6);
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+
+  /* ── DUNGEON VIEWPORT ─────────────────────────────────── */
+  .dungeon-wrapper {
+    flex: 1; overflow: auto; min-height: 0;
+    background: linear-gradient(160deg, rgba(15,8,75,0.7) 0%, rgba(13,2,33,0.9) 100%);
+    border: 1px solid rgba(35,206,107,0.18);
+    border-radius: var(--radius);
+    position: relative;
+  }
+  .dungeon-wrapper::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(35,206,107,0.5),
+      rgba(11,83,81,0.45), transparent);
+    z-index: 1; pointer-events: none;
+  }
+  #dungeon-canvas {
+    /* Fira Code = clean sans-serif monospace. Falls back to other geometric monospaces. */
+    font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', 'Consolas', 'SF Mono', monospace;
+    font-size: 14px;
+    line-height: 1.0;
+    letter-spacing: 0;
+    white-space: pre;
+    display: block;
+    padding: 14px 16px;
+    cursor: default;
+    user-select: none;
+  }
+
+  /* ── LEGEND BAR ───────────────────────────────────────── */
+  .legend-bar {
+    grid-area: legend;
+    display: flex; align-items: center; flex-wrap: wrap; gap: 0;
+    border-top: 1px solid rgba(35,206,107,0.12);
+    background: rgba(13,2,33,0.75);
+    padding: 7px 18px;
+  }
+  .legend-label {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--text-muted); margin-right: 14px; white-space: nowrap;
+  }
+  .legend-item {
+    display: flex; align-items: center; gap: 5px;
+    padding: 3px 10px;
+    font-family: 'Fira Code', monospace; font-size: 0.78rem;
+    color: var(--text-muted);
+    border-right: 1px solid rgba(35,206,107,0.08);
+    white-space: nowrap;
+  }
+  .legend-item:last-child { border-right: none; }
+
+  /* ── CARD ─────────────────────────────────────────────── */
+  .card {
+    background: linear-gradient(160deg, rgba(15,8,75,0.95) 0%, rgba(13,2,33,0.98) 100%);
+    border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(35,206,107,0.5),
+      rgba(11,83,81,0.45), transparent);
+  }
+  .card-title {
+    font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent-gold);
+    padding: 11px 14px 0; margin-bottom: 10px; position: relative;
+  }
+  .card-title::after {
+    content: ''; display: block; height: 1px; margin-top: 8px;
+    background: linear-gradient(to right, rgba(35,206,107,0.45), transparent);
+  }
+  .card-body { padding: 0 14px 14px; }
+
+  /* ── ROOM INFO ────────────────────────────────────────── */
+  .ri-name { font-family: 'Cinzel', serif; font-size: 0.88rem; color: var(--accent-gold2); margin-bottom: 3px; }
+  .ri-desc { font-size: 0.82rem; color: var(--text-muted); font-style: italic; margin-bottom: 10px; line-height: 1.5; }
+  .ri-section {
+    font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--text-muted);
+    border-bottom: 1px solid rgba(35,206,107,0.12);
+    padding-bottom: 3px; margin: 8px 0 5px;
+  }
+  .ri-entry { display: flex; gap: 7px; align-items: baseline; padding: 2px 0; }
+  .ri-sym { font-family: 'Fira Code', monospace; width: 14px; text-align: center; font-size: 0.85rem; flex-shrink: 0; }
+  .ri-sym-monster  { color: var(--col-monster); }
+  .ri-sym-treasure { color: var(--col-treasure); }
+  .ri-sym-trap     { color: var(--col-trap); }
+  .ri-sym-feature  { color: var(--col-feature); }
+  .ri-item-name { font-size: 0.82rem; color: var(--text-primary); }
+  .ri-item-note { font-size: 0.74rem; color: var(--text-muted); font-style: italic; padding-left: 21px; margin-bottom: 3px; }
+
+  /* ── STAT GRID ────────────────────────────────────────── */
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .stat-box {
+    background: rgba(10,6,30,0.8); border: 1px solid rgba(35,206,107,0.15);
+    border-radius: 4px; padding: 8px; text-align: center;
+  }
+  .stat-val { font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--accent-gold2); line-height: 1; }
+  .stat-lbl { font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-top: 3px; }
+
+  /* ── SEED ─────────────────────────────────────────────── */
+  .seed-val { font-family: 'Fira Code', monospace; font-size: 0.8rem; color: var(--accent-gold); text-align: center; word-break: break-all; }
+
+  /* ── CHAR REF ─────────────────────────────────────────── */
+  .char-ref { font-family: 'Fira Code', monospace; font-size: 0.82rem; color: var(--col-wall-inner); line-height: 1.8; }
+
+  /* ── APP FOOTER ───────────────────────────────────────── */
+  .app-footer {
+    grid-area: footer;
+    border-top: 1px solid rgba(35,206,107,0.18); padding: 24px 20px;
+    text-align: center; background: rgba(13,2,33,0.85); position: relative;
+  }
+  .app-footer::before {
+    content: ''; position: absolute; top: -1px; left: 10%; right: 10%; height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent-gold),
+      var(--accent-teal), var(--accent-gold), transparent);
+  }
+  .footer-copy { font-size: 0.78rem; color: rgba(168,180,212,0.5); font-style: italic; }
+
+  /* ── TOOLTIP ──────────────────────────────────────────── */
+  #tooltip {
+    position: fixed; z-index: 200; pointer-events: none; display: none;
+    background: linear-gradient(160deg, rgba(15,8,75,0.97) 0%, rgba(13,2,33,0.99) 100%);
+    border: 1px solid rgba(35,206,107,0.35); border-radius: var(--radius);
+    padding: 10px 13px; box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+    max-width: 230px; line-height: 1.5;
+  }
+  #tooltip::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), transparent);
+  }
+  .tt-name { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--accent-gold2); margin-bottom: 5px; }
+  .tt-line { font-size: 0.74rem; margin: 2px 0; }
+  .tt-monster  { color: var(--col-monster); }
+  .tt-treasure { color: var(--col-treasure); }
+  .tt-trap     { color: var(--col-trap); }
+  .tt-feature  { color: var(--col-feature); }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: rgba(13,2,33,0.8); }
+  ::-webkit-scrollbar-thumb { background: rgba(35,206,107,0.25); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(35,206,107,0.45); }
+
+  .flash { animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from { opacity: 0.2; } to { opacity: 1; } }
+
+
+  /* ── BACK BANNER ──────────────────────────────────────── */
+  .back-banner {
+    grid-area: back;
+    background: var(--s347-deep-twilight);
+    border-bottom: 1px solid var(--s347-indigo-velvet);
+    padding: 7px 28px;
+    display: flex; gap: 24px;
+  }
+  .back-banner a {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--s347-dark-slate-grey); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-banner a:hover { color: var(--s347-emerald); }
+  .back-banner .bc-current { color: var(--s347-ghost-white); pointer-events: none; }
+
+</style>
+</head>
+<body>
+
+  <!-- BACK BANNER -->
+<div class="back-banner">
+  <a href="index.html">⟵ Hamster RPG Home</a>
+  <a href="session-scribe.html">Session Scribe</a>
+  <a href="ascii-dungeon.html" class="bc-current">ASCII Dungeon</a>
+  <a href="daggerheart-character-forge.html">Daggerheart</a>
+  <a href="dnd5e-character-forge.html">D&D 5e</a>
+  <a href="pf2e-character-forge.html">PF2e</a>
+  <a href="icrpg-character-forge.html">ICRPG</a>
+  <a href="swade-character-forge.html">SWADE</a>
+</div>
+
+<header class="app-header">
+  <h1>Hamster RPG</h1>
+  <div class="header-sub">ASCII Dungeon Generator</div>
+</header>
+
+<div class="controls-bar">
+  <div class="ctrl-group">
+    <label>Size</label>
+    <select id="ctrl-size">
+      <option value="small">Small</option>
+      <option value="medium" selected>Medium</option>
+      <option value="large">Large</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label>Rooms</label>
+    <input type="number" id="ctrl-rooms" value="12" min="4" max="30">
+  </div>
+  <div class="ctrl-group">
+    <label>Wall Style</label>
+    <select id="ctrl-style">
+      <option value="single">Single-line</option>
+      <option value="double">Double-line</option>
+      <option value="mixed" selected>Mixed</option>
+      <option value="block">Block</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label>Seed</label>
+    <input type="text" id="ctrl-seed" placeholder="random">
+  </div>
+  <div class="ctrl-buttons">
+    <button class="btn btn-primary" onclick="generate()">⚔ Generate</button>
+    <button class="btn btn-teal btn-sm" onclick="exportDungeon()">↓ Export .txt</button>
+  </div>
+</div>
+
+<main>
+  <div class="dungeon-wrapper">
+    <div id="dungeon-canvas"></div>
+  </div>
+</main>
+
+<aside>
+  <div class="card">
+    <div class="card-title">Room Info</div>
+    <div class="card-body">
+      <div id="room-info">
+        <div class="ri-desc" style="margin-bottom:0;">Hover over a room to inspect its contents.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Dungeon Stats</div>
+    <div class="card-body">
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-val" id="s-rooms">–</div><div class="stat-lbl">Rooms</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-monsters">–</div><div class="stat-lbl">Monsters</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-treasures">–</div><div class="stat-lbl">Treasures</div></div>
+        <div class="stat-box"><div class="stat-val" id="s-traps">–</div><div class="stat-lbl">Traps</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Seed</div>
+    <div class="card-body">
+      <div class="seed-val" id="seed-display">–</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Drawing Characters</div>
+    <div class="card-body">
+      <div style="font-size:0.76rem;color:var(--text-muted);margin-bottom:6px;">ASCII 176–223. Wall Style controls which subset is used.</div>
+      <div class="char-ref">░▒▓│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">How To Use</div>
+    <div class="card-body" style="font-size:0.82rem;color:var(--text-muted);line-height:1.8;">
+      <div>• <span style="color:var(--text-primary)">Generate</span> creates a new dungeon</div>
+      <div>• <span style="color:var(--text-primary)">Hover</span> any room for contents</div>
+      <div>• <span style="color:var(--text-primary)">Export</span> saves a plain-text map + room log</div>
+      <div>• Edit <span style="color:var(--accent-gold)">room_contents.json</span> to customise monsters, loot, traps &amp; features</div>
+      <div>• Re-enter a <span style="color:var(--text-primary)">Seed</span> to reproduce any dungeon exactly</div>
+    </div>
+  </div>
+</aside>
+
+<div class="legend-bar">
+  <span class="legend-label">Legend</span>
+  <span class="legend-item"><span style="color:var(--col-wall-inner)">░▒╔═╗</span>&nbsp;Wall</span>
+  <span class="legend-item"><span style="color:rgba(35,206,107,0.3)">·</span>&nbsp;Floor</span>
+  <span class="legend-item"><span style="color:var(--col-door)">+</span>&nbsp;Door</span>
+  <span class="legend-item"><span style="color:var(--col-start)">@</span>&nbsp;Start</span>
+  <span class="legend-item"><span style="color:var(--col-stairs)">▼</span>&nbsp;Stairs Down</span>
+  <span class="legend-item"><span style="color:var(--col-monster)">H G r</span>&nbsp;Monster</span>
+  <span class="legend-item"><span style="color:var(--col-treasure)">* $</span>&nbsp;Treasure</span>
+  <span class="legend-item"><span style="color:var(--col-trap)">T</span>&nbsp;Trap</span>
+  <span class="legend-item"><span style="color:var(--col-feature)">O ~</span>&nbsp;Feature</span>
+</div>
+
+<footer class="app-footer">
+  <div class="footer-copy">Hamster RPG &mdash; ASCII Dungeon Generator &mdash; Studio 347 &mdash; Box-drawing characters 176&ndash;223</div>
+</footer>
+
+<div id="tooltip"></div>
+
+<script>
+/* ─────────────────────────────────────────────────────────
+   ROOM CONTENTS DB  (keep in sync with room_contents.json)
+───────────────────────────────────────────────────────── */
+const ROOM_DB = {
+  monsters: [
+    { name:"Giant Hamster",     symbol:"H", level:1, note:"Fluffier than expected. Very bitey." },
+    { name:"Dire Gerbil",       symbol:"G", level:1, note:"Attacks in packs of 3." },
+    { name:"Rat Swarm",         symbol:"r", level:1, note:"Scurries across the floor." },
+    { name:"Dungeon Ferret",    symbol:"f", level:2, note:"Surprisingly quick." },
+    { name:"Cave Chinchilla",   symbol:"C", level:2, note:"Adorable but territorial." },
+    { name:"Hamster Warlord",   symbol:"W", level:3, note:"Wears tiny armor. Very serious." },
+    { name:"Shadow Mouse",      symbol:"m", level:3, note:"Phasing through walls." },
+    { name:"Pellet Golem",      symbol:"P", level:4, note:"Constructed from ancient food pellets." },
+    { name:"Wheel Specter",     symbol:"S", level:4, note:"Haunts old exercise wheels." },
+    { name:"Elder Hamster God", symbol:"!", level:5, note:"BOSS. Do not taunt." }
+  ],
+  treasures: [
+    { name:"Sunflower Seed Pile",   symbol:"*", value:5,  note:"Currency of the hamster realm." },
+    { name:"Golden Acorn",          symbol:"$", value:20, note:"Rare. Glows faintly." },
+    { name:"Ancient Bedding Cache", symbol:"%", value:10, note:"Fluffed by unknown paws." },
+    { name:"Pouch of Grains",       symbol:"g", value:8,  note:"Still fresh somehow." },
+    { name:"Cracked Water Bottle",  symbol:"~", value:3,  note:"Slightly leaky." },
+    { name:"Tiny Crown",            symbol:"^", value:50, note:"Fits only the chosen one." },
+    { name:"Rusted Wheel Fragment", symbol:"o", value:2,  note:"From a legendary run." },
+    { name:"Crystal Pellet",        symbol:"&", value:30, note:"Magical energy inside." }
+  ],
+  traps: [
+    { name:"Sticky Tape Strip",   symbol:"T", damage:"1d4", note:"Causes stuck condition for 1 round." },
+    { name:"Spinning Wheel Trap", symbol:"T", damage:"1d6", note:"Forces mandatory running." },
+    { name:"Seed Choke Pit",      symbol:"T", damage:"2d4", note:"Too tempting to resist." },
+    { name:"Sawdust Avalanche",   symbol:"T", damage:"1d8", note:"Buries victim in bedding." },
+    { name:"Squeaky Floor",       symbol:"T", damage:"0",   note:"Alerts nearby monsters." },
+    { name:"Cage Latch Trigger",  symbol:"T", damage:"1d4", note:"Locks the room door." }
+  ],
+  features: [
+    { name:"Ancient Wheel",       symbol:"O", note:"Turning it powers something elsewhere." },
+    { name:"Chew Marks",          symbol:".", note:"Something was gnawing here recently." },
+    { name:"Nest of Straw",       symbol:"~", note:"Soft. Resting here restores 1 HP." },
+    { name:"Old Food Cache",      symbol:"c", note:"Someone stashed food long ago." },
+    { name:"Arcane Burrow",       symbol:"0", note:"Leads to an unknown location." },
+    { name:"Cracked Mirror",      symbol:"|", note:"Reflects something that isn't you." },
+    { name:"Water Dish Fountain", symbol:"W", note:"Drinkable. Magical properties unknown." },
+    { name:"Pile of Fluff",       symbol:"f", note:"Conceals something. Roll perception." },
+    { name:"Scrawled Runes",      symbol:"?", note:"In the ancient Rodent tongue." },
+    { name:"Bone of the Fallen",  symbol:"b", note:"A hero who came before. Sad." }
+  ],
+  room_types: ["Dungeon Cell","Guard Room","Treasure Vault","Nest Chamber","Feeding Hall",
+    "Wheel Room","Boss Lair","Collapsed Passage","Secret Alcove","Alchemist Den",
+    "Torture Chamber","Armory","Shrine of the Pellet","Flooded Burrow","Crypt of the Ancients"],
+  room_descriptions: [
+    "The air smells of cedar shavings and old fear.",
+    "Claw marks line every surface.",
+    "A faint squeaking echoes from within the walls.",
+    "Husks of sunflower seeds crunch underfoot.",
+    "The ceiling drips with an unknown moisture.",
+    "Strange glowing symbols pulse on the floor.",
+    "The stench of hamster musk is overwhelming.",
+    "Tiny footprints cover every inch of dust.",
+    "You feel watched. The shadows shift.",
+    "An eerie silence hangs over this place.",
+    "The walls seem to be made of compressed bedding.",
+    "Bones of small rodents litter the corners.",
+    "A warm draft comes from somewhere unseen.",
+    "Old running-wheel spindles hang from the ceiling.",
+    "The room vibrates with low-frequency squeaking."
+  ]
+};
+
+/* ─────────────────────────────────────────────────────────
+   SEEDED RNG
+───────────────────────────────────────────────────────── */
+let rngState = 0;
+function seedRng(s) { rngState = (s >>> 0) || 1; }
+function rng() {
+  rngState ^= rngState << 13;
+  rngState ^= rngState >> 17;
+  rngState ^= rngState << 5;
+  return (rngState >>> 0) / 4294967296;
+}
+function rngInt(min,max) { return Math.floor(rng()*(max-min+1))+min; }
+function rngPick(arr)    { return arr[Math.floor(rng()*arr.length)]; }
+function rngChance(p)    { return rng()<p; }
+
+/* ─────────────────────────────────────────────────────────
+   TILE TYPES
+───────────────────────────────────────────────────────── */
+const T = { VOID:0, WALL:1, FLOOR:2, DOOR:3, CORRIDOR:4, STAIRS:5, START:6 };
+
+/* ─────────────────────────────────────────────────────────
+   WALL CHARACTER SETS  (using ASCII 176-223)
+───────────────────────────────────────────────────────── */
+const WALL_SETS = {
+  single: { h:'─',v:'│',tl:'┌',tr:'┐',bl:'└',br:'┘',t:'┬',b:'┴',l:'├',r:'┤',x:'┼', fill:'░',solid:'▒' },
+  double: { h:'═',v:'║',tl:'╔',tr:'╗',bl:'╚',br:'╝',t:'╦',b:'╩',l:'╠',r:'╣',x:'╬', fill:'▒',solid:'▓' },
+  mixed:  { h:'─',v:'║',tl:'╓',tr:'╖',bl:'╙',br:'╜',t:'╥',b:'╨',l:'╟',r:'╢',x:'╫', fill:'░',solid:'▒' },
+  block:  { h:'▀',v:'▌',tl:'█',tr:'█',bl:'█',br:'█',t:'▀',b:'▄',l:'▌',r:'▐',x:'█', fill:'▓',solid:'█' }
+};
+
+/* ─────────────────────────────────────────────────────────
+   GENERATION
+───────────────────────────────────────────────────────── */
+function generateDungeon(cfg) {
+  const { width, height, maxRooms, style } = cfg;
+  const grid = Array.from({length:height}, ()=>new Uint8Array(width));
+  const rooms = [];
+  const entities = new Map();
+  const inB = (x,y)=>x>=0&&y>=0&&x<width&&y<height;
+
+  function setRect(x,y,w,h,tile) {
+    for (let cy=y;cy<y+h;cy++) for (let cx=x;cx<x+w;cx++) if(inB(cx,cy)) grid[cy][cx]=tile;
+  }
+
+  function tryRoom() {
+    const rw=rngInt(5,14), rh=rngInt(4,10);
+    const rx=rngInt(1,width-rw-2), ry=rngInt(1,height-rh-2);
+    for (const r of rooms)
+      if (rx<r.x+r.w+2&&rx+rw+1>r.x&&ry<r.y+r.h+2&&ry+rh+1>r.y) return null;
+    return {x:rx,y:ry,w:rw,h:rh,cx:Math.floor(rx+rw/2),cy:Math.floor(ry+rh/2)};
+  }
+
+  for (let i=0;i<maxRooms*30&&rooms.length<maxRooms;i++) {
+    const r=tryRoom();
+    if (r) { setRect(r.x,r.y,r.w,r.h,T.WALL); setRect(r.x+1,r.y+1,r.w-2,r.h-2,T.FLOOR); rooms.push(r); }
+  }
+  if (rooms.length<2) return null;
+
+  for (let i=1;i<rooms.length;i++) {
+    const a=rooms[i-1],b=rooms[i];
+    function carve(x1,y1,x2,y2) {
+      const dx=x2>x1?1:-1,dy=y2>y1?1:-1;
+      let cx=x1,cy=y1;
+      while(cx!==x2){if(inB(cx,cy)&&grid[cy][cx]===T.VOID)grid[cy][cx]=T.CORRIDOR;cx+=dx;}
+      while(cy!==y2){if(inB(cx,cy)&&grid[cy][cx]===T.VOID)grid[cy][cx]=T.CORRIDOR;cy+=dy;}
+    }
+    if(rngChance(0.5)){carve(a.cx,a.cy,b.cx,a.cy);carve(b.cx,a.cy,b.cx,b.cy);}
+    else              {carve(a.cx,a.cy,a.cx,b.cy);carve(a.cx,b.cy,b.cx,b.cy);}
+  }
+
+  for (const room of rooms) {
+    const edges=[];
+    for(let x=room.x+1;x<room.x+room.w-1;x++){
+      if(inB(x,room.y-1)     &&grid[room.y-1][x]     ===T.CORRIDOR)edges.push([x,room.y]);
+      if(inB(x,room.y+room.h)&&grid[room.y+room.h][x]===T.CORRIDOR)edges.push([x,room.y+room.h-1]);
+    }
+    for(let y=room.y+1;y<room.y+room.h-1;y++){
+      if(inB(room.x-1,y)     &&grid[y][room.x-1]     ===T.CORRIDOR)edges.push([room.x,y]);
+      if(inB(room.x+room.w,y)&&grid[y][room.x+room.w]===T.CORRIDOR)edges.push([room.x+room.w-1,y]);
+    }
+    for(const[ex,ey]of edges) if(rngChance(0.75)) grid[ey][ex]=T.DOOR;
+  }
+
+  for (let ri=0;ri<rooms.length;ri++) {
+    const room=rooms[ri];
+    room.type=rngPick(ROOM_DB.room_types);
+    room.description=rngPick(ROOM_DB.room_descriptions);
+    room.index=ri;
+    room.contents={monsters:[],treasures:[],traps:[],features:[]};
+
+    const ix1=room.x+1,iy1=room.y+1,ix2=room.x+room.w-2,iy2=room.y+room.h-2;
+    const floors=[];
+    for(let y=iy1;y<=iy2;y++) for(let x=ix1;x<=ix2;x++) floors.push([x,y]);
+
+    const freePos=()=>{
+      for(let t=0;t<60;t++){
+        const[x,y]=floors[Math.floor(rng()*floors.length)];
+        if(!entities.has(`${x},${y}`))return[x,y];
+      }return null;
+    };
+
+    if(ri===rooms.length-1){const p=freePos();if(p){const[x,y]=p;grid[y][x]=T.STAIRS;entities.set(`${x},${y}`,{type:'stairs'});}}
+    if(ri===0)             {const p=freePos();if(p){const[x,y]=p;grid[y][x]=T.START; entities.set(`${x},${y}`,{type:'start'});}}
+
+    if(ri>0&&rngChance(0.7)){const cnt=rngInt(1,3);for(let m=0;m<cnt;m++){const mon=rngPick(ROOM_DB.monsters);const p=freePos();if(p){const[x,y]=p;entities.set(`${x},${y}`,{type:'monster',...mon});room.contents.monsters.push(mon);}}}
+    if(rngChance(0.5)){const tr=rngPick(ROOM_DB.treasures);const p=freePos();if(p){const[x,y]=p;entities.set(`${x},${y}`,{type:'treasure',...tr});room.contents.treasures.push(tr);}}
+    if(ri>0&&rngChance(0.3)){const trap=rngPick(ROOM_DB.traps);const p=freePos();if(p){const[x,y]=p;entities.set(`${x},${y}`,{type:'trap',...trap});room.contents.traps.push(trap);}}
+    if(rngChance(0.55)){const feat=rngPick(ROOM_DB.features);const p=freePos();if(p){const[x,y]=p;entities.set(`${x},${y}`,{type:'feature',...feat});room.contents.features.push(feat);}}
+  }
+
+  return {grid,rooms,entities,width,height,style};
+}
+
+/* ─────────────────────────────────────────────────────────
+   RENDER
+───────────────────────────────────────────────────────── */
+const CMAP = {
+  void:      '#050509',
+  wallOuter: '#2e4a36',
+  wallInner: '#4a7a5a',
+  floor:     '#1f2614',
+  corridor:  '#0e100a',
+  door:      '#3a9080',
+  stairs:    '#23ce6b',
+  start:     '#39e87e',
+  monster:   '#e05050',
+  treasure:  '#d4b04a',
+  trap:      '#9040c0',
+  feature:   '#4a8abf',
+};
+
+function renderDungeon(dng) {
+  const {grid,rooms,entities,width,height,style}=dng;
+  const ws=WALL_SETS[style]||WALL_SETS.mixed;
+  const chars =Array.from({length:height},()=>Array(width).fill(' '));
+  const colors=Array.from({length:height},()=>Array(width).fill('void'));
+  const inB=(x,y)=>x>=0&&y>=0&&x<width&&y<height;
+  const isW=(x,y)=>inB(x,y)&&grid[y][x]===T.WALL;
+
+  for(let y=0;y<height;y++){
+    for(let x=0;x<width;x++){
+      const t=grid[y][x];
+      if(t===T.VOID)    {chars[y][x]=' '; colors[y][x]='void';      continue;}
+      if(t===T.WALL){
+        const n=isW(x,y-1),s=isW(x,y+1),w=isW(x-1,y),e=isW(x+1,y);
+        let ch=ws.fill;
+        if     (n&&s&&!w&&!e) ch=ws.v;
+        else if(!n&&!s&&w&&e) ch=ws.h;
+        else if(!n&&s&&!w&&e) ch=ws.tl;
+        else if(!n&&s&&w&&!e) ch=ws.tr;
+        else if(n&&!s&&!w&&e) ch=ws.bl;
+        else if(n&&!s&&w&&!e) ch=ws.br;
+        else if(n&&s&&w&&e)   ch=ws.x;
+        else if(n&&s&&w&&!e)  ch=ws.r;
+        else if(n&&s&&!w&&e)  ch=ws.l;
+        else if(n&&!s&&w&&e)  ch=ws.b;
+        else if(!n&&s&&w&&e)  ch=ws.t;
+        else if(n||s) ch=ws.v;
+        else          ch=ws.h;
+        chars[y][x]=ch; colors[y][x]=(!n||!s||!w||!e)?'wallOuter':'wallInner';
+        continue;
+      }
+      if(t===T.FLOOR)    {chars[y][x]='·';colors[y][x]='floor';    continue;}
+      if(t===T.CORRIDOR) {chars[y][x]='·';colors[y][x]='corridor'; continue;}
+      if(t===T.DOOR)     {chars[y][x]='+';colors[y][x]='door';     continue;}
+      if(t===T.STAIRS)   {chars[y][x]='▼';colors[y][x]='stairs';   continue;}
+      if(t===T.START)    {chars[y][x]='@';colors[y][x]='start';    continue;}
+    }
+  }
+
+  for(const[key,ent]of entities){
+    const[ex,ey]=key.split(',').map(Number);
+    if(ent.type==='monster') {chars[ey][ex]=ent.symbol;colors[ey][ex]='monster';}
+    if(ent.type==='treasure'){chars[ey][ex]=ent.symbol;colors[ey][ex]='treasure';}
+    if(ent.type==='trap')    {chars[ey][ex]=ent.symbol;colors[ey][ex]='trap';}
+    if(ent.type==='feature') {chars[ey][ex]=ent.symbol;colors[ey][ex]='feature';}
+  }
+
+  const roomMap=new Map();
+  for(let ri=0;ri<rooms.length;ri++){
+    const r=rooms[ri];
+    for(let y=r.y;y<r.y+r.h;y++) for(let x=r.x;x<r.x+r.w;x++) roomMap.set(`${x},${y}`,ri);
+  }
+
+  let html='';
+  for(let y=0;y<height;y++){
+    let line='',runCol=null,runRoom=null,runText='';
+    function flush(){
+      if(!runText)return;
+      const col=CMAP[runCol]||CMAP.void;
+      const ra=runRoom!==null?` data-room="${runRoom}"`:'';
+      line+=`<span style="color:${col}"${ra}>${runText.replace(/&/g,'&amp;')}</span>`;
+      runText='';
+    }
+    for(let x=0;x<width;x++){
+      const c=chars[y][x],col=colors[y][x],ri=roomMap.get(`${x},${y}`)??null;
+      if(col!==runCol||ri!==runRoom){flush();runCol=col;runRoom=ri;}
+      runText+=c;
+    }
+    flush();
+    html+=line+'\n';
+  }
+  return html;
+}
+
+/* ─────────────────────────────────────────────────────────
+   UI
+───────────────────────────────────────────────────────── */
+let currentDungeon=null;
+
+function generate(){
+  const sizeMap={small:[60,30],medium:[92,46],large:[132,66]};
+  const[w,h]=sizeMap[document.getElementById('ctrl-size').value];
+  const maxRooms=parseInt(document.getElementById('ctrl-rooms').value)||12;
+  const style=document.getElementById('ctrl-style').value;
+  const seedRaw=document.getElementById('ctrl-seed').value.trim();
+  const seed=seedRaw?(parseInt(seedRaw)||1):(Math.floor(Math.random()*2147483646)+1);
+
+  document.getElementById('ctrl-seed').value=seed;
+  document.getElementById('seed-display').textContent=seed;
+
+  let dng=null;
+  for(let att=0;att<10;att++){
+    seedRng(seed+att);
+    dng=generateDungeon({width:w,height:h,maxRooms,style});
+    if(dng&&dng.rooms.length>=3)break;
+  }
+  if(!dng){alert('Generation failed – try again or reduce room count.');return;}
+  currentDungeon=dng;
+
+  const canvas=document.getElementById('dungeon-canvas');
+  canvas.innerHTML=renderDungeon(dng);
+  canvas.classList.remove('flash');
+  void canvas.offsetWidth;
+  canvas.classList.add('flash');
+
+  let monsters=0,treasures=0,traps=0;
+  for(const r of dng.rooms){monsters+=r.contents.monsters.length;treasures+=r.contents.treasures.length;traps+=r.contents.traps.length;}
+  document.getElementById('s-rooms').textContent=dng.rooms.length;
+  document.getElementById('s-monsters').textContent=monsters;
+  document.getElementById('s-treasures').textContent=treasures;
+  document.getElementById('s-traps').textContent=traps;
+  wireHover();
+}
+
+function wireHover(){
+  const canvas=document.getElementById('dungeon-canvas');
+  const tooltip=document.getElementById('tooltip');
+  canvas.onmousemove=e=>{
+    const span=e.target.closest('[data-room]');
+    if(!span){tooltip.style.display='none';updateRoomInfo(null);return;}
+    const room=currentDungeon.rooms[parseInt(span.dataset.room)];
+    if(!room){tooltip.style.display='none';return;}
+    updateRoomInfo(room);
+    const c=room.contents;
+    const has=c.monsters.length||c.treasures.length||c.traps.length||c.features.length;
+    if(has){
+      let tt=`<div class="tt-name">${room.type}</div>`;
+      if(c.monsters.length)  tt+=`<div class="tt-line tt-monster">⚔ ${c.monsters.map(m=>m.name).join(', ')}</div>`;
+      if(c.treasures.length) tt+=`<div class="tt-line tt-treasure">◆ ${c.treasures.map(t=>t.name).join(', ')}</div>`;
+      if(c.traps.length)     tt+=`<div class="tt-line tt-trap">⚠ ${c.traps.map(t=>t.name).join(', ')}</div>`;
+      if(c.features.length)  tt+=`<div class="tt-line tt-feature">★ ${c.features.map(f=>f.name).join(', ')}</div>`;
+      tooltip.innerHTML=tt;
+      tooltip.style.display='block';
+      tooltip.style.left=(e.clientX+15)+'px';
+      tooltip.style.top=(e.clientY-10)+'px';
+    }else{tooltip.style.display='none';}
+  };
+  canvas.onmouseleave=()=>{tooltip.style.display='none';};
+}
+
+function updateRoomInfo(room){
+  const el=document.getElementById('room-info');
+  if(!room){el.innerHTML='<div class="ri-desc" style="margin-bottom:0;">Hover over a room to inspect its contents.</div>';return;}
+  let html=`<div class="ri-name">${room.type}</div><div class="ri-desc">${room.description}</div>`;
+  function section(title,items,cls){
+    if(!items.length)return'';
+    let s=`<div class="ri-section">${title}</div>`;
+    for(const it of items){
+      s+=`<div class="ri-entry"><span class="ri-sym ri-sym-${cls}">${it.symbol}</span><span class="ri-item-name">${it.name}</span></div>`;
+      s+=`<div class="ri-item-note">${it.note}</div>`;
+    }return s;
+  }
+  html+=section('Monsters',room.contents.monsters,'monster');
+  html+=section('Treasure',room.contents.treasures,'treasure');
+  html+=section('Traps',room.contents.traps,'trap');
+  html+=section('Features',room.contents.features,'feature');
+  if(!room.contents.monsters.length&&!room.contents.treasures.length&&
+     !room.contents.traps.length&&!room.contents.features.length)
+    html+=`<div class="ri-section">Contents</div><div class="ri-item-note" style="margin:0;">Empty room.</div>`;
+  el.innerHTML=html;
+}
+
+function exportDungeon(){
+  if(!currentDungeon){alert('Generate a dungeon first!');return;}
+  const{grid,rooms,entities,width,height,style}=currentDungeon;
+  const ws=WALL_SETS[style]||WALL_SETS.mixed;
+  const DIV='═'.repeat(60);
+  const lines=['HAMSTER RPG :: ASCII DUNGEON',DIV,''];
+  for(let y=0;y<height;y++){
+    let row='';
+    for(let x=0;x<width;x++){
+      const ent=entities.get(`${x},${y}`);
+      if(ent&&ent.symbol){row+=ent.symbol;continue;}
+      const t=grid[y][x];
+      if(t===T.VOID)row+=' ';
+      else if(t===T.WALL)row+=ws.fill;
+      else if(t===T.FLOOR||t===T.CORRIDOR)row+='·';
+      else if(t===T.DOOR)row+='+';
+      else if(t===T.STAIRS)row+='▼';
+      else if(t===T.START)row+='@';
+      else row+=' ';
+    }
+    lines.push(row);
+  }
+  lines.push('',DIV,'ROOM CONTENTS',DIV);
+  for(const r of rooms){
+    lines.push(`\nRoom ${r.index+1}: ${r.type} (${r.w-2}×${r.h-2})`);
+    lines.push(r.description);
+    if(r.contents.monsters.length)  lines.push('  Monsters:  '+r.contents.monsters.map(m=>`${m.name} [Lv.${m.level}]`).join(', '));
+    if(r.contents.treasures.length) lines.push('  Treasure:  '+r.contents.treasures.map(t=>`${t.name} (${t.value}gp)`).join(', '));
+    if(r.contents.traps.length)     lines.push('  Traps:     '+r.contents.traps.map(t=>`${t.name} (${t.damage})`).join(', '));
+    if(r.contents.features.length)  lines.push('  Features:  '+r.contents.features.map(f=>f.name).join(', '));
+  }
+  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`hamster_dungeon_${document.getElementById('ctrl-seed').value}.txt`;
+  a.click();
+}
+
+window.addEventListener('load', generate);
+</script>
+</body>
+</html>

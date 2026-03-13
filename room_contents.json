@@ -1,0 +1,85 @@
+{
+  "_comment": "Edit this file to customize dungeon room contents. Each category has a list of entries. The generator randomly picks from these lists.",
+
+  "monsters": [
+    { "name": "Giant Hamster",     "symbol": "H", "level": 1, "note": "Fluffier than expected. Very bitey." },
+    { "name": "Dire Gerbil",       "symbol": "G", "level": 1, "note": "Attacks in packs of 3." },
+    { "name": "Rat Swarm",         "symbol": "r", "level": 1, "note": "Scurries across the floor." },
+    { "name": "Dungeon Ferret",    "symbol": "f", "level": 2, "note": "Surprisingly quick." },
+    { "name": "Cave Chinchilla",   "symbol": "C", "level": 2, "note": "Adorable but territorial." },
+    { "name": "Hamster Warlord",   "symbol": "W", "level": 3, "note": "Wears tiny armor. Very serious." },
+    { "name": "Shadow Mouse",      "symbol": "m", "level": 3, "note": "Phasing through walls." },
+    { "name": "Pellet Golem",      "symbol": "P", "level": 4, "note": "Constructed from ancient food pellets." },
+    { "name": "Wheel Specter",     "symbol": "S", "level": 4, "note": "Haunts old exercise wheels." },
+    { "name": "Elder Hamster God", "symbol": "@", "level": 5, "note": "BOSS. Do not taunt." }
+  ],
+
+  "treasures": [
+    { "name": "Sunflower Seed Pile",    "symbol": "*", "value": 5,   "note": "Currency of the hamster realm." },
+    { "name": "Golden Acorn",           "symbol": "$", "value": 20,  "note": "Rare. Glows faintly." },
+    { "name": "Ancient Bedding Cache",  "symbol": "%", "value": 10,  "note": "Fluffed by unknown paws." },
+    { "name": "Pouch of Grains",        "symbol": "g", "value": 8,   "note": "Still fresh somehow." },
+    { "name": "Cracked Water Bottle",   "symbol": "~", "value": 3,   "note": "Slightly leaky." },
+    { "name": "Tiny Crown",             "symbol": "^", "value": 50,  "note": "Fits only the chosen one." },
+    { "name": "Rusted Wheel Fragment",  "symbol": "o", "value": 2,   "note": "From a legendary run." },
+    { "name": "Crystal Pellet",         "symbol": "+", "value": 30,  "note": "Magical energy inside." }
+  ],
+
+  "traps": [
+    { "name": "Sticky Tape Strip",   "symbol": "T", "damage": "1d4",  "note": "Causes stuck condition for 1 round." },
+    { "name": "Spinning Wheel Trap", "symbol": "T", "damage": "1d6",  "note": "Forces mandatory running." },
+    { "name": "Seed Choke Pit",      "symbol": "T", "damage": "2d4",  "note": "Too tempting to resist." },
+    { "name": "Sawdust Avalanche",   "symbol": "T", "damage": "1d8",  "note": "Buries victim in bedding." },
+    { "name": "Squeaky Floor",       "symbol": "T", "damage": "0",    "note": "Alerts nearby monsters." },
+    { "name": "Cage Latch Trigger",  "symbol": "T", "damage": "1d4",  "note": "Locks room door." }
+  ],
+
+  "features": [
+    { "name": "Ancient Wheel",      "symbol": "O", "note": "Turning it powers something elsewhere." },
+    { "name": "Chew Marks",         "symbol": ".", "note": "Something was gnawing here." },
+    { "name": "Nest of Straw",      "symbol": "~", "note": "Soft. Could rest here. Restore 1 HP." },
+    { "name": "Old Food Cache",     "symbol": "c", "note": "Someone stashed food long ago." },
+    { "name": "Arcane Burrow",      "symbol": "0", "note": "Leads to an unknown location." },
+    { "name": "Cracked Mirror",     "symbol": "|", "note": "Reflects something that isn't you." },
+    { "name": "Water Dish Fountain","symbol": "W", "note": "Drinkable. Magical properties unknown." },
+    { "name": "Pile of Fluff",      "symbol": "f", "note": "Conceals something. Roll perception." },
+    { "name": "Scrawled Runes",     "symbol": "?", "note": "In the ancient Rodent tongue." },
+    { "name": "Bone of the Fallen", "symbol": "b", "note": "A hero who came before. Sad." }
+  ],
+
+  "room_types": [
+    "Dungeon Cell",
+    "Guard Room",
+    "Treasure Vault",
+    "Nest Chamber",
+    "Feeding Hall",
+    "Wheel Room",
+    "Boss Lair",
+    "Collapsed Passage",
+    "Secret Alcove",
+    "Alchemist Den",
+    "Torture Chamber",
+    "Armory",
+    "Shrine of the Pellet",
+    "Flooded Burrow",
+    "Crypt of the Ancients"
+  ],
+
+  "room_descriptions": [
+    "The air smells of cedar shavings and old fear.",
+    "Claw marks line every surface.",
+    "A faint squeaking echoes from within the walls.",
+    "Husks of sunflower seeds crunch underfoot.",
+    "The ceiling drips with an unknown moisture.",
+    "Strange glowing symbols pulse on the floor.",
+    "The stench of hamster musk is overwhelming.",
+    "Tiny footprints cover every inch of dust.",
+    "You feel watched. The shadows shift.",
+    "An eerie silence hangs over this place.",
+    "The walls seem to be made of compressed bedding.",
+    "Bones of small rodents litter the corners.",
+    "A warm draft comes from somewhere unseen.",
+    "Old running wheel spindles hang from the ceiling.",
+    "The room vibrates with low-frequency squeaking."
+  ]
+}
