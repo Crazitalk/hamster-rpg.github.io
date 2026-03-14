@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d0221">
+<meta name="description" content="Realm Forge — Medieval demographics generator for tabletop RPGs.">
+<title>Realm Forge — Studio 347</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   STUDIO 347 — REALM FORGE
+   Palette: Studio347.scss
+══════════════════════════════════════════════ */
+:root {
+  --s347-midnight-violet: #0d0221;
+  --s347-deep-twilight:   #0f084b;
+  --s347-dark-slate-grey: #0b5351;
+  --s347-emerald:         #23ce6b;
+  --s347-indigo-velvet:   #511a91;
+  --s347-ghost-white:     #f6f8ff;
+  --bg-deep:       var(--s347-midnight-violet);
+  --bg-card:       #140a3a;
+  --bg-card2:      #1a0f52;
+  --bg-card3:      #0d0730;
+  --accent-gold:   var(--s347-emerald);
+  --accent-gold2:  #39e87e;
+  --accent-fear:   #e04444;
+  --accent-teal:   var(--s347-dark-slate-grey);
+  --accent-purple: var(--s347-indigo-velvet);
+  --text-primary:  var(--s347-ghost-white);
+  --text-muted:    #a8b4d4;
+  --text-gold:     var(--s347-emerald);
+  --border:        rgba(35,206,107,0.2);
+  --border-bright: rgba(35,206,107,0.55);
+  --shadow:        0 8px 40px rgba(0,0,0,0.6);
+  --glow-gold:     0 0 20px rgba(35,206,107,0.3);
+  --transition:    all 0.25s cubic-bezier(0.4,0,0.2,1);
+  --radius:        8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-deep);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+  color: var(--text-primary); font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 17px; line-height: 1.65; min-height: 100vh; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 0%, rgba(81,26,145,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 85% 90%, rgba(11,83,81,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(15,8,75,0.45) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+#page { position: relative; z-index: 1; }
+
+/* ─── HEADER ─── */
+.app-header {
+  text-align: center;
+  padding: clamp(32px,6vw,64px) 20px clamp(24px,4vw,44px);
+  border-bottom: 2px solid rgba(35,206,107,0.25);
+  background: linear-gradient(180deg, rgba(81,26,145,0.18) 0%, transparent 100%);
+  position: relative; overflow: hidden;
+}
+.app-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(105deg,transparent 0px,transparent 80px,rgba(35,206,107,0.025) 80px,rgba(35,206,107,0.025) 81px);
+  pointer-events: none;
+}
+.app-header::after {
+  content: ''; position: absolute; bottom: -2px; left: 8%; right: 8%; height: 2px;
+  background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+}
+.header-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.9rem,6vw,3.8rem); font-weight: 700; color: var(--accent-gold2);
+  text-shadow: 0 0 30px rgba(35,206,107,0.5), 0 0 60px rgba(35,206,107,0.2), 0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing: 0.04em; line-height: 1.15; margin-bottom: 6px;
+  animation: fade-down 0.7s ease both;
+}
+.header-divider {
+  width: 220px; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(24,168,158,0.8), transparent);
+  margin: 10px auto 12px;
+}
+.header-subtitle {
+  font-family: 'Cinzel', serif; font-size: clamp(0.6rem,1.8vw,0.78rem);
+  letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-teal);
+  animation: fade-up 0.9s 0.2s ease both;
+}
+
+/* ─── NAV TABS ─── */
+.nav-tabs {
+  display: flex; justify-content: center; gap: 2px; padding: 0 12px;
+  border-bottom: 1px solid rgba(35,206,107,0.12);
+  background: rgba(13,2,33,0.75); flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.nav-tab {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--text-muted); text-decoration: none;
+  padding: 13px 20px; border: none; border-bottom: 3px solid transparent;
+  transition: var(--transition); white-space: nowrap; position: relative;
+  background: transparent; cursor: pointer;
+}
+.nav-tab:hover { color: #fff; border-bottom-color: rgba(35,206,107,0.4); }
+.nav-tab.active { color: var(--accent-gold2); border-bottom-color: var(--accent-gold); background: rgba(35,206,107,0.05); }
+.nav-tab.active::before {
+  content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%;
+  height: 2px; background: var(--accent-teal); border-radius: 2px 2px 0 0;
+}
+
+/* ─── MAIN LAYOUT ─── */
+.main { max-width: 1200px; margin: 0 auto; padding: clamp(24px,4vw,48px) clamp(14px,3vw,28px) 80px; }
+.view { display: none; animation: fade-in 0.3s ease both; }
+.view.active { display: block; }
+
+/* ─── SECTION HEADING ─── */
+.section-heading {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent-gold); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.section-heading::before, .section-heading::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(35,206,107,0.4));
+}
+.section-heading::before { background: linear-gradient(to left, transparent, rgba(35,206,107,0.4)); }
+
+/* ─── CARDS ─── */
+.card {
+  background: linear-gradient(160deg, rgba(15,8,75,0.95) 0%, rgba(13,2,33,0.98) 100%);
+  border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+  padding: 20px; margin-bottom: 16px; position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), rgba(11,83,81,0.45), transparent);
+  pointer-events: none;
+}
+.card-title {
+  font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--accent-gold); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, rgba(35,206,107,0.45), transparent);
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; padding: 10px 20px;
+  border: 1.5px solid var(--accent-gold); background: transparent;
+  color: var(--accent-gold2); cursor: pointer; border-radius: 4px;
+  transition: var(--transition); text-decoration: none; display: inline-block;
+  position: relative; overflow: hidden;
+}
+.btn:hover { border-color: var(--accent-gold2); box-shadow: 0 0 16px rgba(35,206,107,0.3); color: #fff; }
+.btn-primary {
+  background: linear-gradient(135deg, #18a858 0%, #23ce6b 50%, #15903e 100%);
+  color: #0d0221; border-color: #23ce6b; font-weight: 700;
+  box-shadow: 0 2px 16px rgba(35,206,107,0.35);
+}
+.btn-primary:hover { background: linear-gradient(135deg, #23ce6b 0%, #39e87e 50%, #1eb55e 100%); box-shadow: 0 4px 24px rgba(35,206,107,0.5); color: #0d0221; }
+.btn-teal { border-color: var(--accent-teal); color: #5ecfcb; }
+.btn-teal:hover { background: rgba(11,83,81,0.2); box-shadow: 0 0 16px rgba(11,83,81,0.4); color: #fff; }
+.btn-danger { border-color: #e04444; color: #e04444; }
+.btn-danger:hover { background: rgba(224,68,68,0.12); }
+.btn-purple { border-color: var(--accent-purple); color: #b080ff; }
+.btn-purple:hover { background: rgba(81,26,145,0.2); color: #fff; }
+.btn-sm { padding: 6px 12px; font-size: 0.62rem; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+/* ─── FORMS ─── */
+label {
+  display: block; font-family: 'Cinzel', serif; font-size: 0.64rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: 4px; margin-top: 14px;
+}
+label:first-child { margin-top: 0; }
+input[type=text], input[type=number], select {
+  width: 100%; background: rgba(10,6,30,0.8);
+  border: 1px solid rgba(35,206,107,0.2); border-radius: 4px;
+  color: var(--text-primary); font-family: 'Crimson Pro', serif;
+  font-size: 1rem; padding: 8px 12px; transition: var(--transition);
+  outline: none; -webkit-appearance: none;
+}
+input:focus, select:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 2px rgba(35,206,107,0.12); }
+select option { background: #140a3a; color: var(--text-primary); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.form-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; }
+@media(max-width:700px) { .form-row, .form-row-3, .form-row-4 { grid-template-columns: 1fr 1fr; } }
+@media(max-width:440px) { .form-row, .form-row-3, .form-row-4 { grid-template-columns: 1fr; } }
+
+/* ─── STAT GRID ─── */
+.stat-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+  gap: 12px; margin-bottom: 16px;
+}
+.stat-block {
+  background: rgba(10,6,30,0.7); border: 1px solid rgba(35,206,107,0.15);
+  border-radius: 6px; padding: 12px 14px; text-align: center;
+}
+.stat-label {
+  font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;
+}
+.stat-value {
+  font-family: 'Cinzel Decorative', serif; font-size: 1.35rem;
+  color: var(--accent-gold2); line-height: 1.2;
+}
+.stat-value.large { font-size: 1.7rem; }
+.stat-note { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ─── INLINE EDITABLE ─── */
+.editable-field {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+}
+.editable-field input[type=number] {
+  width: auto; min-width: 80px; padding: 4px 8px; font-size: 1rem;
+  display: none;
+}
+.editable-field.editing input[type=number] { display: inline-block; }
+.editable-field.editing .display-val { display: none; }
+.edit-hint {
+  font-size: 0.65rem; color: rgba(35,206,107,0.4); font-family: 'Cinzel', serif;
+  letter-spacing: 0.1em;
+}
+
+/* ─── SETTLEMENT TABLES ─── */
+.settlement-table {
+  width: 100%; border-collapse: collapse; font-size: 0.92rem;
+}
+.settlement-table th {
+  font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--accent-gold); text-align: left;
+  padding: 8px 12px; border-bottom: 1px solid rgba(35,206,107,0.2);
+}
+.settlement-table td {
+  padding: 7px 12px; border-bottom: 1px solid rgba(35,206,107,0.07);
+  color: var(--text-primary);
+}
+.settlement-table tr:last-child td { border-bottom: none; }
+.settlement-table tr:hover td { background: rgba(35,206,107,0.04); }
+.settlement-table .name-col { color: var(--accent-gold2); font-weight: 600; }
+.settlement-table .type-badge {
+  font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.12em;
+  text-transform: uppercase; padding: 2px 7px; border-radius: 3px; border: 1px solid;
+}
+.badge-bigcity { color: #e0a0ff; border-color: rgba(160,80,255,0.4); background: rgba(80,0,160,0.2); }
+.badge-city    { color: #80c8ff; border-color: rgba(80,160,255,0.4); background: rgba(0,80,200,0.15); }
+.badge-town    { color: #a8d4f0; border-color: rgba(100,180,230,0.35); background: rgba(0,60,120,0.15); }
+.badge-village { color: var(--text-muted); border-color: rgba(168,180,212,0.25); background: rgba(20,20,60,0.3); }
+
+/* ─── MERCHANTS TABLE ─── */
+.merchants-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap: 6px;
+}
+.merchant-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 5px 10px; border-radius: 4px; font-size: 0.88rem;
+  background: rgba(10,6,30,0.5); border: 1px solid rgba(35,206,107,0.08);
+}
+.merchant-name { color: var(--text-primary); }
+.merchant-count { color: var(--accent-gold2); font-family: 'Cinzel', serif; font-size: 0.8rem; min-width: 28px; text-align: right; }
+.merchant-count.zero { color: var(--text-muted); font-style: italic; font-size: 0.75rem; }
+
+/* ─── TOGGLE ─── */
+.toggle-wrap { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.toggle-switch { position: relative; display: inline-block; width: 38px; height: 22px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: rgba(10,6,30,0.8); border: 1px solid rgba(35,206,107,0.3); border-radius: 11px;
+  transition: 0.25s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute; height: 14px; width: 14px;
+  left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.25s;
+}
+.toggle-switch input:checked + .toggle-slider { background: rgba(35,206,107,0.15); border-color: var(--accent-gold); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--accent-gold2); }
+.toggle-label { font-family: 'Cinzel', serif; font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
+
+/* ─── OUTPUT PANEL ─── */
+.output-panel {
+  background: rgba(8,4,24,0.9); border: 1px solid rgba(35,206,107,0.25);
+  border-radius: var(--radius); padding: 24px; margin-top: 20px;
+  animation: fade-in 0.4s ease both;
+}
+.output-panel.hidden { display: none; }
+
+/* ─── RESULT HIGHLIGHT ─── */
+.highlight-box {
+  background: rgba(35,206,107,0.06); border: 1px solid rgba(35,206,107,0.2);
+  border-left: 3px solid var(--accent-gold); border-radius: 4px;
+  padding: 10px 14px; margin: 8px 0; font-size: 0.9rem;
+}
+.highlight-box strong { color: var(--accent-gold2); }
+
+/* ─── DICE ROLL DISPLAY ─── */
+.dice-result {
+  font-family: 'Cinzel Decorative', serif; color: rgba(35,206,107,0.5);
+  font-size: 0.75rem; margin-left: 6px;
+}
+
+/* ─── FOOTER ─── */
+.app-footer {
+  text-align: center; padding: 24px; font-size: 0.78rem;
+  color: rgba(168,180,212,0.45); border-top: 1px solid rgba(35,206,107,0.08);
+  font-family: 'Cinzel', serif; letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes fade-in  { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
+@keyframes fade-down{ from{opacity:0;transform:translateY(-12px);} to{opacity:1;transform:none;} }
+@keyframes fade-up  { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:none;} }
+
+/* ─── RANGE / PROBABILITY ─── */
+.prob-note { color: rgba(35,206,107,0.55); font-size: 0.85rem; font-style: italic; }
+.inline-edit-hint { font-size: 0.75rem; color: rgba(35,206,107,0.35); margin-left: 4px; cursor: pointer; }
+.inline-edit-hint:hover { color: var(--accent-gold); }
+
+/* ─── EDITABLE NUMBER IN OUTPUT ─── */
+.edit-num {
+  display: inline-block;
+  background: rgba(35,206,107,0.08); border: 1px solid rgba(35,206,107,0.25);
+  border-radius: 3px; padding: 0 6px; cursor: pointer; color: var(--accent-gold2);
+  font-family: 'Cinzel Decorative', serif; transition: var(--transition);
+}
+.edit-num:hover { background: rgba(35,206,107,0.15); border-color: var(--accent-gold); }
+.edit-num input {
+  width: auto; background: transparent; border: none; outline: none;
+  color: var(--accent-gold2); font-family: 'Cinzel Decorative', serif;
+  font-size: inherit; padding: 0; min-width: 60px;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(13,2,33,0.8); }
+::-webkit-scrollbar-thumb { background: rgba(35,206,107,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(35,206,107,0.5); }
+
+  /* ── BACK BANNER ──────────────────────────────────────── */
+  .back-banner {
+    grid-area: back;
+    background: var(--s347-deep-twilight);
+    border-bottom: 1px solid var(--s347-indigo-velvet);
+    padding: 7px 28px;
+    display: flex; gap: 24px;
+  }
+  .back-banner a {
+    font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--s347-dark-slate-grey); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-banner a:hover { color: var(--s347-emerald); }
+  .back-banner .bc-current { color: var(--s347-ghost-white); pointer-events: none; }
+
+</style>
+</head>
+<body>
+
+  <!-- BACK BANNER -->
+<div class="back-banner">
+  <a href="index.html">⟵ Hamster RPG Home</a>
+  <a href="session-scribe.html">Session Scribe</a>
+  <a href="realm-forge.html" class="bc-current">Realm Forge</a>
+  <a href="ascii-dungeon.html">ASCII Dungeon</a>
+  <a href="daggerheart-character-forge.html">Daggerheart</a>
+  <a href="dnd5e-character-forge.html">D&D 5e</a>
+  <a href="pf2e-character-forge.html">PF2e</a>
+  <a href="icrpg-character-forge.html">ICRPG</a>
+  <a href="swade-character-forge.html">SWADE</a>
+</div>
+
+  <header class="app-header">
+    <div class="header-title">Realm Forge</div>
+    <div class="header-divider"></div>
+    <div class="header-subtitle">Medieval Demographics Generator &nbsp;·&nbsp; Studio 347</div>
+  </header>
+
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('kingdom')">Kingdom</button>
+    <button class="nav-tab" onclick="showView('settlement')">Settlement</button>
+    <button class="nav-tab" onclick="showView('reference')">Reference</button>
+  </nav>
+
+  <main class="main">
+
+    <!-- ═══════════════ KINGDOM VIEW ═══════════════ -->
+    <div id="view-kingdom" class="view active">
+
+      <div class="card">
+        <div class="card-title">Kingdom Parameters</div>
+
+        <div class="form-row" style="margin-bottom:10px;">
+          <div>
+            <label>Kingdom Name</label>
+            <input type="text" id="k-name" value="Valdremor" placeholder="Enter realm name…">
+          </div>
+          <div>
+            <label>Development Level</label>
+            <select id="k-dev">
+              <option value="5">Fully Developed (×5)</option>
+              <option value="4">Well Settled (×4)</option>
+              <option value="3">Moderately Settled (×3)</option>
+              <option value="2">Frontier / Sparse (×2)</option>
+              <option value="1">Wilderness / Depopulated (×1)</option>
+              <option value="custom">Custom Multiplier…</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="custom-mult-row" style="display:none; margin-bottom:10px;">
+          <label>Custom Density Multiplier (1–5)</label>
+          <input type="number" id="k-custom-mult" min="1" max="5" step="0.1" value="3">
+        </div>
+
+        <div class="section-heading" style="margin:18px 0 12px;">Area Definition</div>
+
+        <div class="form-row-3">
+          <div>
+            <label>Grid Type</label>
+            <select id="k-grid-type" onchange="updateGridCalc()">
+              <option value="hex">Hexagonal</option>
+              <option value="square">Square</option>
+              <option value="sqmi">Direct (sq miles)</option>
+            </select>
+          </div>
+          <div id="grid-count-wrap">
+            <label>Number of Hexes / Squares</label>
+            <input type="number" id="k-grid-count" value="120" min="1" onchange="updateGridCalc()">
+          </div>
+          <div id="grid-size-wrap">
+            <label id="grid-size-label">Hex Width (miles, flat-to-flat)</label>
+            <input type="number" id="k-grid-size" value="3" min="0.5" step="0.5" onchange="updateGridCalc()">
+          </div>
+        </div>
+
+        <div id="sqmi-direct-wrap" style="display:none; margin-top:10px;">
+          <label>Total Area (square miles)</label>
+          <input type="number" id="k-sqmi-direct" value="5000" min="1" onchange="updateGridCalc()">
+        </div>
+
+        <div class="highlight-box" style="margin-top:12px;">
+          Calculated area: <strong id="calc-area">—</strong> square miles
+          <span id="calc-area-note" class="dice-result"></span>
+        </div>
+
+        <div class="section-heading" style="margin:18px 0 12px;">Optional Overrides</div>
+
+        <div class="form-row-3">
+          <div>
+            <div class="toggle-wrap">
+              <label class="toggle-switch"><input type="checkbox" id="k-override-density" onchange="toggleOverride('density')"><span class="toggle-slider"></span></label>
+              <span class="toggle-label">Fix Density</span>
+            </div>
+            <input type="number" id="k-density-val" value="75" min="1" max="200" style="display:none;">
+          </div>
+          <div>
+            <div class="toggle-wrap">
+              <label class="toggle-switch"><input type="checkbox" id="k-override-pop" onchange="toggleOverride('pop')"><span class="toggle-slider"></span></label>
+              <span class="toggle-label">Fix Population</span>
+            </div>
+            <input type="number" id="k-pop-val" value="500000" min="1" style="display:none;">
+          </div>
+          <div>
+            <div class="toggle-wrap">
+              <label class="toggle-switch"><input type="checkbox" id="k-override-largecity" onchange="toggleOverride('largecity')"><span class="toggle-slider"></span></label>
+              <span class="toggle-label">Fix Largest City Pop.</span>
+            </div>
+            <input type="number" id="k-largecity-val" value="25000" min="1" style="display:none;">
+          </div>
+        </div>
+
+        <div class="section-heading" style="margin:18px 0 12px;">Trade & Era</div>
+        <div class="form-row">
+          <div>
+            <label>Mercantile Era (towns multiplier)</label>
+            <select id="k-mercantile">
+              <option value="9">Thriving Mercantile (avg ×9)</option>
+              <option value="5">Moderate Trade (×5)</option>
+              <option value="1">Pre-Crusades / Low Trade (×1)</option>
+            </select>
+          </div>
+          <div>
+            <label>Kingdom Age (years, for ruins)</label>
+            <input type="number" id="k-age" value="400" min="0">
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:18px;">
+          <button class="btn btn-primary" onclick="generateKingdom()">⚄ Generate Kingdom</button>
+          <button class="btn btn-teal" onclick="rerollKingdom()">↺ Re-roll Dice</button>
+          <button class="btn btn-sm btn-purple" onclick="exportKingdom()">⬇ Export</button>
+        </div>
+      </div>
+
+      <!-- OUTPUT -->
+      <div id="kingdom-output" class="output-panel hidden">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- ═══════════════ SETTLEMENT VIEW ═══════════════ -->
+    <div id="view-settlement" class="view">
+      <div class="card">
+        <div class="card-title">Settlement Lookup</div>
+        <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:16px;">
+          Enter a settlement's population to see its services, merchants, and characteristics — useful for any individual town or city outside a kingdom generation.
+        </p>
+        <div class="form-row">
+          <div>
+            <label>Settlement Name</label>
+            <input type="text" id="s-name" value="Ashford" placeholder="Settlement name…">
+          </div>
+          <div>
+            <label>Population</label>
+            <input type="number" id="s-pop" value="3500" min="1">
+          </div>
+        </div>
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="btn btn-primary" onclick="generateSettlement()">Calculate</button>
+        </div>
+      </div>
+      <div id="settlement-output" class="output-panel hidden"></div>
+    </div>
+
+    <!-- ═══════════════ REFERENCE VIEW ═══════════════ -->
+    <div id="view-reference" class="view">
+      <div class="card">
+        <div class="card-title">Support Values — Merchants & Services</div>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:14px;">
+          One business per this many people. Divide settlement population by SV to get expected count; fractional results = percentage chance of having one at all.
+        </p>
+        <div class="merchants-grid" id="ref-sv-table"></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">Grid Area Reference</div>
+        <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:14px;">Area of a hex = (width × 0.9306049)². Common hex sizes:</p>
+        <table class="settlement-table">
+          <thead><tr><th>Flat-to-Flat Width</th><th>Area (sq mi)</th><th>Typical Use</th></tr></thead>
+          <tbody id="ref-hex-table"></tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">Settlement Size Ranges</div>
+        <table class="settlement-table">
+          <thead><tr><th>Category</th><th>Population Range</th><th>Typical Value</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><span class="settlement-table type-badge badge-village">Village</span></td><td>20–1,000</td><td>50–300</td><td>Agrarian; thousands per kingdom</td></tr>
+            <tr><td><span class="settlement-table type-badge badge-town">Town</span></td><td>1,000–8,000</td><td>~2,500</td><td>Mercantile hub; walls if important</td></tr>
+            <tr><td><span class="settlement-table type-badge badge-city">City</span></td><td>8,000–12,000</td><td>~10,000</td><td>Few per kingdom; universities here</td></tr>
+            <tr><td><span class="settlement-table type-badge badge-bigcity">Big City</span></td><td>12,000–100,000+</td><td>~25,000</td><td>Trade convergence; rare wonders</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">Agricultural &amp; Physical Density</div>
+        <div class="stat-grid">
+          <div class="stat-block"><div class="stat-label">People / sq mi cultivated</div><div class="stat-value">180</div></div>
+          <div class="stat-block"><div class="stat-label">Urban density (avg)</div><div class="stat-value">150<span style="font-size:0.8rem">/ha</span></div></div>
+          <div class="stat-block"><div class="stat-label">Dwellings / acre (avg)</div><div class="stat-value">15–25</div></div>
+          <div class="stat-block"><div class="stat-label">Pop / dwelling (avg)</div><div class="stat-value">~3</div></div>
+          <div class="stat-block"><div class="stat-label">Guard / citizen ratio</div><div class="stat-value">1 : 150</div></div>
+          <div class="stat-block"><div class="stat-label">Castle / people</div><div class="stat-value">1 : 50k</div></div>
+          <div class="stat-block"><div class="stat-label">Clergy / population</div><div class="stat-value">1 : 40</div></div>
+          <div class="stat-block"><div class="stat-label">Priest / clergy</div><div class="stat-value">1 : 25–30</div></div>
+          <div class="stat-block"><div class="stat-label">Lawyer / people</div><div class="stat-value">1 : 650</div></div>
+          <div class="stat-block"><div class="stat-label">Noble household / pop</div><div class="stat-value">1 : 200</div></div>
+          <div class="stat-block"><div class="stat-label">University / continent</div><div class="stat-value">1 : 27.3M</div></div>
+          <div class="stat-block"><div class="stat-label">Livestock : people</div><div class="stat-value">2.2 : 1</div></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="app-footer">Studio 347 · Realm Forge · Based on <em>Medieval Demographics Made Easy</em> by S. John Ross</footer>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
+const SV_LIST = [
+  ['Shoemakers',150],['Furriers',250],['Maidservants',250],['Tailors',250],
+  ['Barbers',350],['Jewelers',400],['Taverns / Restaurants',400],['Old-Clothes Dealers',400],
+  ['Pastrycooks',500],['Masons',500],['Carpenters',550],['Weavers',600],
+  ['Chandlers',700],['Mercers',700],['Coopers',700],['Bakers',800],
+  ['Watercarriers',850],['Scabbardmakers',850],['Wine-Sellers',900],['Hatmakers',950],
+  ['Saddlers',1000],['Chicken Butchers',1000],['Pursemakers',1100],
+  ['Butchers',1200],['Fishmongers',1200],['Beer-Sellers',1400],
+  ['Buckle Makers',1400],['Plasterers',1400],['Spice Merchants',1400],
+  ['Blacksmiths',1500],['Painters',1500],
+  ['Doctors (licensed)',1700],['Roofers',1800],
+  ['Locksmiths',1900],['Bathers',1900],['Ropemakers',1900],
+  ['Inns',2000],['Tanners',2000],['Copyists',2000],['Sculptors',2000],
+  ['Rugmakers',2000],['Harness-Makers',2000],['Bleachers',2100],
+  ['Hay Merchants',2300],['Cutlers',2300],['Glovemakers',2400],
+  ['Woodsellers',2400],['Woodcarvers',2400],
+  ['Illuminators',3900],['Magic-Shops',2800],
+  ['Bookbinders',3000],['Booksellers',6300],
+];
+
+const HEX_SIZES = [
+  [1,'0.87','Small detail hex'],
+  [2,'3.46','Common encounter hex'],
+  [3,'7.79','Studio 347 default (3 mi)'],
+  [5,'21.6','Regional exploration'],
+  [6,'31.2','Day-travel hex'],
+  [12,'124.8','Large regional hex'],
+  [24,'499.3','Province-scale hex'],
+  [30,'780','Classic MDME example'],
+];
+
+/* ══════════════════════════════════════
+   DICE
+══════════════════════════════════════ */
+function d(n){ return Math.floor(Math.random()*n)+1; }
+function roll(count,sides){ let t=0; for(let i=0;i<count;i++) t+=d(sides); return t; }
+function d4(){ return d(4); }
+function roll6d4(){ return roll(6,4); }
+
+/* ══════════════════════════════════════
+   VIEW
+══════════════════════════════════════ */
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+/* ══════════════════════════════════════
+   AREA CALCULATION
+══════════════════════════════════════ */
+function hexArea(w){ return Math.pow(w*0.9306049,2); }
+
+function updateGridCalc(){
+  const type = document.getElementById('k-grid-type').value;
+  const countWrap = document.getElementById('grid-count-wrap');
+  const sizeWrap  = document.getElementById('grid-size-wrap');
+  const sqmiWrap  = document.getElementById('sqmi-direct-wrap');
+  const lbl = document.getElementById('grid-size-label');
+
+  if(type==='sqmi'){
+    countWrap.style.display='none'; sizeWrap.style.display='none'; sqmiWrap.style.display='block';
+  } else {
+    countWrap.style.display=''; sizeWrap.style.display=''; sqmiWrap.style.display='none';
+    lbl.textContent = type==='hex' ? 'Hex Width (miles, flat-to-flat)' : 'Square Side Length (miles)';
+  }
+
+  const area = computeArea();
+  document.getElementById('calc-area').textContent = fmt(area);
+}
+
+function computeArea(){
+  const type  = document.getElementById('k-grid-type').value;
+  const count = +document.getElementById('k-grid-count').value || 0;
+  const size  = +document.getElementById('k-grid-size').value  || 0;
+
+  if(type==='sqmi') return +document.getElementById('k-sqmi-direct').value || 0;
+  if(type==='hex')  return count * hexArea(size);
+  return count * size * size; // square
+}
+
+function toggleOverride(which){
+  const map = { density:'k-density-val', pop:'k-pop-val', largecity:'k-largecity-val' };
+  const cb = document.getElementById('k-override-'+which);
+  const inp = document.getElementById(map[which]);
+  inp.style.display = cb.checked ? 'block' : 'none';
+}
+
+document.getElementById('k-dev').addEventListener('change', function(){
+  document.getElementById('custom-mult-row').style.display = this.value==='custom' ? 'block' : 'none';
+});
+
+/* ══════════════════════════════════════
+   FORMAT
+══════════════════════════════════════ */
+function fmt(n){ return Math.round(n).toLocaleString(); }
+function fmtDec(n,d=1){ return (+n).toLocaleString(undefined,{maximumFractionDigits:d}); }
+
+/* ══════════════════════════════════════
+   SETTLEMENT TYPE
+══════════════════════════════════════ */
+function settlementType(pop){
+  if(pop>=12000) return ['Big City','badge-bigcity'];
+  if(pop>=8000)  return ['City','badge-city'];
+  if(pop>=1000)  return ['Town','badge-town'];
+  return ['Village','badge-village'];
+}
+
+/* ══════════════════════════════════════
+   MERCHANTS FOR A POPULATION
+══════════════════════════════════════ */
+function merchantsForPop(pop){
+  return SV_LIST.map(([name,sv])=>{
+    const count = pop/sv;
+    return {name, sv, count};
+  });
+}
+
+function renderMerchantsGrid(pop){
+  const items = merchantsForPop(pop);
+  let html = '<div class="merchants-grid">';
+  items.forEach(({name,count})=>{
+    if(count>=1){
+      html += `<div class="merchant-row"><span class="merchant-name">${name}</span><span class="merchant-count">${fmt(count)}</span></div>`;
+    } else {
+      const pct = Math.round(count*100);
+      html += `<div class="merchant-row"><span class="merchant-name">${name}</span><span class="merchant-count zero">${pct}%</span></div>`;
+    }
+  });
+  html += '</div>';
+  return html;
+}
+
+/* ══════════════════════════════════════
+   KINGDOM GENERATION (state)
+══════════════════════════════════════ */
+let kState = null;
+
+function rerollKingdom(){
+  if(!kState) return generateKingdom();
+  kState.diceRolled = null;
+  generateKingdom(true);
+}
+
+function generateKingdom(useExistingForm){
+  const name   = document.getElementById('k-name').value || 'Unnamed Realm';
+  const devSel = document.getElementById('k-dev').value;
+  const mult   = devSel==='custom' ? (+document.getElementById('k-custom-mult').value||3) : +devSel;
+  const area   = computeArea();
+
+  const overrideDensity   = document.getElementById('k-override-density').checked;
+  const overridePop       = document.getElementById('k-override-pop').checked;
+  const overrideLargeCity = document.getElementById('k-override-largecity').checked;
+
+  const mercantile = +document.getElementById('k-mercantile').value;
+  const age        = +document.getElementById('k-age').value || 0;
+
+  // Roll 6d4 × mult for density (unless override)
+  let densityRoll, density;
+  if(overrideDensity){
+    density = +document.getElementById('k-density-val').value;
+    densityRoll = null;
+  } else if(overridePop){
+    const fixedPop = +document.getElementById('k-pop-val').value;
+    density = fixedPop / area;
+    densityRoll = null;
+  } else {
+    densityRoll = roll6d4();
+    density = densityRoll * mult;
+  }
+  density = Math.max(1, density);
+
+  // Population
+  let population;
+  if(overridePop && !overrideDensity){
+    population = +document.getElementById('k-pop-val').value;
+    density = population / area;
+  } else {
+    population = Math.round(density * area);
+  }
+
+  // Cultivated land
+  const cultivatedMi = population / 180;
+  const cultivatedPct = (cultivatedMi / area) * 100;
+
+  // Largest city: P = sqrt(pop), M = 2d4+10
+  let largestCityPop, largeCityM;
+  if(overrideLargeCity){
+    largestCityPop = +document.getElementById('k-largecity-val').value;
+    largeCityM = null;
+  } else {
+    largeCityM = roll(2,4) + 10;
+    largestCityPop = Math.round(Math.sqrt(population) * largeCityM);
+  }
+
+  // Build city list
+  const cities = [];
+  cities.push({name: generateCityName(), pop: largestCityPop});
+
+  // Second city: 20-80% of largest
+  let prev = largestCityPop;
+  let c2pct = roll(2,4)*10; // 2d4*10%
+  cities.push({name: generateCityName(), pop: Math.round(prev * c2pct/100)});
+  prev = cities[cities.length-1].pop;
+
+  // Remaining cities until below 8000
+  let attempts = 0;
+  while(prev >= 8000 && attempts < 30){
+    const reduction = roll(2,4)*5; // 2d4*5% reduction
+    prev = Math.round(prev * (1 - reduction/100));
+    if(prev < 1000) break;
+    cities.push({name: generateCityName(), pop: prev});
+    attempts++;
+  }
+
+  const cityCount = cities.filter(c=>c.pop>=8000).length;
+  const townCountBase = Math.max(cityCount, 1);
+  const townMultRoll  = mercantile === 9 ? roll(2,8) : mercantile;
+  const townCount     = Math.max(1, Math.round(townCountBase * townMultRoll));
+
+  // Generate town pops (continue city reduction from last city)
+  const towns = [];
+  prev = cities[cities.length-1].pop;
+  for(let i=0;i<townCount;i++){
+    const red = roll(2,4)*5;
+    prev = Math.round(prev * (1 - red/100));
+    if(prev < 1) prev = Math.floor(Math.random()*7000)+1000;
+    towns.push({name: generateCityName(), pop: Math.min(7999, Math.max(1000, prev))});
+  }
+
+  // Active castles, ruins
+  const activeCastles = Math.round(population / 50000);
+  const ruinedCastles = Math.round((population/5000000) * Math.sqrt(age));
+  const castlesUrban  = Math.round(activeCastles * 0.75);
+  const castlesWild   = activeCastles - castlesUrban;
+
+  // Urban pop
+  const urbanPop = cities.reduce((a,c)=>a+c.pop,0) + towns.reduce((a,t)=>a+t.pop,0);
+  const ruralPop = population - urbanPop;
+
+  // Guards for largest city
+  const guards = Math.round(largestCityPop / 150);
+  const cityArea_ha = Math.round(largestCityPop / 150);
+
+  kState = { name, population, area, density, densityRoll, mult, cultivatedMi, cultivatedPct,
+             cities, towns, cityCount, townCount, urbanPop, ruralPop,
+             activeCastles, ruinedCastles, castlesUrban, castlesWild,
+             largestCityPop, largeCityM, guards, cityArea_ha, age, mercantile };
+
+  renderKingdomOutput(kState);
+}
+
+function renderKingdomOutput(k){
+  const out = document.getElementById('kingdom-output');
+  out.classList.remove('hidden');
+
+  const allSettlements = [
+    ...k.cities.map(c=>({...c, tier: c.pop>=12000?'Big City':c.pop>=8000?'City':c.pop>=1000?'Town':'Village'})),
+    ...k.towns.map(t=>({...t, tier:'Town'}))
+  ];
+
+  // Sort by pop desc
+  allSettlements.sort((a,b)=>b.pop-a.pop);
+
+  let citiesRows = '';
+  allSettlements.forEach((s,i)=>{
+    const [typeName, badgeClass] = settlementType(s.pop);
+    citiesRows += `<tr>
+      <td>${i+1}</td>
+      <td class="name-col">${s.name}</td>
+      <td><span class="settlement-table type-badge ${badgeClass}">${typeName}</span></td>
+      <td>${fmt(s.pop)}</td>
+      <td>${fmt(Math.round(s.pop/150))} ha</td>
+      <td>${fmt(Math.round(s.pop/150))}</td>
+    </tr>`;
+  });
+
+  const density6d4 = k.densityRoll ? `<span class="dice-result">[6d4=${k.densityRoll}]</span>` : '';
+  const largeCityRoll = k.largeCityM ? `<span class="dice-result">[M=${k.largeCityM}]</span>` : '';
+
+  out.innerHTML = `
+    <div class="section-heading" style="margin-bottom:18px;">The Realm of ${k.name}</div>
+
+    <div class="stat-grid">
+      <div class="stat-block">
+        <div class="stat-label">Total Area</div>
+        <div class="stat-value large">${fmt(k.area)}</div>
+        <div class="stat-note">square miles</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Population</div>
+        <div class="stat-value large">${fmt(k.population)}</div>
+        <div class="stat-note">${density6d4}</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Avg. Density</div>
+        <div class="stat-value">${fmtDec(k.density,1)}</div>
+        <div class="stat-note">per sq mi</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Cultivated Land</div>
+        <div class="stat-value">${fmt(k.cultivatedMi)}</div>
+        <div class="stat-note">sq mi (${fmtDec(k.cultivatedPct,1)}%)</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Wilderness</div>
+        <div class="stat-value">${fmtDec(100-k.cultivatedPct,1)}%</div>
+        <div class="stat-note">of total area</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Urban Population</div>
+        <div class="stat-value">${fmt(k.urbanPop)}</div>
+        <div class="stat-note">${fmtDec(k.urbanPop/k.population*100,1)}% of total</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Rural Population</div>
+        <div class="stat-value">${fmt(k.ruralPop)}</div>
+        <div class="stat-note">villages & farmsteads</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Cities</div>
+        <div class="stat-value">${k.cityCount}</div>
+        <div class="stat-note">pop ≥ 8,000</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Towns</div>
+        <div class="stat-value">${k.townCount}</div>
+        <div class="stat-note">pop 1,000–7,999</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Active Castles</div>
+        <div class="stat-value">${k.activeCastles}</div>
+        <div class="stat-note">${k.castlesUrban} urban / ${k.castlesWild} frontier</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Ruined Forts</div>
+        <div class="stat-value">${k.ruinedCastles}</div>
+        <div class="stat-note">~${k.age} yr history</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Largest City</div>
+        <div class="stat-value">${fmt(k.largestCityPop)}</div>
+        <div class="stat-note">${largeCityRoll}</div>
+      </div>
+    </div>
+
+    <div class="section-heading" style="margin:22px 0 12px;">Settlements</div>
+    <div style="overflow-x:auto;">
+      <table class="settlement-table">
+        <thead><tr><th>#</th><th>Name</th><th>Type</th><th>Population</th><th>Area (ha)</th><th>City Guard</th></tr></thead>
+        <tbody>${citiesRows}</tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:8px; font-size:0.82rem; color:var(--text-muted);">
+      Area in hectares at 150 pop/ha urban density. Guard at 1:150 ratio.
+      Estimated village count: ~${fmt(Math.round(k.ruralPop / 150))} villages (avg 150 pop each).
+    </div>
+
+    <div class="section-heading" style="margin:22px 0 12px;">Largest City — ${k.cities[0]?.name}</div>
+    <div class="stat-grid">
+      <div class="stat-block">
+        <div class="stat-label">Population</div>
+        <div class="stat-value">${fmt(k.largestCityPop)}</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Area within walls</div>
+        <div class="stat-value">${k.cityArea_ha}</div>
+        <div class="stat-note">hectares</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">City Guard</div>
+        <div class="stat-value">${fmt(k.guards)}</div>
+        <div class="stat-note">1 per 150 citizens</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Clergy</div>
+        <div class="stat-value">${fmt(Math.round(k.largestCityPop/40))}</div>
+        <div class="stat-note">1 per 40 people</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Priests</div>
+        <div class="stat-value">${fmt(Math.round(k.largestCityPop/40/27.5))}</div>
+        <div class="stat-note">1 per 25–30 clergy</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Noble Households</div>
+        <div class="stat-value">${fmt(Math.round(k.largestCityPop/200))}</div>
+        <div class="stat-note">1 per 200 people</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Lawyers</div>
+        <div class="stat-value">${fmt(Math.round(k.largestCityPop/650))}</div>
+        <div class="stat-note">1 per 650 people</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Approx. Dwellings</div>
+        <div class="stat-value">${fmt(Math.round(k.largestCityPop/3))}</div>
+        <div class="stat-note">avg 3 per dwelling</div>
+      </div>
+    </div>
+
+    <div class="section-heading" style="margin:22px 0 12px;">Merchants &amp; Services — ${k.cities[0]?.name} (pop ${fmt(k.largestCityPop)})</div>
+    ${renderMerchantsGrid(k.largestCityPop)}
+
+    <div class="btn-row" style="margin-top:18px;">
+      <button class="btn btn-sm" onclick="showSecondCityMerchants()">Show 2nd City Merchants</button>
+      <button class="btn btn-sm btn-purple" onclick="exportKingdom()">⬇ Export JSON</button>
+    </div>
+    <div id="second-city-merchants" style="display:none; margin-top:16px;">
+      <div class="section-heading" style="margin:0 0 12px;">${k.cities[1]?.name || 'Second City'} (pop ${fmt(k.cities[1]?.pop||0)})</div>
+      ${k.cities[1] ? renderMerchantsGrid(k.cities[1].pop) : '<p style="color:var(--text-muted)">No second city generated.</p>'}
+    </div>
+  `;
+}
+
+function showSecondCityMerchants(){
+  const el = document.getElementById('second-city-merchants');
+  el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+/* ══════════════════════════════════════
+   SETTLEMENT VIEW
+══════════════════════════════════════ */
+function generateSettlement(){
+  const name = document.getElementById('s-name').value || 'Settlement';
+  const pop  = +document.getElementById('s-pop').value || 1000;
+  const [typeName, badgeClass] = settlementType(pop);
+
+  const out = document.getElementById('settlement-output');
+  out.classList.remove('hidden');
+
+  const area_ha = Math.round(pop/150);
+  const guards  = Math.round(pop/150);
+  const clergy  = Math.round(pop/40);
+  const priests = Math.round(clergy/27.5);
+  const nobles  = Math.round(pop/200);
+  const lawyers = Math.round(pop/650);
+  const dwell   = Math.round(pop/3);
+
+  out.innerHTML = `
+    <div class="section-heading" style="margin-bottom:16px;">
+      ${name} &nbsp;<span class="settlement-table type-badge ${badgeClass}">${typeName}</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-block"><div class="stat-label">Population</div><div class="stat-value large">${fmt(pop)}</div></div>
+      <div class="stat-block"><div class="stat-label">Area</div><div class="stat-value">${area_ha}</div><div class="stat-note">hectares</div></div>
+      <div class="stat-block"><div class="stat-label">Guards</div><div class="stat-value">${fmt(guards)}</div></div>
+      <div class="stat-block"><div class="stat-label">Clergy</div><div class="stat-value">${fmt(clergy)}</div></div>
+      <div class="stat-block"><div class="stat-label">Priests</div><div class="stat-value">${fmt(priests)}</div></div>
+      <div class="stat-block"><div class="stat-label">Noble Households</div><div class="stat-value">${fmt(nobles)}</div></div>
+      <div class="stat-block"><div class="stat-label">Lawyers</div><div class="stat-value">${fmt(lawyers)}</div></div>
+      <div class="stat-block"><div class="stat-label">Dwellings</div><div class="stat-value">${fmt(dwell)}</div></div>
+    </div>
+    <div class="section-heading" style="margin:20px 0 12px;">Merchants &amp; Services</div>
+    ${renderMerchantsGrid(pop)}
+  `;
+}
+
+/* ══════════════════════════════════════
+   NAME GENERATOR
+══════════════════════════════════════ */
+const PRE = ['Ash','Bel','Cor','Dar','El','Fal','Gor','Har','Im','Jal','Kel','Lor','Mal','Nor','Or','Pol','Rel','Sil','Tal','Ul','Vol','Wel','Xan','Yor','Zel'];
+const MID = ['an','ar','en','in','or','um','al','el','on','ur','ath','eth','ith','oth','uth'];
+const SUF = ['ford','moor','haven','wick','gate','bridge','holm','vale','keep','mere','fell','tarn','cross','worth','stead','mark','burg','port','hold','spire'];
+
+function generateCityName(){
+  return PRE[Math.floor(Math.random()*PRE.length)] + MID[Math.floor(Math.random()*MID.length)] + SUF[Math.floor(Math.random()*SUF.length)];
+}
+
+/* ══════════════════════════════════════
+   EXPORT
+══════════════════════════════════════ */
+function exportKingdom(){
+  if(!kState){ alert('Generate a kingdom first.'); return; }
+  const blob = new Blob([JSON.stringify(kState, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`${kState.name.replace(/\s+/g,'-')}-realm-forge.json`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+/* ══════════════════════════════════════
+   REFERENCE TABLE BUILDS
+══════════════════════════════════════ */
+function buildRefSV(){
+  const grid = document.getElementById('ref-sv-table');
+  let html = '';
+  SV_LIST.forEach(([name,sv])=>{
+    html += `<div class="merchant-row"><span class="merchant-name">${name}</span><span class="merchant-count" style="color:var(--text-muted); font-size:0.8rem;">1 : ${sv.toLocaleString()}</span></div>`;
+  });
+  grid.innerHTML = html;
+}
+
+function buildRefHex(){
+  const tbody = document.getElementById('ref-hex-table');
+  let html = '';
+  HEX_SIZES.forEach(([w,area,note])=>{
+    const isDefault = w===3;
+    html += `<tr${isDefault?' style="background:rgba(35,206,107,0.05)"':''}><td>${w} mi${isDefault?' <span class="dice-result">[default]</span>':''}</td><td>${area}</td><td>${note}</td></tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  updateGridCalc();
+  buildRefSV();
+  buildRefHex();
+  generateKingdom();
+});
+</script>
+</body>
+</html>
