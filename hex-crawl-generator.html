@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0d0221">
+<title>Hex Crawl Generator — Studio 347</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   STUDIO 347 — HEX CRAWL GENERATOR
+   Palette: Studio347.scss
+══════════════════════════════════════════════ */
+:root {
+  --s347-midnight-violet: #0d0221;
+  --s347-deep-twilight:   #0f084b;
+  --s347-dark-slate-grey: #0b5351;
+  --s347-emerald:         #23ce6b;
+  --s347-indigo-velvet:   #511a91;
+  --s347-ghost-white:     #f6f8ff;
+  --bg-deep:       var(--s347-midnight-violet);
+  --bg-card:       #140a3a;
+  --bg-card2:      #1a0f52;
+  --bg-card3:      #0d0730;
+  --accent-gold:   var(--s347-emerald);
+  --accent-gold2:  #39e87e;
+  --accent-teal:   var(--s347-dark-slate-grey);
+  --accent-purple: var(--s347-indigo-velvet);
+  --text-primary:  var(--s347-ghost-white);
+  --text-muted:    #a8b4d4;
+  --text-gold:     var(--s347-emerald);
+  --border:        rgba(35,206,107,0.2);
+  --border-bright: rgba(35,206,107,0.55);
+  --shadow:        0 8px 40px rgba(0,0,0,0.6);
+  --glow-gold:     0 0 20px rgba(35,206,107,0.3);
+  --transition:    all 0.25s cubic-bezier(0.4,0,0.2,1);
+  --radius:        8px;
+  /* legacy aliases used by JS-generated markup */
+  --bg:    var(--bg-deep);
+  --bg2:   var(--bg-card);
+  --bg3:   var(--bg-card3);
+  --bg4:   #0a0520;
+  --text:  var(--text-primary);
+  --text2: var(--text-muted);
+  --text3: rgba(168,180,212,0.5);
+  --font-head: 'Cinzel', Georgia, serif;
+  --font-body: 'Crimson Pro', Georgia, serif;
+  --font-mono: 'Courier New', monospace;
+  --radius2: var(--radius);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-deep);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.022'/%3E%3C/svg%3E");
+  color: var(--text-primary);
+  font-family: 'Crimson Pro', Georgia, serif;
+  font-size: 17px; line-height: 1.65; min-height: 100vh; overflow-x: hidden;
+}
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 0%, rgba(81,26,145,0.22) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 60% at 85% 90%, rgba(11,83,81,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(15,8,75,0.45) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+#page { position: relative; z-index: 1; }
+
+/* ─── BACK BANNER / NAV ─── */
+.back-banner {
+  background: var(--s347-deep-twilight);
+  border-bottom: 1px solid var(--s347-indigo-velvet);
+  padding: 7px 28px;
+  display: flex; gap: 24px; flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.back-banner a {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--s347-dark-slate-grey); text-decoration: none;
+  transition: color 0.2s;
+}
+.back-banner a:hover { color: var(--s347-emerald); }
+.back-banner .bc-current { color: var(--s347-ghost-white); pointer-events: none; }
+
+/* ─── HEADER ─── */
+.app-header {
+  text-align: center;
+  padding: clamp(32px,6vw,64px) 20px clamp(24px,4vw,44px);
+  border-bottom: 2px solid rgba(35,206,107,0.25);
+  background: linear-gradient(180deg, rgba(81,26,145,0.18) 0%, transparent 100%);
+  position: relative; overflow: hidden;
+}
+.app-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-linear-gradient(105deg,transparent 0px,transparent 80px,rgba(35,206,107,0.025) 80px,rgba(35,206,107,0.025) 81px);
+  pointer-events: none;
+}
+.app-header::after {
+  content: ''; position: absolute; bottom: -2px; left: 8%; right: 8%; height: 2px;
+  background: linear-gradient(to right, transparent, var(--accent-gold), var(--accent-teal), var(--accent-gold), transparent);
+}
+.header-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.9rem,6vw,3.8rem); font-weight: 700; color: var(--accent-gold2);
+  text-shadow: 0 0 30px rgba(35,206,107,0.5), 0 0 60px rgba(35,206,107,0.2), 0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing: 0.04em; line-height: 1.15; margin-bottom: 6px;
+  animation: fade-down 0.7s ease both;
+}
+.header-divider {
+  width: 220px; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(24,168,158,0.8), transparent);
+  margin: 10px auto 12px;
+}
+.header-subtitle {
+  font-family: 'Cinzel', serif; font-size: clamp(0.6rem,1.8vw,0.78rem);
+  letter-spacing: 0.3em; text-transform: uppercase; color: var(--accent-teal);
+  animation: fade-up 0.9s 0.2s ease both;
+}
+
+/* ─── TAB NAV ─── */
+.nav-tabs {
+  display: flex; justify-content: center; gap: 2px; padding: 0 12px;
+  border-bottom: 1px solid rgba(35,206,107,0.12);
+  background: rgba(13,2,33,0.75); flex-wrap: wrap;
+}
+.nav-tab {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--text-muted); text-decoration: none;
+  padding: 13px 20px; border: none; border-bottom: 3px solid transparent;
+  transition: var(--transition); white-space: nowrap; position: relative;
+  background: transparent; cursor: pointer;
+}
+.nav-tab:hover { color: #fff; border-bottom-color: rgba(35,206,107,0.4); }
+.nav-tab.active { color: var(--accent-gold2); border-bottom-color: var(--accent-gold); background: rgba(35,206,107,0.05); }
+.nav-tab.active::before {
+  content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%;
+  height: 2px; background: var(--accent-teal); border-radius: 2px 2px 0 0;
+}
+
+.tab-panel { display: none; animation: fade-in 0.3s ease both; }
+.tab-panel.active { display: block; }
+
+/* ─── LAYOUT ─── */
+.container { max-width: 1100px; margin: 0 auto; padding: clamp(24px,4vw,48px) clamp(14px,3vw,28px) 80px; }
+
+/* ─── SECTION HEADING ─── */
+.section-heading, .section-title {
+  font-family: 'Cinzel', serif; font-size: 0.68rem; letter-spacing: 0.28em;
+  text-transform: uppercase; color: var(--accent-gold); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px;
+  border-bottom: none; padding-bottom: 0;
+}
+.section-heading::before, .section-heading::after,
+.section-title::before, .section-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(35,206,107,0.4));
+}
+.section-heading::before, .section-title::before {
+  background: linear-gradient(to left, transparent, rgba(35,206,107,0.4));
+}
+
+/* ─── CARDS ─── */
+.card {
+  background: linear-gradient(160deg, rgba(15,8,75,0.95) 0%, rgba(13,2,33,0.98) 100%);
+  border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 16px; position: relative;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), rgba(11,83,81,0.45), transparent);
+  pointer-events: none;
+}
+.card-header {
+  background: rgba(10,6,30,0.7);
+  border-bottom: 1px solid rgba(35,206,107,0.15);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-header .title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.cluster-pip {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.badge {
+  margin-left: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(35,206,107,0.5);
+}
+
+/* ─── LOOKUP TABLE inside card ─── */
+.lookup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.lookup-table thead tr {
+  background: rgba(10,6,30,0.8);
+}
+.lookup-table th {
+  padding: 6px 10px;
+  text-align: left;
+  font-family: 'Cinzel', serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  border-bottom: 1px solid rgba(35,206,107,0.2);
+}
+.lookup-table th.right, .lookup-table td.right { text-align: right; }
+.lookup-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid rgba(35,206,107,0.07);
+  color: var(--text-primary);
+}
+.lookup-table tr:last-child td { border-bottom: none; }
+.lookup-table tr:hover td { background: rgba(35,206,107,0.03); }
+.lookup-table tr.diag-row { background: rgba(35,206,107,0.06); }
+.lookup-table tr.diag-row td.dest-cell { font-weight: 600; color: var(--accent-gold2); }
+.lookup-table td.range-cell {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: rgba(168,180,212,0.55);
+  width: 72px;
+}
+.lookup-table td.pct-cell {
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: rgba(168,180,212,0.55);
+  width: 36px;
+  text-align: right;
+}
+
+/* ── GRID ── */
+  .biome-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+/* ─── CONTROLS ─── */
+.controls-bar {
+  background: linear-gradient(160deg, rgba(15,8,75,0.9) 0%, rgba(13,2,33,0.95) 100%);
+  border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+  margin-bottom: 1.5rem; position: relative; overflow: hidden;
+}
+.controls-bar::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), rgba(11,83,81,0.45), transparent);
+  pointer-events: none;
+}
+.control-group {
+  display: flex; align-items: center; gap: 8px;
+}
+.control-group label {
+  display: block; font-family: 'Cinzel', serif; font-size: 0.64rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted);
+  margin: 0; white-space: nowrap;
+}
+select {
+  background: rgba(10,6,30,0.8);
+  border: 1px solid rgba(35,206,107,0.2); border-radius: 4px;
+  color: var(--text-primary); font-family: 'Crimson Pro', serif;
+  font-size: 1rem; padding: 6px 12px; transition: var(--transition);
+  outline: none; -webkit-appearance: none; cursor: pointer;
+}
+select:hover, select:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 2px rgba(35,206,107,0.12); }
+select option { background: #140a3a; color: var(--text-primary); }
+
+/* ─── ROLLER ─── */
+.roller-panel {
+  background: linear-gradient(160deg, rgba(15,8,75,0.9) 0%, rgba(13,2,33,0.95) 100%);
+  border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+  padding: 1.5rem; position: relative; overflow: hidden;
+}
+.roller-panel::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), rgba(11,83,81,0.45), transparent);
+  pointer-events: none;
+}
+.roller-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+}
+@media (max-width: 600px) { .roller-grid { grid-template-columns: 1fr; } }
+
+.roller-label {
+  font-family: 'Cinzel', serif; font-size: 0.64rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent-gold);
+  margin-bottom: 8px;
+}
+.biome-select-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 6px; margin-bottom: 1rem;
+}
+.biome-btn {
+  background: rgba(10,6,30,0.7);
+  border: 1px solid rgba(35,206,107,0.15); border-radius: 4px;
+  color: var(--text-muted); cursor: pointer;
+  font-family: 'Cinzel', serif; font-size: 0.6rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 7px 10px; text-align: left;
+  transition: var(--transition);
+  display: flex; align-items: center; gap: 6px;
+}
+.biome-btn:hover { border-color: rgba(35,206,107,0.4); color: var(--text-primary); background: rgba(35,206,107,0.06); }
+.biome-btn.selected {
+  border-color: var(--accent-gold);
+  background: rgba(35,206,107,0.1);
+  color: var(--accent-gold2);
+  box-shadow: 0 0 10px rgba(35,206,107,0.15);
+}
+.biome-btn .pip {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+
+.roll-btn {
+  font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #18a858 0%, #23ce6b 50%, #15903e 100%);
+  color: #0d0221; border: 1.5px solid #23ce6b; font-weight: 700;
+  box-shadow: 0 2px 16px rgba(35,206,107,0.35);
+  border-radius: 4px; cursor: pointer;
+  padding: 12px 24px; width: 100%;
+  transition: var(--transition); margin-bottom: 1rem;
+}
+.roll-btn:hover { background: linear-gradient(135deg, #23ce6b 0%, #39e87e 50%, #1eb55e 100%); box-shadow: 0 4px 24px rgba(35,206,107,0.5); }
+.roll-btn:active { transform: scale(0.98); }
+.roll-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* secondary/utility roll-btn (clear history, etc.) */
+.roll-btn.btn-sm-util {
+  background: transparent; color: var(--text-muted); border-color: rgba(35,206,107,0.25);
+  box-shadow: none; font-size: 0.6rem; padding: 6px 14px; width: auto; margin-bottom: 0;
+}
+.roll-btn.btn-sm-util:hover { border-color: rgba(35,206,107,0.5); color: var(--text-primary); box-shadow: none; }
+
+.result-box {
+  background: rgba(8,4,24,0.9); border: 1px solid rgba(35,206,107,0.25);
+  border-radius: var(--radius); padding: 1.25rem; min-height: 140px;
+  animation: fade-in 0.3s ease both;
+}
+.result-empty {
+  color: rgba(168,180,212,0.4); font-family: 'Crimson Pro', serif;
+  font-style: italic; font-size: 1rem; text-align: center; padding-top: 1rem;
+}
+.result-roll-num {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 2rem; color: var(--accent-gold2);
+  display: block; margin-bottom: 4px;
+  text-shadow: 0 0 20px rgba(35,206,107,0.4);
+}
+.result-biome {
+  font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 600;
+  letter-spacing: 0.06em; margin-bottom: 6px;
+}
+.result-range {
+  font-family: 'Courier New', monospace; font-size: 0.72rem;
+  color: rgba(168,180,212,0.5); margin-bottom: 8px;
+}
+.result-note {
+  font-family: 'Crimson Pro', serif; font-size: 1rem;
+  color: var(--text-muted); line-height: 1.65;
+  border-top: 1px solid rgba(35,206,107,0.15);
+  padding-top: 8px; margin-top: 8px;
+}
+.result-same {
+  display: inline-block;
+  background: rgba(35,206,107,0.1); border: 1px solid rgba(35,206,107,0.3);
+  border-radius: 4px; color: var(--accent-gold2);
+  font-family: 'Cinzel', serif; font-size: 0.58rem;
+  font-weight: 600; letter-spacing: 0.1em;
+  padding: 1px 7px; text-transform: uppercase;
+  margin-left: 8px; vertical-align: middle;
+}
+
+.history-list {
+  list-style: none; font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  color: rgba(168,180,212,0.5);
+  max-height: 160px; overflow-y: auto;
+}
+.history-list li {
+  padding: 3px 0; border-bottom: 1px solid rgba(35,206,107,0.07);
+  display: flex; gap: 8px;
+}
+.history-list li:last-child { border-bottom: none; }
+.hist-roll { color: var(--accent-gold); min-width: 28px; }
+.hist-from { color: rgba(168,180,212,0.5); }
+.hist-arrow { color: rgba(35,206,107,0.3); }
+.hist-to { color: var(--text-muted); }
+.hist-same { color: var(--accent-gold2); font-size: 0.65rem; }
+
+/* ─── DOCS ─── */
+.doc-section { margin-bottom: 2.5rem; }
+.doc-section:last-child { margin-bottom: 0; }
+
+.prose {
+  font-family: 'Crimson Pro', serif; font-size: 1.05rem;
+  color: var(--text-muted); line-height: 1.8; max-width: 72ch;
+}
+.prose + .prose { margin-top: 1rem; }
+.prose a { color: var(--accent-gold2); text-decoration: none; }
+.prose a:hover { text-decoration: underline; }
+.prose strong { color: var(--text-primary); font-weight: 600; }
+
+.cluster-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(10,6,30,0.7); border: 1px solid rgba(35,206,107,0.2);
+  border-radius: 4px; font-family: 'Cinzel', serif; font-size: 0.58rem;
+  font-weight: 600; letter-spacing: 0.1em; padding: 2px 8px;
+  text-transform: uppercase; margin: 2px;
+}
+
+.rule-block {
+  background: rgba(35,206,107,0.05); border: 1px solid rgba(35,206,107,0.15);
+  border-left: 3px solid var(--accent-gold);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 10px 14px; margin: 1rem 0;
+  font-family: 'Crimson Pro', serif; font-size: 1rem;
+  color: var(--text-muted); line-height: 1.7;
+}
+.rule-block strong { color: var(--text-primary); }
+
+.ref-table {
+  width: 100%; border-collapse: collapse; font-size: 0.92rem; margin: 1rem 0;
+}
+.ref-table th {
+  background: rgba(10,6,30,0.8); padding: 7px 12px; text-align: left;
+  font-family: 'Cinzel', serif; font-size: 0.58rem; font-weight: 600;
+  letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent-gold);
+  border-bottom: 1px solid rgba(35,206,107,0.2);
+}
+.ref-table td {
+  padding: 7px 12px; border-bottom: 1px solid rgba(35,206,107,0.07);
+  color: var(--text-primary); vertical-align: top;
+}
+.ref-table tr:hover td { background: rgba(35,206,107,0.03); }
+.ref-table tr:last-child td { border-bottom: none; }
+.ref-table td.muted { color: var(--text-muted); font-family: 'Crimson Pro', serif; font-size: 1rem; }
+
+/* ─── FOOTER ─── */
+footer {
+  text-align: center; padding: 24px; font-size: 0.72rem;
+  color: rgba(168,180,212,0.35); border-top: 1px solid rgba(35,206,107,0.08);
+  font-family: 'Cinzel', serif; letter-spacing: 0.1em; text-transform: uppercase;
+}
+footer .divider { color: rgba(35,206,107,0.2); font-size: 14px; margin: 0.5rem 0; }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fade-in  { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
+@keyframes fade-down{ from{opacity:0;transform:translateY(-12px);} to{opacity:1;transform:none;} }
+@keyframes fade-up  { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:none;} }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(13,2,33,0.8); }
+::-webkit-scrollbar-thumb { background: rgba(35,206,107,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(35,206,107,0.5); }
+
+/* ─── UTIL ─── */
+.mt1 { margin-top: 0.5rem; }
+.mt2 { margin-top: 1rem; }
+.mt3 { margin-top: 1.5rem; }
+.mt4 { margin-top: 2rem; }
+.flex { display: flex; }
+.gap1 { gap: 0.5rem; }
+.gap2 { gap: 1rem; }
+.wrap { flex-wrap: wrap; }
+/* ─── TOGGLE SWITCH ─── */
+.toggle-switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: rgba(10,6,30,0.8); border: 1px solid rgba(35,206,107,0.3); border-radius: 11px;
+  transition: 0.25s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute; height: 14px; width: 14px;
+  left: 3px; bottom: 3px; background: var(--text-muted); border-radius: 50%; transition: 0.25s;
+}
+.toggle-switch input:checked + .toggle-slider { background: rgba(35,206,107,0.15); border-color: var(--accent-gold); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--accent-gold2); }
+</style>
+</head>
+<body>
+
+<div id="page">
+
+<!-- BACK BANNER -->
+<div class="back-banner">
+  <a href="index.html">⟵ Hamster RPG Home</a>
+  <a href="session-scribe.html">Session Scribe</a>
+  <a href="realm-forge.html">Realm Forge</a>
+  <a href="ascii-dungeon.html">ASCII Dungeon</a>
+  <a href="hex-crawl-generator.html" class="bc-current">Hex Crawl</a>
+  <a href="daggerheart-character-forge.html">Daggerheart</a>
+  <a href="dnd5e-character-forge.html">D&amp;D 5e</a>
+  <a href="pf2e-character-forge.html">PF2e</a>
+  <a href="icrpg-character-forge.html">ICRPG</a>
+  <a href="swade-character-forge.html">SWADE</a>
+</div>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-title">Hex Crawl Generator</div>
+  <div class="header-divider"></div>
+  <div class="header-subtitle">Biome Adjacency &amp; Percentile Roller &nbsp;·&nbsp; Studio 347</div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="nav-tabs">
+  <button class="nav-tab active" data-tab="roller">⚄ Roller</button>
+  <button class="nav-tab" data-tab="lookup">📋 Lookup Tables</button>
+  <button class="nav-tab" data-tab="docs">📖 Documentation</button>
+</nav>
+
+<!-- ════════════════════════════════════════
+     TAB: ROLLER
+════════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-roller">
+<div class="container">
+
+  <div class="controls-bar">
+    <div class="control-group">
+      <label>Rain Shadow</label>
+      <select id="roller-shadow">
+        <option value="none">Off</option>
+        <option value="leeward">Leeward — drier</option>
+        <option value="windward">Windward — wetter</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label style="margin:0;">Auto-Advance</label>
+      <label class="toggle-switch" title="Automatically set Current Biome to the last result after each roll">
+        <input type="checkbox" id="autoAdvanceToggle">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="control-group" style="margin-left:auto;">
+      <button class="roll-btn btn-sm-util" id="clearHistBtn">↺ Clear History</button>
+    </div>
+  </div>
+
+  <div class="roller-grid">
+    <!-- LEFT: biome selector + roll -->
+    <div>
+      <div class="roller-label">Current Biome</div>
+      <div class="biome-select-grid" id="biomeBtns"></div>
+      <button class="roll-btn" id="rollBtn" disabled>⚄ &nbsp; Roll d100</button>
+
+      <div class="roller-label" style="margin-top:1rem;">Roll History</div>
+      <ul class="history-list" id="historyList">
+        <li style="color:var(--text3);font-style:italic;justify-content:center;">No rolls yet.</li>
+      </ul>
+    </div>
+
+    <!-- RIGHT: result -->
+    <div>
+      <div class="roller-label">Result</div>
+      <div class="result-box" id="resultBox">
+        <div class="result-empty">Select a biome, then roll.</div>
+      </div>
+
+      <div class="roller-label" style="margin-top:1.25rem;">What This Means</div>
+      <div class="result-box" id="contextBox" style="min-height:80px;">
+        <div class="result-empty">—</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB: LOOKUP
+════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-lookup">
+<div class="container">
+
+  <div class="controls-bar">
+    <div class="control-group">
+      <label>Rain Shadow</label>
+      <select id="lookup-shadow">
+        <option value="none">Off</option>
+        <option value="leeward">Leeward — drier</option>
+        <option value="windward">Windward — wetter</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>Filter</label>
+      <select id="lookup-filter">
+        <option value="all">All Biomes</option>
+        <option value="elevation">Elevation</option>
+        <option value="forest">Forest</option>
+        <option value="arid">Arid</option>
+        <option value="transitional">Transitional</option>
+        <option value="water">Water</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="flex gap1 wrap" style="margin-bottom:1.25rem;">
+    <span class="cluster-badge" style="color:#9d94f7;border-color:#3d3580;"><span class="cluster-pip" style="background:#7c6af7;"></span>Elevation</span>
+    <span class="cluster-badge" style="color:#6ec89a;border-color:#1e5c3a;"><span class="cluster-pip" style="background:#4caf7c;"></span>Forest</span>
+    <span class="cluster-badge" style="color:#e8a055;border-color:#5a3010;"><span class="cluster-pip" style="background:#c97c3a;"></span>Arid</span>
+    <span class="cluster-badge" style="color:#6aafd4;border-color:#1e3e52;"><span class="cluster-pip" style="background:#4c8caf;"></span>Transitional</span>
+    <span class="cluster-badge" style="color:#5599cc;border-color:#1a2e45;"><span class="cluster-pip" style="background:#3366aa;"></span>Water</span>
+  </div>
+
+  <div class="biome-grid" id="lookupGrid"></div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB: DOCS
+════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-docs">
+<div class="container">
+
+  <div class="doc-section">
+    <div class="section-title">Overview</div>
+    <p class="prose">
+      This tool generates biome transitions for hex-crawl tabletop campaigns. It is inspired by
+      <a href="https://thenerdd.com/2021/06/14/my-dd-hex-crawl-generator-system/" target="_blank">The Nerdd's D&amp;D Hex Crawl Generator System</a>,
+      which uses a d10 table of five biomes (Plains, Hills, Mountains, Forest, Desert/Tundra).
+      That system was a great starting point, but the five biomes conflate different geographic axes —
+      terrain shape, climate, and vegetation — in ways that make some biomes hard to categorise.
+      <em>Desert/Tundra</em> in particular lumps two climatically opposite environments together
+      simply because both have sparse vegetation.
+    </p>
+    <p class="prose mt2">
+      This generator expands to <strong>14 biomes</strong> built on three clean axes:
+      terrain (Hills, Mountains, Plateau), climate (Desert, Tundra), and vegetation (Temperate Forest, Jungle, Boreal).
+      Water bodies large enough to occupy a full hex are treated as biomes in their own right.
+      Rivers belong on hex edges; bays, straights, and ponds are local features, not hex biomes.
+    </p>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-title">The 14 Biomes</div>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Biome</th>
+          <th>Cluster</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Grassland / Prairie</td><td><span class="cluster-badge" style="color:#9d94f7;border-color:#3d3580;">Elevation</span></td><td class="muted">Flat temperate plains. The default lowland biome.</td></tr>
+        <tr><td>Arid Grassland</td><td><span class="cluster-badge" style="color:#9d94f7;border-color:#3d3580;">Elevation</span></td><td class="muted">Steppe and savanna. Replaces the ambiguous Desert/Tundra catch-all for grass-covered arid zones. Steppes are cold/temperate; savannas are tropical.</td></tr>
+        <tr><td>Hills</td><td><span class="cluster-badge" style="color:#9d94f7;border-color:#3d3580;">Elevation</span></td><td class="muted">Rolling uplands. The transitional terrain between plains and mountains.</td></tr>
+        <tr><td>Mountains</td><td><span class="cluster-badge" style="color:#9d94f7;border-color:#3d3580;">Elevation</span></td><td class="muted">Dramatic elevation. Passes, peaks, and ranges. Very high inertia.</td></tr>
+        <tr><td>Plateau / Badlands</td><td><span class="cluster-badge" style="color:#9d94f7;border-color:#3d3580;">Elevation</span></td><td class="muted">Elevated flat or heavily eroded terrain. Colorado Plateau, Gobi plateau, canyon country.</td></tr>
+        <tr><td>Temperate Forest</td><td><span class="cluster-badge" style="color:#6ec89a;border-color:#1e5c3a;">Forest</span></td><td class="muted">Deciduous and mixed woodland. Four-season forest of the temperate zone.</td></tr>
+        <tr><td>Boreal / Taiga</td><td><span class="cluster-badge" style="color:#6ec89a;border-color:#1e5c3a;">Forest</span></td><td class="muted">Cold coniferous forest. Bridges temperate forest and arctic tundra. One of Earth's largest biomes.</td></tr>
+        <tr><td>Jungle / Rainforest</td><td><span class="cluster-badge" style="color:#6ec89a;border-color:#1e5c3a;">Forest</span></td><td class="muted">Tropical dense canopy. High humidity and rainfall. Includes flooded forest margins.</td></tr>
+        <tr><td>Desert</td><td><span class="cluster-badge" style="color:#e8a055;border-color:#5a3010;">Arid</span></td><td class="muted">Hot arid zone. Sparse or absent vegetation. Can border coastline (Namib, Atacama).</td></tr>
+        <tr><td>Tundra</td><td><span class="cluster-badge" style="color:#e8a055;border-color:#5a3010;">Arid</span></td><td class="muted">Cold arid zone with permafrost. Arctic and high-alpine. Grades into taiga at the treeline.</td></tr>
+        <tr><td>Wetlands</td><td><span class="cluster-badge" style="color:#6aafd4;border-color:#1e3e52;">Transitional</span></td><td class="muted">Swamps, marshes, bogs, fens. Water-saturated land. Naturally blurs into adjacent biomes.</td></tr>
+        <tr><td>Coast / Shore</td><td><span class="cluster-badge" style="color:#6aafd4;border-color:#1e3e52;">Transitional</span></td><td class="muted">Littoral zone. Sits between a land biome and Saltwater. Cliffs of Dover (→ Plains/Hills) and fjords (→ Mountains) both valid.</td></tr>
+        <tr><td>Freshwater</td><td><span class="cluster-badge" style="color:#5599cc;border-color:#1a2e45;">Water</span></td><td class="muted">A hex-scale body of non-saline water. Large lakes, inland seas, vast river deltas, floodplain lake systems.</td></tr>
+        <tr><td>Saltwater</td><td><span class="cluster-badge" style="color:#5599cc;border-color:#1a2e45;">Water</span></td><td class="muted">Open ocean, sea, or large saltwater bay. Very high inertia. Exit only through Coast/Shore.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-title">Hex Scale</div>
+    <p class="prose">
+      These tables are calibrated for <strong>3-mile hexes</strong> — one hex equals roughly one day of travel on foot at a cautious pace.
+      At this scale, real-world biomes are compressed: a "forest" spanning 10 hexes covers only about 30 miles,
+      far smaller than any real-world forest. This is intentional. A fantasy hex crawl benefits from variety and discovery,
+      not geological accuracy. The same→same inertia values (40–55% for most biomes) produce average biome runs of
+      2–5 hexes, or 6–15 miles, which keeps the terrain interesting without feeling random.
+    </p>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-title">Affinity Clusters</div>
+    <p class="prose">
+      Biomes are grouped into five clusters. Transitions within a cluster are more likely than transitions across clusters.
+      Cross-cluster transitions follow specific geographic rules — some are common (Boreal → Tundra, the treeline),
+      some are rare but valid (Desert → Saltwater, coastal deserts), and some are near-zero (Jungle → Tundra).
+    </p>
+
+    <div class="rule-block mt2">
+      <strong>Elevation</strong> biomes (Grassland, Arid Grassland, Hills, Mountains, Plateau) transition along elevation gradients.
+      Mountains most commonly descend into Hills, which descend into Grassland. Plateau sits beside Mountains and Arid zones.
+    </div>
+    <div class="rule-block">
+      <strong>Forest</strong> biomes transition along temperature and moisture gradients.
+      Temperate Forest ↔ Boreal is the altitude/latitude line; Temperate Forest ↔ Jungle is the tropical margin.
+      Forest biomes rarely transition directly to Arid without an intermediate Elevation or Transitional step.
+    </div>
+    <div class="rule-block">
+      <strong>Arid</strong> biomes (Desert, Tundra) connect readily to each other and to Arid Grassland and Plateau.
+      Desert can border Saltwater directly (Atacama, Namib). Tundra borders Freshwater frequently (glacial lakes).
+    </div>
+    <div class="rule-block">
+      <strong>Transitional</strong> biomes (Wetlands, Coast/Shore) are connectors. They have elevated cross-cluster probability in both directions.
+      Coast sits between any land biome and Saltwater. Wetlands blur into Forest, Jungle, and Freshwater.
+    </div>
+    <div class="rule-block">
+      <strong>Water</strong> biomes have very high inertia. Saltwater only exits to Coast/Shore.
+      Freshwater exits to Wetlands, and reflects the surrounding land biome (boreal lakes, tropical floodplains).
+    </div>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-title">Rain Shadow Modifier</div>
+    <p class="prose">
+      Mountain ranges create rain shadows: the windward side receives abundant rainfall and tends toward Forest,
+      while the leeward side is starved of moisture and tends toward Arid Grassland or Desert.
+    </p>
+    <p class="prose mt2">
+      When the modifier is active, the five Elevation cluster biome rows are rescaled:
+    </p>
+    <table class="ref-table mt2" style="max-width:480px;">
+      <thead><tr><th>Mode</th><th>Arid transitions</th><th>Forest transitions</th></tr></thead>
+      <tbody>
+        <tr><td>Leeward (drier)</td><td class="muted">×2 (doubled)</td><td class="muted">×0.5 (halved)</td></tr>
+        <tr><td>Windward (wetter)</td><td class="muted">×0.5 (halved)</td><td class="muted">×2 (doubled)</td></tr>
+      </tbody>
+    </table>
+    <p class="prose mt2">
+      After applying multipliers the row is renormalised to sum to 100. The same→same diagonal absorbs any rounding drift.
+      Apply the modifier only when crossing a Mountain or Highland hex in your world's prevailing wind direction,
+      not universally — that preserves geographic coherence.
+    </p>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-title">How to Roll</div>
+    <p class="prose">Roll percentile dice (d100 or two d10s read as tens/units, 00 = 100). Find your current biome's card in the Lookup Tables tab, then scan the roll ranges top to bottom until your result falls within one. That is your next hex's biome.</p>
+    <p class="prose mt2">If you roll the same biome twice in a row, lean into it — you are deep in continuous terrain. Consider adding a local feature (a river crossing, a ruined watchtower, an unusual rock formation) to break visual monotony without changing the biome.</p>
+    <p class="prose mt2">For hexes with <strong>two biomes</strong>, roll twice (rerolling true duplicates) and combine. Forested Hills, Desert Coast, Mountain Wetlands — the intersection is often more interesting than either alone.</p>
+  </div>
+
+  <div class="doc-section">
+    <div class="section-title">Attribution &amp; Inspiration</div>
+    <p class="prose">
+      Biome transition system designed for <strong>Hamster RPG</strong> by Studio 347.
+      Inspired by <a href="https://thenerdd.com/2021/06/14/my-dd-hex-crawl-generator-system/" target="_blank">My D&amp;D Hex Crawl Generator System</a>
+      by Sean Tasker at The Nerdd (2021). Biome taxonomy informed by real-world climate science and the
+      <em>Whittaker biome classification</em>. Probability values are designed for fantasy play, not ecological simulation.
+    </p>
+  </div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="divider">✦ &nbsp; ✦ &nbsp; ✦</div>
+  <div style="margin-top:0.5rem;">
+    <img src="https://crazitalk.github.io/hamster-rpg.github.io/ref/logo.png" alt="Studio 347" style="height:24px;opacity:0.5;vertical-align:middle;margin-right:8px;">
+    Studio 347 &nbsp;·&nbsp; Hex Crawl Generator &nbsp;·&nbsp; Inspired by <a href="https://thenerdd.com/2021/06/14/my-dd-hex-crawl-generator-system/" target="_blank" style="color:rgba(168,180,212,0.45);">The Nerdd</a>
+  </div>
+  <div style="margin-top:0.4rem;">Not affiliated with any trademarked tabletop properties.</div>
+</footer>
+
+</div><!-- #page -->
+
+<script>
+const BIOMES = [
+  { id:'grassland',   name:'Grassland',        cluster:'elevation'   },
+  { id:'arid_grass',  name:'Arid Grassland',   cluster:'elevation'   },
+  { id:'hills',       name:'Hills',            cluster:'elevation'   },
+  { id:'mountains',   name:'Mountains',        cluster:'elevation'   },
+  { id:'plateau',     name:'Plateau/Badlands', cluster:'elevation'   },
+  { id:'temp_forest', name:'Temp. Forest',     cluster:'forest'      },
+  { id:'boreal',      name:'Boreal/Taiga',     cluster:'forest'      },
+  { id:'jungle',      name:'Jungle',           cluster:'forest'      },
+  { id:'desert',      name:'Desert',           cluster:'arid'        },
+  { id:'tundra',      name:'Tundra',           cluster:'arid'        },
+  { id:'wetlands',    name:'Wetlands',         cluster:'transitional'},
+  { id:'coast',       name:'Coast/Shore',      cluster:'transitional'},
+  { id:'freshwater',  name:'Freshwater',       cluster:'water'       },
+  { id:'saltwater',   name:'Saltwater',        cluster:'water'       },
+];
+
+const CLUSTER_COLORS = {
+  elevation:   '#7c6af7',
+  forest:      '#4caf7c',
+  arid:        '#c97c3a',
+  transitional:'#4c8caf',
+  water:       '#3366aa',
+};
+
+const BASE = [
+  [42,8,14,3,4,10,3,2,3,1,5,1,3,1],   // Grassland
+  [8,40,10,4,8,3,2,1,12,4,2,1,4,1],   // Arid Grassland
+  [14,8,38,12,6,8,4,1,2,2,2,1,1,1],   // Hills
+  [4,4,18,55,7,1,4,0,3,2,0,2,0,0],    // Mountains
+  [5,9,8,8,38,2,2,1,9,5,2,1,1,0],     // Plateau/Badlands
+  [10,3,9,2,2,42,8,6,1,1,8,2,4,2],    // Temp Forest
+  [4,2,7,5,2,10,44,1,1,8,5,2,6,3],    // Boreal/Taiga
+  [3,1,3,1,1,8,1,50,2,0,12,4,8,6],    // Jungle
+  [3,12,4,3,9,1,1,1,48,5,2,2,4,5],    // Desert
+  [2,5,4,3,5,1,9,0,5,48,3,3,7,5],     // Tundra
+  [6,2,3,0,2,9,5,8,2,3,40,8,10,2],    // Wetlands
+  [2,1,2,2,1,3,3,3,2,3,8,38,4,28],    // Coast/Shore
+  [4,3,1,0,1,5,6,7,3,6,10,4,44,6],    // Freshwater
+  [1,1,0,0,0,2,2,4,3,3,2,28,4,50],    // Saltwater
+];
+
+const REASONS = {
+  'grassland-grassland':     'Vast temperate plains — strong inertia.',
+  'grassland-arid_grass':    'Plains grade into steppe at the arid margin.',
+  'grassland-hills':         'Classic elevation gradient; plains rise into rolling uplands.',
+  'grassland-temp_forest':   'Temperate forest and grassland meet along moisture gradients.',
+  'grassland-wetlands':      'Low-lying plains collect water into marshes and fens.',
+  'arid_grass-arid_grass':   'Steppes and savannas are wide — strong inertia.',
+  'arid_grass-desert':       'Arid grassland is the buffer zone before full desert.',
+  'arid_grass-hills':        'Semi-arid uplands are a natural transition.',
+  'arid_grass-plateau':      'Plateaus often share the same arid climate as steppe.',
+  'hills-hills':             'Hill country is extensive — strong inertia.',
+  'hills-mountains':         'Hills are frequently the foothills of a mountain range.',
+  'hills-grassland':         'Hills flatten into plains on their lower margins.',
+  'hills-temp_forest':       'Forested hills are very common in temperate zones.',
+  'mountains-mountains':     'Ranges are wide — very strong inertia.',
+  'mountains-hills':         'The most natural descent from a mountain range.',
+  'mountains-plateau':       'Eroded mountain edges become badlands or plateau.',
+  'mountains-boreal':        'Cold high-altitude slopes support taiga-like forest.',
+  'mountains-desert':        'Rain shadow effect — leeward side becomes arid.',
+  'mountains-coast':         'Fjords and sea cliffs — mountains meet the ocean directly.',
+  'mountains-arid_grass':    'Leeward foothill steppe, especially under rain shadow.',
+  'plateau-plateau':         'Plateaus are broad elevated features — good inertia.',
+  'plateau-desert':          'Arid plateaus grade into desert.',
+  'plateau-arid_grass':      'Semi-arid plateau edges support steppe vegetation.',
+  'plateau-mountains':       'Plateaus often border or grade into ranges.',
+  'temp_forest-temp_forest': 'Temperate forests are extensive — strong inertia.',
+  'temp_forest-grassland':   'Forest gives way to grassland along moisture or fire gradients.',
+  'temp_forest-boreal':      'Temperate forest grades into boreal as latitude rises.',
+  'temp_forest-jungle':      'Transitional zone between temperate and tropical forest.',
+  'temp_forest-wetlands':    'Forested wetlands and riparian woodland are common neighbours.',
+  'boreal-boreal':           'Taiga is one of Earth\'s largest biomes — very strong inertia.',
+  'boreal-tundra':           'The treeline — boreal grades directly into tundra.',
+  'boreal-temp_forest':      'Boreal transitions to temperate forest moving equatorward.',
+  'boreal-freshwater':       'Boreal zones have abundant lakes — glacial and bog.',
+  'jungle-jungle':           'Tropical rainforest is dense and continuous — strong inertia.',
+  'jungle-wetlands':         'Flooded forest and mangrove swamps — jungle and wetland blur.',
+  'jungle-temp_forest':      'Transitional montane or subtropical forest.',
+  'jungle-freshwater':       'Major tropical rivers and floodplain lake systems.',
+  'jungle-saltwater':        'Tropical coasts — mangroves and coral coasts.',
+  'desert-desert':           'Deserts are vast — strong inertia.',
+  'desert-arid_grass':       'Desert edge grades into scrub and steppe.',
+  'desert-plateau':          'Many deserts are plateau deserts (Tibetan, Atacama).',
+  'desert-freshwater':       'Oasis lakes — rare but meaningful in desert hexes.',
+  'desert-saltwater':        'Coastal deserts (Atacama, Namib) meet the ocean directly.',
+  'tundra-tundra':           'Arctic and alpine tundra is vast — strong inertia.',
+  'tundra-boreal':           'Tundra gives way to taiga at the treeline.',
+  'tundra-arid_grass':       'Cold steppe; interior continental tundra grades into grassland.',
+  'tundra-freshwater':       'Glacial lakes and permafrost ponds are characteristic.',
+  'tundra-saltwater':        'Arctic coastlines open onto polar sea.',
+  'wetlands-wetlands':       'Wetland complexes are extensive — moderate inertia.',
+  'wetlands-jungle':         'Tropical swamp and flooded forest are intertwined.',
+  'wetlands-freshwater':     'Wetlands grade into open lake — natural transition.',
+  'wetlands-coast':          'Estuaries and deltas — where wetlands meet the sea.',
+  'wetlands-temp_forest':    'Riparian woodland and swamp forest border each other.',
+  'coast-coast':             'Coastlines are linear — moderate inertia along the shore.',
+  'coast-saltwater':         'Coast edges directly onto open ocean.',
+  'coast-wetlands':          'Estuaries, mudflats, and mangroves along the coastal edge.',
+  'freshwater-freshwater':   'Large lake systems (Great Lakes scale) span many hexes.',
+  'freshwater-wetlands':     'Freshwater edges into marsh and fen.',
+  'freshwater-boreal':       'Boreal lakes are ubiquitous in taiga zones.',
+  'freshwater-jungle':       'Tropical river systems and floodplain lakes.',
+  'saltwater-saltwater':     'Ocean is the dominant water body — strong inertia.',
+  'saltwater-coast':         'The only exit from open ocean is the shore.',
+};
+
+function getReason(fromId, toId) {
+  return REASONS[fromId+'-'+toId] || REASONS[toId+'-'+fromId] || 'Trace probability — uncommon but geographically possible.';
+}
+
+function applyRainShadow(matrix, mode) {
+  if (mode === 'none') return matrix.map(r => [...r]);
+  const result = matrix.map(r => [...r]);
+  const elevIdx = [0,1,2,3,4];
+  const aridIdx = [8,9,1];
+  const forestIdx = [5,6,7];
+  const am = mode === 'leeward' ? 2.0 : 0.5;
+  const fm = mode === 'leeward' ? 0.5 : 2.0;
+  elevIdx.forEach(i => {
+    let row = [...result[i]];
+    aridIdx.forEach(j => { row[j] = Math.round(row[j] * am); });
+    forestIdx.forEach(j => { row[j] = Math.round(row[j] * fm); });
+    const sum = row.reduce((a,b) => a+b, 0);
+    row = row.map(v => Math.round(v * 100 / sum));
+    const diff = 100 - row.reduce((a,b) => a+b, 0);
+    row[i] += diff;
+    result[i] = row;
+  });
+  return result;
+}
+
+function toRanges(probs) {
+  const ranges = [];
+  let cur = 1;
+  probs.forEach(p => {
+    if (p === 0) { ranges.push(null); return; }
+    const end = cur + p - 1;
+    ranges.push([cur, end]);
+    cur = end + 1;
+  });
+  return ranges;
+}
+
+function fmtRange(r) {
+  if (!r) return null;
+  const lo = String(r[0]).padStart(2,'0');
+  const hi = String(r[1]).padStart(2,'0');
+  return r[0] === r[1] ? lo : lo + '–' + hi;
+}
+
+// ── LOOKUP GRID ──────────────────────────────
+function buildLookup() {
+  const shadow = document.getElementById('lookup-shadow').value;
+  const filter = document.getElementById('lookup-filter').value;
+  const mat = applyRainShadow(BASE, shadow);
+  const grid = document.getElementById('lookupGrid');
+  grid.innerHTML = '';
+
+  BIOMES.forEach((from, i) => {
+    if (filter !== 'all' && from.cluster !== filter) return;
+    const ranges = toRanges(mat[i]);
+    const color = CLUSTER_COLORS[from.cluster];
+
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'card-header';
+    hdr.innerHTML = `<span class="cluster-pip" style="background:${color};"></span>
+      <span class="title" style="color:${color};">${from.name}</span>
+      <span class="badge">d100</span>`;
+    card.appendChild(hdr);
+
+    const tbl = document.createElement('table');
+    tbl.className = 'lookup-table';
+    tbl.innerHTML = `<thead><tr>
+      <th style="width:72px;">Roll</th>
+      <th>Result</th>
+      <th class="right" style="width:36px;">%</th>
+    </tr></thead>`;
+
+    const tbody = document.createElement('tbody');
+    BIOMES.forEach((to, j) => {
+      const r = ranges[j];
+      if (!r) return;
+      const isDiag = i === j;
+      const tc = CLUSTER_COLORS[to.cluster];
+      const tr = document.createElement('tr');
+      if (isDiag) tr.className = 'diag-row';
+      tr.innerHTML = `<td class="range-cell">${fmtRange(r)}</td>
+        <td class="dest-cell">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${tc};margin-right:5px;vertical-align:middle;"></span>
+          ${to.name}${isDiag ? ' <em style="font-size:10px;color:var(--text3);">(same)</em>' : ''}
+        </td>
+        <td class="pct-cell">${mat[i][j]}</td>`;
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    card.appendChild(tbl);
+    grid.appendChild(card);
+  });
+}
+
+// ── ROLLER ───────────────────────────────────
+let selectedBiome = null;
+const rollHistory = [];
+
+function buildBiomeButtons() {
+  const container = document.getElementById('biomeBtns');
+  container.innerHTML = '';
+  BIOMES.forEach((b, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'biome-btn';
+    btn.dataset.idx = i;
+    btn.innerHTML = `<span class="pip" style="background:${CLUSTER_COLORS[b.cluster]};"></span>${b.name}`;
+    btn.addEventListener('click', () => selectBiome(i));
+    container.appendChild(btn);
+  });
+}
+
+function selectBiome(idx) {
+  selectedBiome = idx;
+  document.querySelectorAll('.biome-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('rollBtn').disabled = false;
+  document.getElementById('resultBox').innerHTML = `<div class="result-empty">Press Roll d100 to generate next hex.</div>`;
+  document.getElementById('contextBox').innerHTML = `<div class="result-empty">—</div>`;
+}
+
+function doRoll() {
+  if (selectedBiome === null) return;
+  const shadow = document.getElementById('roller-shadow').value;
+  const mat = applyRainShadow(BASE, shadow);
+  const roll = Math.floor(Math.random() * 100) + 1;
+  const probs = mat[selectedBiome];
+  const ranges = toRanges(probs);
+
+  let resultIdx = -1;
+  let cumulative = 0;
+  for (let j = 0; j < probs.length; j++) {
+    cumulative += probs[j];
+    if (roll <= cumulative) { resultIdx = j; break; }
+  }
+  if (resultIdx < 0) resultIdx = selectedBiome;
+
+  const fromB = BIOMES[selectedBiome];
+  const toB = BIOMES[resultIdx];
+  const isSame = resultIdx === selectedBiome;
+  const color = CLUSTER_COLORS[toB.cluster];
+  const r = ranges[resultIdx];
+  const reason = getReason(fromB.id, toB.id);
+
+  // Result box
+  document.getElementById('resultBox').innerHTML = `
+    <span class="result-roll-num">${String(roll).padStart(2,'0')}</span>
+    <div class="result-biome" style="color:${color};">
+      ${toB.name}${isSame ? '<span class="result-same">Same</span>' : ''}
+    </div>
+    <div class="result-range">Range ${fmtRange(r)} &nbsp;·&nbsp; ${probs[resultIdx]}% probability</div>
+  `;
+
+  // Context box
+  document.getElementById('contextBox').innerHTML = `<div class="result-note">${reason}</div>`;
+
+  // History
+  rollHistory.unshift({ roll, from: fromB.name, to: toB.name, same: isSame });
+  if (rollHistory.length > 20) rollHistory.pop();
+  renderHistory();
+
+  // Auto-advance: silently shift selected biome to the result
+  if (document.getElementById('autoAdvanceToggle').checked) {
+    selectedBiome = resultIdx;
+    document.querySelectorAll('.biome-btn').forEach((btn, i) => {
+      btn.classList.toggle('selected', i === resultIdx);
+    });
+  }
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (rollHistory.length === 0) {
+    list.innerHTML = '<li style="color:var(--text3);font-style:italic;justify-content:center;">No rolls yet.</li>';
+    return;
+  }
+  list.innerHTML = rollHistory.map(h => `
+    <li>
+      <span class="hist-roll">${String(h.roll).padStart(2,'0')}</span>
+      <span class="hist-from">${h.from}</span>
+      <span class="hist-arrow">→</span>
+      <span class="hist-to">${h.to}</span>
+      ${h.same ? '<span class="hist-same">same</span>' : ''}
+    </li>`).join('');
+}
+
+// ── TABS ─────────────────────────────────────
+document.querySelectorAll('.nav-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+document.getElementById('lookup-shadow').addEventListener('change', buildLookup);
+document.getElementById('lookup-filter').addEventListener('change', buildLookup);
+document.getElementById('roller-shadow').addEventListener('change', () => {});
+document.getElementById('rollBtn').addEventListener('click', doRoll);
+document.getElementById('clearHistBtn').addEventListener('click', () => {
+  rollHistory.length = 0;
+  renderHistory();
+});
+
+buildBiomeButtons();
+buildLookup();
+</script>
+
+</body>
+</html>

@@ -611,6 +611,85 @@
 
   .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
+  /* ── HERO STATS ROW ── */
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
+    margin-top: 32px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(35,206,107,0.12);
+    flex-wrap: wrap;
+  }
+
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .hero-stat-value {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--accent-gold2);
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(35,206,107,0.35);
+  }
+
+  .hero-stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .hero-stat-divider {
+    font-size: 0.55rem;
+    color: rgba(35,206,107,0.2);
+    letter-spacing: 0;
+    user-select: none;
+  }
+
+  /* ── HERO SESSION PILL ── */
+  .hero-session {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 8px 20px;
+    background: rgba(11,83,81,0.12);
+    border: 1px solid rgba(11,83,81,0.35);
+    border-radius: 100px;
+  }
+
+  .hero-session-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-teal);
+  }
+
+  .hero-session-label::after {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 10px;
+    background: rgba(11,83,81,0.5);
+    margin-left: 12px;
+    vertical-align: middle;
+  }
+
+  .hero-session-date {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    font-style: italic;
+    color: var(--text-primary);
+  }
+
   /* ─────────────────── FOOTER ─────────────────── */
   .app-footer {
     border-top: 1px solid rgba(35,206,107,0.18);
@@ -753,21 +832,43 @@
 
     <!-- HERO -->
     <section class="hero" aria-labelledby="hero-heading">
-      <p class="hero-eyebrow">✦ Welcome, Adventurer ✦</p>
+      <p class="hero-eyebrow">✦ &nbsp; Studio 347 &nbsp; ✦</p>
+
       <h2 class="hero-headline" id="hero-heading">
         Your <span>forge</span> for every<br>tabletop session
       </h2>
+
       <p class="hero-body">
-        Free, browser-based tools built to help you create characters, track resources,
-        and roll dice — no login, no install, just play.
+        Free, browser-based tools built for character creation, world-building,
+        and resource tracking — no login, no install, just play.
       </p>
+
       <div class="hero-cta-row">
-        <a href="daggerheart-character-forge.html" class="btn btn-primary">Open Character Forge</a>
+        <a href="daggerheart-character-forge.html" class="btn btn-primary">Open Daggerheart Character Forge</a>
         <a href="#tools" class="btn btn-teal">Browse All Tools</a>
       </div>
-      <p class="hero-body">
-        Next session planned for <strong>Friday, April 24th</strong>.
-      </p>
+
+      <div class="hero-stats" role="presentation">
+        <div class="hero-stat">
+          <span class="hero-stat-value">8</span>
+          <span class="hero-stat-label">Tools</span>
+        </div>
+        <div class="hero-stat-divider" aria-hidden="true">✦</div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">5</span>
+          <span class="hero-stat-label">Systems</span>
+        </div>
+        <div class="hero-stat-divider" aria-hidden="true">✦</div>
+        <div class="hero-stat">
+          <span class="hero-stat-value">0</span>
+          <span class="hero-stat-label">Installs Required</span>
+        </div>
+      </div>
+
+      <div class="hero-session" aria-label="Next session">
+        <span class="hero-session-label">Next Session</span>
+        <span class="hero-session-date">Friday, April 24th</span>
+      </div>
     </section>
 
     <!-- TOOLS SECTION -->
@@ -868,6 +969,17 @@
             Medieval demography generator.
           </div>
           <div class="tool-link-row" style="opacity:0.5;">Open Tool</div>
+        </a>
+
+        <!-- Hex Crawl Generator -->
+        <a href="hex-crawl-generator.html" class="tool-card">
+          <div class="tool-icon">🌐</div>
+          <span class="tool-badge badge-muted">Game Mastery</span>
+          <div class="tool-name">Hex Crawl Generator</div>
+          <div class="tool-desc">
+            Biome adjacency tables and percentile roller for hex crawl tabletop campaigns.
+          </div>
+          <div class="tool-link-row">Open Tool</div>
         </a>
 
         <!-- Placeholder: Dice Vault -->
