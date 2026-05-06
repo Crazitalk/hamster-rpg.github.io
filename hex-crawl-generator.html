@@ -413,7 +413,7 @@ select option { background: #140a3a; color: var(--text-primary); }
 
 .prose {
   font-family: 'Crimson Pro', serif; font-size: 1.05rem;
-  color: var(--text-muted); line-height: 1.8; max-width: 128ch;
+  color: var(--text-muted); line-height: 1.8; max-width: 72ch;
 }
 .prose + .prose { margin-top: 1rem; }
 .prose a { color: var(--accent-gold2); text-decoration: none; }
@@ -497,6 +497,109 @@ footer .divider { color: rgba(35,206,107,0.2); font-size: 14px; margin: 0.5rem 0
 }
 .toggle-switch input:checked + .toggle-slider { background: rgba(35,206,107,0.15); border-color: var(--accent-gold); }
 .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--accent-gold2); }
+/* ─── HEX MAP TAB ─── */
+.map-controls-bar {
+  background: linear-gradient(160deg, rgba(15,8,75,0.9) 0%, rgba(13,2,33,0.95) 100%);
+  border: 1px solid rgba(35,206,107,0.18); border-radius: var(--radius);
+  padding: 14px 20px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  margin-bottom: 16px; position: relative; overflow: hidden;
+}
+.map-controls-bar::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(to right, transparent, rgba(35,206,107,0.5), rgba(11,83,81,0.45), transparent);
+  pointer-events: none;
+}
+.map-seed-select {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.map-seed-select label {
+  font-family: 'Cinzel', serif; font-size: 0.64rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
+}
+.map-size-inputs { display: flex; align-items: center; gap: 6px; }
+.map-size-inputs input[type=number] {
+  background: rgba(10,6,30,0.8); border: 1px solid rgba(35,206,107,0.2);
+  border-radius: 4px; color: var(--text-primary); font-family: 'Crimson Pro', serif;
+  font-size: 1rem; padding: 5px 8px; width: 58px; outline: none;
+  transition: var(--transition); text-align: center;
+}
+.map-size-inputs input[type=number]:focus { border-color: var(--accent-gold); box-shadow: 0 0 0 2px rgba(35,206,107,0.12); }
+.map-size-inputs span { color: var(--text-muted); font-size: 0.85rem; }
+.map-btn {
+  font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.14em;
+  text-transform: uppercase; font-weight: 700; border-radius: 4px;
+  cursor: pointer; padding: 9px 20px; border: 1.5px solid; transition: var(--transition);
+}
+.map-btn-primary {
+  background: linear-gradient(135deg, #18a858 0%, #23ce6b 50%, #15903e 100%);
+  color: #0d0221; border-color: #23ce6b;
+  box-shadow: 0 2px 16px rgba(35,206,107,0.35);
+}
+.map-btn-primary:hover { background: linear-gradient(135deg, #23ce6b 0%, #39e87e 50%, #1eb55e 100%); box-shadow: 0 4px 24px rgba(35,206,107,0.5); }
+.map-btn-secondary {
+  background: transparent; color: var(--text-muted);
+  border-color: rgba(35,206,107,0.25);
+}
+.map-btn-secondary:hover { border-color: rgba(35,206,107,0.5); color: var(--text-primary); }
+.map-btn:active { transform: scale(0.97); }
+.map-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+.map-legend {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; align-items: center;
+}
+.map-legend-label {
+  font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.18em;
+  text-transform: uppercase; color: var(--text-muted); margin-right: 4px;
+}
+.map-legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-muted);
+  background: rgba(10,6,30,0.6); border: 1px solid rgba(35,206,107,0.12);
+  border-radius: 4px; padding: 3px 8px;
+}
+.map-legend-swatch {
+  width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+}
+
+.map-canvas-wrap {
+  background: rgba(8,4,24,0.85); border: 1px solid rgba(35,206,107,0.2);
+  border-radius: var(--radius); overflow: auto; position: relative;
+  max-height: 72vh; cursor: default;
+}
+#hexMapCanvas {
+  display: block;
+}
+.map-tooltip {
+  position: fixed; pointer-events: none; z-index: 200;
+  background: rgba(13,7,40,0.97); border: 1px solid rgba(35,206,107,0.4);
+  border-radius: 6px; padding: 8px 12px; min-width: 140px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.1s;
+}
+.map-tooltip.visible { opacity: 1; }
+.map-tt-coord {
+  font-family: 'Courier New', monospace; font-size: 0.68rem;
+  color: rgba(168,180,212,0.5); margin-bottom: 3px;
+}
+.map-tt-biome {
+  font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.map-tt-cluster {
+  font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-muted); margin-top: 2px;
+}
+.map-status {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 10px; padding: 6px 12px;
+  background: rgba(8,4,24,0.6); border: 1px solid rgba(35,206,107,0.1);
+  border-radius: 4px;
+}
+.map-status-text {
+  font-family: 'Cinzel', serif; font-size: 0.58rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(168,180,212,0.4);
+}
+.map-status-text span { color: var(--accent-gold2); }
 </style>
 </head>
 <body>
@@ -505,16 +608,16 @@ footer .divider { color: rgba(35,206,107,0.2); font-size: 14px; margin: 0.5rem 0
 
 <!-- BACK BANNER -->
 <div class="back-banner">
-  <a href="index.html">⟵ Hamster RPG Home</a>
-  <a href="session-scribe.html">Session Scribe</a>
-  <a href="realm-forge.html">Realm Forge</a>
-  <a href="ascii-dungeon.html">ASCII Dungeon</a>
-  <a href="hex-crawl-generator.html" class="bc-current">Hex Crawl</a>
-  <a href="daggerheart-character-forge.html">Daggerheart</a>
-  <a href="dnd5e-character-forge.html">D&amp;D 5e</a>
-  <a href="pf2e-character-forge.html">PF2e</a>
-  <a href="icrpg-character-forge.html">ICRPG</a>
-  <a href="swade-character-forge.html">SWADE</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/index.html">⟵ Hamster RPG Home</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/session-scribe.html">Session Scribe</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/realm-forge.html">Realm Forge</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/ascii-dungeon.html">ASCII Dungeon</a>
+  <a href="#" class="bc-current">Hex Crawl</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/daggerheart-character-forge.html">Daggerheart</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/dnd5e-character-forge.html">D&amp;D 5e</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/pf2e-character-forge.html">PF2e</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/icrpg-character-forge.html">ICRPG</a>
+  <a href="https://crazitalk.github.io/hamster-rpg.github.io/swade-character-forge.html">SWADE</a>
 </div>
 
 <!-- HEADER -->
@@ -527,6 +630,7 @@ footer .divider { color: rgba(35,206,107,0.2); font-size: 14px; margin: 0.5rem 0
 <!-- TAB NAV -->
 <nav class="nav-tabs">
   <button class="nav-tab active" data-tab="roller">⚄ Roller</button>
+  <button class="nav-tab" data-tab="map">🌐 Hex Map</button>
   <button class="nav-tab" data-tab="lookup">📋 Lookup Tables</button>
   <button class="nav-tab" data-tab="docs">📖 Documentation</button>
 </nav>
@@ -583,6 +687,72 @@ footer .divider { color: rgba(35,206,107,0.2); font-size: 14px; margin: 0.5rem 0
         <div class="result-empty">—</div>
       </div>
     </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TAB: HEX MAP
+════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-map">
+<div class="container">
+
+  <div class="map-controls-bar">
+    <div class="map-seed-select">
+      <label>Starting Biome</label>
+      <select id="map-seed-biome">
+        <option value="random">— Random —</option>
+      </select>
+    </div>
+    <div class="map-seed-select">
+      <label>Hex Scale</label>
+      <select id="map-scale">
+        <option value="1">1 mile — Local detail</option>
+        <option value="3">3 miles — Neighbourhood</option>
+        <option value="10">10 miles — Regional</option>
+        <option value="24" selected>24 miles — Kingdom</option>
+        <option value="100">100 miles — Continental</option>
+      </select>
+    </div>
+    <div class="map-seed-select">
+      <label>Rain Shadow</label>
+      <select id="map-shadow">
+        <option value="none">Off</option>
+        <option value="leeward">Leeward — drier</option>
+        <option value="windward">Windward — wetter</option>
+      </select>
+    </div>
+    <div class="map-seed-select">
+      <label>Size</label>
+      <div class="map-size-inputs">
+        <input type="number" id="map-cols" value="15" min="4" max="30">
+        <span>×</span>
+        <input type="number" id="map-rows" value="15" min="4" max="30">
+      </div>
+    </div>
+    <button class="map-btn map-btn-primary" id="mapGenerateBtn">⚄ Generate Map</button>
+    <button class="map-btn map-btn-secondary" id="mapDownloadBtn" disabled>↓ Download PNG</button>
+  </div>
+
+  <div class="map-legend" id="mapLegend">
+    <span class="map-legend-label">Biomes</span>
+  </div>
+
+  <div class="map-canvas-wrap" id="mapCanvasWrap">
+    <canvas id="hexMapCanvas"></canvas>
+  </div>
+
+  <div class="map-status" id="mapStatus">
+    <span class="map-status-text" id="mapStatusText">No map generated yet.</span>
+    <span class="map-status-text" id="mapScaleText"></span>
+    <span class="map-status-text" id="mapCellCount"></span>
+  </div>
+
+  <div class="map-tooltip" id="mapTooltip">
+    <div class="map-tt-coord" id="ttCoord"></div>
+    <div class="map-tt-biome" id="ttBiome"></div>
+    <div class="map-tt-cluster" id="ttCluster"></div>
   </div>
 
 </div>
@@ -686,21 +856,12 @@ footer .divider { color: rgba(35,206,107,0.2); font-size: 14px; margin: 0.5rem 0
   <div class="doc-section">
     <div class="section-title">Hex Scale</div>
     <p class="prose">
-      To say these tables are calibrated for <strong>3-league hexes</strong> — one hex equals roughly one day of travel on foot at a cautious pace, is a bit misleading. My initial
-      design target was 3-mile hexes, but playtesting revealed that the same→same inertia values produced biome runs that were too short for my taste — a forest would only last a
-      hex or two before giving way to a different biome, which felt too random and fragmented. Tripling the hex size to 3 leagues (about 9 miles) fixed that, at least as far as design
-      goes, creating more satisfying runs of continuous terrain while still allowing for regular transitions and variety.
+      These tables are calibrated for <strong>3-mile hexes</strong> — one hex equals roughly one day of travel on foot at a cautious pace.
+      At this scale, real-world biomes are compressed: a "forest" spanning 10 hexes covers only about 30 miles,
+      far smaller than any real-world forest. This is intentional. A fantasy hex crawl benefits from variety and discovery,
+      not geological accuracy. The same→same inertia values (40–55% for most biomes) produce average biome runs of
+      2–5 hexes, or 6–15 miles, which keeps the terrain interesting without feeling random.
     </p>
-    <p class="prose">
-      The image below shows how I choose to apply biomes. Generally, for the crawl itself I'll have 1 hex be 1 league or 3 miles. When designing the world map, I'll use 7 1-league 
-      hexes to lay down broad biome regions, if I'm looking for something more drastic I'll do 49 or 133 hexes in the configurations shown to address larger areas at once, but mostly I just
-      stick with the 7.
-    </p>
-    <p class="prose">
-      A fantasy hex crawl benefits from variety and discovery, not geological accuracy. The same→same inertia values (40–55% for most biomes) produce average biome runs of
-      2–5 runs, depending on the design pattern you go with that could be as little as 6 miles or as many as 225 miles, which keeps the terrain interesting without feeling random.
-    </p>
-    <img src="img/Hex-Range.png" alt="Hex Range" style="margin-top:1rem;max-width:100%;border:1px solid rgba(35,206,107,0.15);border-radius:4px;">
   </div>
 
   <div class="doc-section">
@@ -831,6 +992,101 @@ const BASE = [
   [4,3,1,0,1,5,6,7,3,6,10,4,44,6],    // Freshwater
   [1,1,0,0,0,2,2,4,3,3,2,28,4,50],    // Saltwater
 ];
+
+
+/* SCALE SYSTEM — inserted between BASE and REASONS */
+
+const IDX = {
+  grassland:0, arid_grass:1, hills:2, mountains:3, plateau:4,
+  temp_forest:5, boreal:6, jungle:7, desert:8, tundra:9,
+  wetlands:10, coast:11, freshwater:12, saltwater:13
+};
+
+const SCALE_CONFIG = {
+  1: {
+    diagMult: 0.55,
+    biomeDiagOverride: { 11:1.8, 12:1.5, 13:1.6, 10:1.4 },
+    suppress: [
+      { from:11, to:[3,4,8,9,6,7], factor:0.05 },
+      { from:0,  to:[13], factor:0.1 },
+      { from:1,  to:[13], factor:0.1 },
+    ],
+    label: '1 mi',
+    note: 'Rapid change. Coastlines persist deep; inland biomes vary quickly.'
+  },
+  3: {
+    diagMult: 0.75,
+    biomeDiagOverride: { 11:1.4, 12:1.2, 13:1.4, 10:1.2 },
+    suppress: [
+      { from:11, to:[3,4,8,9], factor:0.1 },
+      { from:0,  to:[13], factor:0.15 },
+    ],
+    label: '3 mi',
+    note: 'Coast 1-2 hexes deep. Inland biomes shift moderately.'
+  },
+  10: {
+    diagMult: 0.90,
+    biomeDiagOverride: { 11:1.1, 12:1.05 },
+    suppress: [
+      { from:11, to:[3,4], factor:0.2 },
+    ],
+    label: '10 mi',
+    note: 'Coast roughly 1 hex deep. Large biomes begin dominating.'
+  },
+  24: {
+    diagMult: 1.00,
+    biomeDiagOverride: {},
+    suppress: [],
+    label: '24 mi',
+    note: 'Baseline matrix. Coast is a thin edge; major biomes span multiple hexes.'
+  },
+  100: {
+    diagMult: 1.40,
+    biomeDiagOverride: { 11:0.4, 12:0.7, 10:0.6 },
+    suppress: [
+      { from:0,  to:[11], factor:0.05 },
+      { from:1,  to:[11], factor:0.05 },
+      { from:2,  to:[11], factor:0.05 },
+      { from:3,  to:[11], factor:0.05 },
+      { from:4,  to:[11], factor:0.05 },
+      { from:5,  to:[11], factor:0.05 },
+      { from:6,  to:[11], factor:0.05 },
+      { from:7,  to:[11], factor:0.1  },
+      { from:8,  to:[11], factor:0.05 },
+      { from:9,  to:[11], factor:0.08 },
+      { from:10, to:[11], factor:0.1  },
+      { from:0,  to:[12], factor:0.3  },
+      { from:1,  to:[12], factor:0.3  },
+      { from:4,  to:[12], factor:0.3  },
+    ],
+    label: '100 mi',
+    note: 'Continental blocks. Coastline rarely occupies its own hex.'
+  }
+};
+
+function applyScale(matrix, scaleMiles) {
+  const cfg = SCALE_CONFIG[scaleMiles] || SCALE_CONFIG[24];
+  const n = matrix.length;
+  const result = matrix.map(r => [...r]);
+  for (let i = 0; i < n; i++) {
+    const ov = cfg.biomeDiagOverride[i];
+    const mult = ov !== undefined ? cfg.diagMult * ov : cfg.diagMult;
+    result[i][i] = Math.max(1, Math.round(result[i][i] * mult));
+  }
+  cfg.suppress.forEach(({ from, to, factor }) => {
+    to.forEach(j => { result[from][j] = Math.max(0, Math.round(result[from][j] * factor)); });
+  });
+  for (let i = 0; i < n; i++) {
+    const sum = result[i].reduce((a,b) => a+b, 0);
+    if (!sum) continue;
+    let row = result[i].map(v => Math.round(v * 100 / sum));
+    const diff = 100 - row.reduce((a,b) => a+b, 0);
+    row[i] = Math.max(0, row[i] + diff);
+    result[i] = row;
+  }
+  return result;
+}
+
 
 const REASONS = {
   'grassland-grassland':     'Vast temperate plains — strong inertia.',
@@ -1085,6 +1341,355 @@ function renderHistory() {
       ${h.same ? '<span class="hist-same">same</span>' : ''}
     </li>`).join('');
 }
+
+// ── HEX MAP ──────────────────────────────────
+
+/* Flat-top hex geometry, horizontal layout (pointy-top rows stagger offset)
+   We use "offset coordinates" with even rows offset right by half a hex width.
+   Neighbor offsets for a pointy-top hex grid (odd-row offset):
+     col  row  direction
+     Even rows:  [+1,0],[−1,0],[0,−1],[+1,−1],[0,+1],[+1,+1]  -- but we normalise below
+*/
+
+const HEX_SIZE = 28; // circumradius in px
+
+// Pointy-top hex: width = sqrt(3)*r, height = 2*r
+// Horizontal hex grid means rows are offset
+const HEX_W = Math.round(Math.sqrt(3) * HEX_SIZE);
+const HEX_H = HEX_SIZE * 2;
+
+// Biome fill colours — richer palette for the canvas
+const BIOME_FILL = {
+  grassland:   '#3a6b2a',
+  arid_grass:  '#8a7a3a',
+  hills:       '#6b5a3a',
+  mountains:   '#7a7a8a',
+  plateau:     '#9a7a5a',
+  temp_forest: '#2a5a3a',
+  boreal:      '#2a4a3a',
+  jungle:      '#1a5a2a',
+  desert:      '#c8a84a',
+  tundra:      '#9aaabb',
+  wetlands:    '#4a6a5a',
+  coast:       '#4a8aaa',
+  freshwater:  '#2a6aaa',
+  saltwater:   '#1a3a7a',
+};
+
+const BIOME_STROKE = {
+  grassland:   '#4a8a38',
+  arid_grass:  '#aa9a50',
+  hills:       '#8a7a50',
+  mountains:   '#9a9aaa',
+  plateau:     '#ba9a70',
+  temp_forest: '#3a7a50',
+  boreal:      '#3a6a50',
+  jungle:      '#2a7a3a',
+  desert:      '#e8c858',
+  tundra:      '#baccdd',
+  wetlands:    '#5a8a70',
+  coast:       '#5aaacc',
+  freshwater:  '#3a8acc',
+  saltwater:   '#2a5aaa',
+};
+
+// Biome symbol glyphs drawn on each hex
+const BIOME_GLYPH = {
+  grassland:   '≋',
+  arid_grass:  '∿',
+  hills:       '∧',
+  mountains:   '▲',
+  plateau:     '⌂',
+  temp_forest: '♣',
+  boreal:      '♠',
+  jungle:      '❧',
+  desert:      '◇',
+  tundra:      '∗',
+  wetlands:    '≈',
+  coast:       '〜',
+  freshwater:  '◉',
+  saltwater:   '◎',
+};
+
+// Current map state
+let mapGrid = [];   // mapGrid[row][col] = biomeIdx
+let mapCols = 15;
+let mapRows = 15;
+
+/* ── Hex neighbour offsets (pointy-top, odd-row-right offset) ──
+   For a given cell (col, row), the 6 neighbours are:
+*/
+function hexNeighbours(col, row, cols, rows) {
+  const isOdd = row % 2 === 1;
+  const offsets = isOdd
+    ? [ [1,0],[-1,0],[0,-1],[1,-1],[0,1],[1,1] ]
+    : [ [1,0],[-1,0],[0,-1],[-1,-1],[0,1],[-1,1] ];
+  return offsets
+    .map(([dc, dr]) => [col + dc, row + dr])
+    .filter(([c, r]) => c >= 0 && c < cols && r >= 0 && r < rows);
+}
+
+/* ── Compute neighbour-weighted probabilities ──
+   Weights: each neighbour with the same biome contributes +1 multiplier.
+   Base probability for each biome = BASE[fromIdx][biomeIdx].
+   Then for each biome j, if k neighbours are already biome j,
+   its weight gets multiplied by (k+1). Renormalise to 100.
+   Special: if all neighbours are the same biome j, multiplier is 6+1=7,
+   which maps to ~91% after renorm (7 * base / total).
+   The adjacency matrix already encodes geographic plausibility,
+   so we let the multiplier amplify existing weights rather than override.
+*/
+function computeCellProbs(col, row, grid, cols, rows, matrix) {
+  // Collect already-filled neighbours
+  const nbrs = hexNeighbours(col, row, cols, rows)
+    .filter(([c, r]) => grid[r][c] !== null);
+
+  // Count how many neighbours are each biome
+  const nbrCount = new Array(BIOMES.length).fill(0);
+  let refBiome = null;  // most common neighbour biome (for adjacency row)
+  if (nbrs.length > 0) {
+    nbrs.forEach(([c, r]) => nbrCount[grid[r][c]]++);
+    let maxN = 0;
+    nbrCount.forEach((cnt, idx) => { if (cnt > maxN) { maxN = cnt; refBiome = idx; } });
+  }
+
+  // Base probabilities — use majority neighbour as adjacency row, else uniform
+  const baseRow = refBiome !== null ? matrix[refBiome] : new Array(BIOMES.length).fill(Math.round(100/BIOMES.length));
+
+  // Apply multipliers: for each biome j, multiply base weight by (nbrCount[j]+1)
+  // so 0 same neighbours = ×1, 1 = ×2, 2 = ×3 … 6 = ×7  (~91%)
+  const weights = baseRow.map((w, j) => w * (nbrCount[j] + 1));
+
+  // Renormalise to 100
+  const total = weights.reduce((a, b) => a + b, 0);
+  return weights.map(w => w / total);  // float probabilities 0–1
+}
+
+/* ── Weighted random pick from float probability array ── */
+function weightedPick(probs) {
+  const r = Math.random();
+  let cum = 0;
+  for (let i = 0; i < probs.length; i++) {
+    cum += probs[i];
+    if (r <= cum) return i;
+  }
+  return probs.length - 1;
+}
+
+/* ── Generate the map grid ── */
+function generateMap() {
+  const cols = parseInt(document.getElementById('map-cols').value) || 15;
+  const rows = parseInt(document.getElementById('map-rows').value) || 15;
+  const seedBiomeVal = document.getElementById('map-seed-biome').value;
+  const shadow = document.getElementById('map-shadow').value;
+  const scaleMiles = parseInt(document.getElementById('map-scale').value) || 24;
+
+  // Apply scale first (warps diagonals & suppresses implausible transitions),
+  // then rain shadow (shifts forest/arid weights). Order matters.
+  const matrix = applyRainShadow(applyScale(BASE, scaleMiles), shadow);
+
+  mapCols = Math.max(4, Math.min(30, cols));
+  mapRows = Math.max(4, Math.min(30, rows));
+
+  // Initialise grid to null
+  mapGrid = Array.from({length: mapRows}, () => new Array(mapCols).fill(null));
+
+  // Seed A1 (col=0, row=0)
+  let seedIdx = seedBiomeVal === 'random'
+    ? Math.floor(Math.random() * BIOMES.length)
+    : parseInt(seedBiomeVal);
+  mapGrid[0][0] = seedIdx;
+
+  // Fill in reading order: row by row, left to right
+  for (let r = 0; r < mapRows; r++) {
+    for (let c = 0; c < mapCols; c++) {
+      if (r === 0 && c === 0) continue; // already seeded
+      const probs = computeCellProbs(c, r, mapGrid, mapCols, mapRows, matrix);
+      mapGrid[r][c] = weightedPick(probs);
+    }
+  }
+
+  renderHexMap();
+  updateMapLegend();
+  document.getElementById('mapDownloadBtn').disabled = false;
+  const total = mapCols * mapRows;
+  const cfg = SCALE_CONFIG[scaleMiles] || SCALE_CONFIG[24];
+  document.getElementById('mapStatusText').innerHTML =
+    `Map generated — <span>${mapCols} × ${mapRows}</span> hexes`;
+  document.getElementById('mapScaleText').innerHTML =
+    `1 hex = <span>${cfg.label}</span>`;
+  document.getElementById('mapCellCount').innerHTML =
+    `<span>${total}</span> cells &nbsp;·&nbsp; ${cfg.note}`;
+}
+
+/* ── Pointy-top hex corner points ── */
+function hexCorners(cx, cy, size) {
+  const pts = [];
+  for (let i = 0; i < 6; i++) {
+    const ang = Math.PI / 180 * (60 * i - 30);
+    pts.push([cx + size * Math.cos(ang), cy + size * Math.sin(ang)]);
+  }
+  return pts;
+}
+
+/* ── Render the hex map onto the canvas ── */
+function renderHexMap() {
+  const canvas = document.getElementById('hexMapCanvas');
+  const size = HEX_SIZE;
+  const w = Math.sqrt(3) * size;   // hex width  (pointy-top)
+  const h = 2 * size;              // hex height (pointy-top)
+  const colStep = w;
+  const rowStep = h * 0.75;
+  const xOff = w / 2;             // stagger offset for odd rows
+
+  const totalW = Math.ceil(colStep * mapCols + xOff + 4);
+  const totalH = Math.ceil(rowStep * mapRows + h * 0.25 + 4);
+
+  canvas.width  = totalW;
+  canvas.height = totalH;
+
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, totalW, totalH);
+
+  // Dark background
+  ctx.fillStyle = '#080418';
+  ctx.fillRect(0, 0, totalW, totalH);
+
+  for (let r = 0; r < mapRows; r++) {
+    for (let c = 0; c < mapCols; c++) {
+      const biomeIdx = mapGrid[r][c];
+      if (biomeIdx === null) continue;
+      const biome = BIOMES[biomeIdx];
+
+      const cx = 2 + c * colStep + (r % 2 === 1 ? xOff : 0) + w / 2;
+      const cy = 2 + r * rowStep + h / 2;
+
+      const corners = hexCorners(cx, cy, size - 1);
+
+      // Fill
+      ctx.beginPath();
+      ctx.moveTo(corners[0][0], corners[0][1]);
+      for (let i = 1; i < 6; i++) ctx.lineTo(corners[i][0], corners[i][1]);
+      ctx.closePath();
+      ctx.fillStyle = BIOME_FILL[biome.id] || '#444';
+      ctx.fill();
+
+      // Stroke
+      ctx.strokeStyle = BIOME_STROKE[biome.id] || '#666';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Glyph
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = `${Math.round(size * 0.55)}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(BIOME_GLYPH[biome.id] || '?', cx, cy);
+
+      // Coord label (tiny, bottom of hex)
+      if (size >= 24) {
+        const colLetter = String.fromCharCode(65 + c);
+        ctx.fillStyle = 'rgba(255,255,255,0.28)';
+        ctx.font = `${Math.round(size * 0.25)}px 'Courier New', monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(`${colLetter}${r+1}`, cx, cy + size * 0.62);
+      }
+    }
+  }
+}
+
+/* ── Legend ── */
+function updateMapLegend() {
+  const seen = new Set();
+  for (let r = 0; r < mapRows; r++)
+    for (let c = 0; c < mapCols; c++)
+      if (mapGrid[r][c] !== null) seen.add(mapGrid[r][c]);
+
+  const legend = document.getElementById('mapLegend');
+  legend.innerHTML = '<span class="map-legend-label">Biomes</span>';
+  [...seen].sort((a,b) => a-b).forEach(idx => {
+    const b = BIOMES[idx];
+    const item = document.createElement('span');
+    item.className = 'map-legend-item';
+    item.innerHTML = `<span class="map-legend-swatch" style="background:${BIOME_FILL[b.id]};border:1px solid ${BIOME_STROKE[b.id]};"></span>${b.name}`;
+    legend.appendChild(item);
+  });
+}
+
+/* ── Tooltip on hover ── */
+(function setupMapTooltip() {
+  const canvas = document.getElementById('hexMapCanvas');
+  const tooltip = document.getElementById('mapTooltip');
+
+  canvas.addEventListener('mousemove', e => {
+    if (!mapGrid.length) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    const size = HEX_SIZE;
+    const w = Math.sqrt(3) * size;
+    const h = 2 * size;
+    const colStep = w;
+    const rowStep = h * 0.75;
+    const xOff = w / 2;
+
+    // Approximate grid hit — find nearest hex centre
+    let best = null, bestDist = Infinity;
+    for (let r = 0; r < mapRows; r++) {
+      for (let c = 0; c < mapCols; c++) {
+        const cx = 2 + c * colStep + (r % 2 === 1 ? xOff : 0) + w / 2;
+        const cy = 2 + r * rowStep + h / 2;
+        const dist = Math.hypot(mx - cx, my - cy);
+        if (dist < bestDist && dist < size) { bestDist = dist; best = {c, r}; }
+      }
+    }
+
+    if (best) {
+      const {c, r} = best;
+      const idx = mapGrid[r][c];
+      if (idx === null) return;
+      const b = BIOMES[idx];
+      const colLetter = String.fromCharCode(65 + c);
+      document.getElementById('ttCoord').textContent = `${colLetter}${r+1}`;
+      document.getElementById('ttBiome').textContent = b.name;
+      document.getElementById('ttBiome').style.color = BIOME_STROKE[b.id];
+      document.getElementById('ttCluster').textContent = b.cluster.charAt(0).toUpperCase() + b.cluster.slice(1);
+      tooltip.style.left = (e.clientX + 14) + 'px';
+      tooltip.style.top  = (e.clientY - 10) + 'px';
+      tooltip.classList.add('visible');
+    } else {
+      tooltip.classList.remove('visible');
+    }
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    document.getElementById('mapTooltip').classList.remove('visible');
+  });
+})();
+
+/* ── PNG Download ── */
+document.getElementById('mapDownloadBtn').addEventListener('click', () => {
+  const canvas = document.getElementById('hexMapCanvas');
+  const link = document.createElement('a');
+  link.download = `hexmap-${mapCols}x${mapRows}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+/* ── Seed biome dropdown ── */
+(function populateSeedDropdown() {
+  const sel = document.getElementById('map-seed-biome');
+  BIOMES.forEach((b, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = b.name;
+    sel.appendChild(opt);
+  });
+})();
+
+document.getElementById('mapGenerateBtn').addEventListener('click', generateMap);
 
 // ── TABS ─────────────────────────────────────
 document.querySelectorAll('.nav-tab').forEach(btn => {
